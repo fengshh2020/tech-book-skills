@@ -98,13 +98,12 @@ else
   echo "✅ 通过"
 fi
 
-# 5. 中英文间应有空格（抽查前 5 个文件）
+# 5. 中英文间应有空格（检查所有文件）
 echo ""
-echo "--- 检查: 中英文间距（抽查）---"
-SAMPLE=$(ls "$DIR"*.html 2>/dev/null | head -5 || true)
-if [ -n "$SAMPLE" ]; then
+echo "--- 检查: 中英文间距 ---"
+if compgen -G "${DIR}*.html" >/dev/null; then
   # 检测中文紧跟英文（无空格）的常见模式
-  FOUND=$(echo "$SAMPLE" | xargs grep -n '[一-龥][A-Za-z]\|[A-Za-z][一-龥]' 2>/dev/null | head -20 || true)
+  FOUND=$(grep -rn '[一-龥][A-Za-z]\|[A-Za-z][一-龥]' "$DIR"*.html 2>/dev/null | head -20 || true)
   COUNT=$(echo "$FOUND" | grep -c '.' || true)
   if [ "$COUNT" -gt 10 ]; then
     echo "⚠ 可能存在中英文间距问题（>10 处），请人工复查:"
@@ -112,8 +111,6 @@ if [ -n "$SAMPLE" ]; then
   else
     echo "✅ 通过（少量间距问题可忽略）"
   fi
-else
-  echo "⚠ 无 HTML 文件可检查"
 fi
 
 # 6. 导航链接完整性
@@ -302,6 +299,50 @@ if [ -n "$FOUND" ]; then
   echo "$FOUND" | head -10
 else
   echo "✅ 通过"
+fi
+
+# 13. 检查 epub-metadata.json 中 spine 章节是否都有对应输出
+echo ""
+echo "--- 检查: spine 章节覆盖完整性 ---"
+SCRIPT_DIR2="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+META=""
+# 查找最近的 translate run 目录中的 epub-metadata.json
+for RUN_DIR in .book-doc/runs/*-translate-*/; do
+  CANDIDATE="${RUN_DIR}epub-metadata.json"
+  if [ -f "$CANDIDATE" ]; then
+    META="$CANDIDATE"
+  fi
+done
+if [ -z "$META" ] || [ ! -f "$META" ]; then
+  echo "⚠ 未找到 epub-metadata.json，跳过 spine 覆盖检查"
+else
+  FOUND=$(python3 -c "
+import json, glob, os, sys
+meta = json.load(open('${META}'))
+spine = meta.get('spine', [])
+if not spine:
+    print('SKIP: spine 为空')
+    sys.exit(0)
+missing = []
+for item in spine:
+    target = item.get('target', '')
+    if not target:
+        continue
+    path = os.path.join('${DIR}', target)
+    if not os.path.exists(path):
+        missing.append(target)
+if missing:
+    print('MISSING:' + ','.join(missing))
+else:
+    print(f'OK: {len(spine)} spine items all have output files')
+" 2>/dev/null || echo "WARN: spine 覆盖检查执行失败")
+  if echo "$FOUND" | grep -q "^MISSING:"; then
+    MISSING_LIST=$(echo "$FOUND" | sed 's/^MISSING://')
+    echo "❌ spine 中有章节缺少对应输出: $MISSING_LIST"
+    ERRORS=$((ERRORS + 1))
+  else
+    echo "$FOUND"
+  fi
 fi
 
 # 总结

@@ -159,12 +159,13 @@ Extract → Project Spec → Output Scaffold → Translate Chapters → Validate
 
 ### 4b. 章节自检
 
-翻译完成后，对本章执行以下检查。每项检查必须**在 progress.md 中留下具体证据**，不能只写"通过"：
+翻译完成后，对本章执行以下检查。每项检查必须**在 progress.md 中留下具体证据**，不能只写"通过"。遵循 `../shared/progress-protocol.md` 阅读证据协议：
 
 - **段落计数**：读取源文件统计段落数，读取译文统计段落数，对比。记录格式：`ChN 段落: 源 M = 译 M`。不一致时必须找出合并/遗漏的段落并修复。
-- **术语抽查**：从 `.book-doc/spec.md` 术语表抽取 3 个本章出现的术语，验证首次出现有括注且后续一致。记录：`术语: decorator✓ 首现ChN行NN, generator✓ 首现ChN行NN, closure✓ 首现ChN行NN`。
+- **术语全量检查**：遍历 `.book-doc/spec.md` 术语表中**所有**本章出现的术语，验证首次出现有括注且后续一致。记录：`术语: decorator✓ 首现ChN行NN, generator✓ 首现ChN行NN, closure✓ 首现ChN行NN`，列出全部已检查术语，不允许用"等"省略。
 - **翻译腔扫描**：用 `../shared/translationese-patterns.md` 的正则逐个搜索本章 HTML。记录：`翻译腔: 0命中` 或 `翻译腔: "正如你" 行234 已修复`。
 - **代码完整性**：代码注释已翻译、代码清单编号连续、图片路径存在。记录具体验证的代码清单编号范围。
+- **内容校验**：从译文中抽取一段核心段落的首行和末行，记录原文和译文对照。这证明你实际打开并对比了源文件和译文，不是凭记忆填写。
 
 ### 4c. 修复与写入
 
@@ -178,7 +179,7 @@ Extract → Project Spec → Output Scaffold → Translate Chapters → Validate
 关卡（逐项在 progress.md 留下证据，5 项全过才继续下一章）：
 ① 首行 `<!-- translated: complete -->` 标记
 ② 段落计数一致（源 = 译）
-③ 术语抽查通过（3 个术语 ✓）
+③ 术语全量检查通过（列出所有已检查术语）
 ④ 翻译腔 0 命中
 ⑤ progress.md 已更新（含具体证据）
 
@@ -190,11 +191,11 @@ Extract → Project Spec → Output Scaffold → Translate Chapters → Validate
 "${SKILL_DIR}/scripts/validate_format.sh" output/
 ```
 
-再做手动抽查：
+再做全量检查：
 
-- 随机 3-5 章代码块，确认翻译没有改变代码行为。
-- 打开封面、目录和至少 1 个正文页，测试导航和代码渲染。
-- 抽查 5 个关键术语的全文一致性。
+- 逐章对比代码块，确认翻译没有改变代码行为。对比方式：提取源文件和译文的所有代码块，逐块对比非注释部分是否一致。
+- 打开封面、目录和所有正文页，测试导航和代码渲染。
+- 全量术语一致性检查：遍历术语表所有术语，确认全文统一。
 
 所有失败项必须修复或写入 `report.md` 的已知限制。
 

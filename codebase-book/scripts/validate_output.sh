@@ -114,6 +114,50 @@ else
 fi
 
 echo ""
+echo "--- coverage table vs output ---"
+CHAPTER_PLAN=""
+for RUN_DIR in .book-doc/runs/*-codebase-*/; do
+  CANDIDATE="${RUN_DIR}chapter-plan.md"
+  if [ -f "$CANDIDATE" ]; then
+    CHAPTER_PLAN="$CANDIDATE"
+  fi
+done
+if [ -z "$CHAPTER_PLAN" ] || [ ! -f "$CHAPTER_PLAN" ]; then
+  echo "WARN: no chapter-plan.md found, skipping coverage check"
+else
+  FOUND=$(python3 -c "
+import re, glob, os, sys
+plan = open('${CHAPTER_PLAN}').read()
+# Find source file references in coverage table
+src_files = re.findall(r'\|\s*([A-Za-z0-9_./-]+\.[A-Za-z0-9]+)\s*\|', plan)
+# Deduplicate
+src_files = list(dict.fromkeys(src_files))
+if not src_files:
+    print('WARN: no source files found in coverage table')
+    sys.exit(0)
+html_files = set(os.path.basename(f) for f in glob.glob('${DIR}*.html'))
+# Check that each HTML page in output has content (not just a stub)
+stubs = []
+for f in sorted(glob.glob('${DIR}*.html')):
+    size = os.path.getsize(f)
+    if size < 200:
+        stubs.append(f'{os.path.basename(f)}: {size} bytes (possible stub)')
+if stubs:
+    print('STUB:' + ','.join(stubs))
+else:
+    print(f'OK: {len(html_files)} output pages, {len(src_files)} source files in coverage table')
+" 2>/dev/null || echo "WARN: coverage check failed")
+  if echo "$FOUND" | grep -q "^STUB:"; then
+    STUB_LIST=$(echo "$FOUND" | sed 's/^STUB://')
+    echo "FAIL: suspiciously small output files (possible stubs)"
+    echo "$STUB_LIST"
+    ERRORS=$((ERRORS + 1))
+  else
+    echo "$FOUND"
+  fi
+fi
+
+echo ""
 echo "--- script syntax ---"
 if command -v node >/dev/null 2>&1 && [ -s "${DIR}script.js" ]; then
   if node -c "${DIR}script.js" >/dev/null 2>&1; then

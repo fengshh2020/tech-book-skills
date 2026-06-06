@@ -226,8 +226,8 @@ def validate_book_skill_contracts() -> None:
         fail("review-tech-book spec must define mode-specific report scope")
     if "补缺模式" not in translate_skill:
         fail("translate-book must define missing-chapter mode to skip unnecessary full-book setup")
-    if "不建立全书知识库" not in integrate_skill:
-        fail("integrate-books quick mode must skip full-book knowledge base construction")
+    if "缩小的是修改范围，不是阅读范围" not in integrate_skill:
+        fail("integrate-books quick mode must read all content to detect conflicts, only narrowing modification scope")
     codebase_skill = (ROOT / "codebase-book" / "SKILL.md").read_text(encoding="utf-8")
     if "范围分层" not in codebase_skill or "核心路径优先" not in codebase_skill:
         fail("codebase-book must avoid full-depth analysis for every file by using scope tiers")
