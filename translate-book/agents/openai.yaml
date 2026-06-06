@@ -1,0 +1,4 @@
+interface:
+  display_name: "Translate Book"
+  short_description: "Translate technical books into Chinese HTML"
+  default_prompt: "Use $translate-book to translate this EPUB technical book into a Chinese HTML site."

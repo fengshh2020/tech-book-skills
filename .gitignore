@@ -1,0 +1,29 @@
+# Runtime state
+.remember/
+.book-doc/
+
+# Output
+output/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# EPUB extraction cache
+.cache/
+epub_extract/
+
+# Node
+node_modules/
