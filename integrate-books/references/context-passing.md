@@ -1,93 +1,208 @@
-# 上下文传递协议
+# Context Passing Protocol
 
-长流程中 LLM 会在阶段间丢失上下文。本协议通过结构化的阶段摘要和进度文件解决这个问题。
+LLMs lose context across phases in long workflows. This protocol solves the problem through structured phase summaries and a progress file.
 
-所有文件都在当前运行目录 `.book-doc/runs/{id}/` 下。
+All files reside under the current run directory `.book-doc/runs/{id}/`.
 
-## 两个文件，两个职责
+## Two Files, Two Responsibilities
 
-| 文件 | 职责 | 谁写 | 谁读 |
-|------|------|------|------|
-| `progress.md` | 进度追踪：哪些阶段/章节已完成，断点在哪 | 每个步骤完成时更新 | 恢复时读取，判断从哪里继续 |
-| `context-summary.md` | 知识传递：跨阶段的关键发现和决策 | 每个阶段完成时追加 | 下一阶段开始时读取，获取上下文 |
+| File | Responsibility | Who Writes | Who Reads |
+|------|---------------|------------|-----------|
+| `progress.md` | Progress tracking: which phases/chapters are done, where to resume | Updated after each step completes | Read on resume to determine where to continue |
+| `context-summary.md` | Knowledge transfer: cross-phase key findings and decisions | Appended after each (sub-)phase completes | Read at the start of the next phase to acquire context |
 
-**progress.md 解决"做到哪了"**，**context-summary.md 解决"知道了什么"**。两者互补，不可互相替代。
+**progress.md answers "where are we"**, **context-summary.md answers "what do we know"**. They complement each other and cannot substitute for one another.
 
-## 核心原则
-每个阶段结束时，产出一份 `context-summary.md`（≤120 行）。下一阶段开始时**只读这份摘要 + 当前阶段的参考文件**，不需要回读之前阶段的完整产出。
+## Core Principle
 
-## 各阶段摘要格式
+At the end of each sub-phase, append a section to `context-summary.md` (each section ≤150 lines). When the next sub-phase starts, **read only this summary + the reference files for the current sub-phase**; there is no need to re-read the full output of prior sub-phases.
 
-### 阶段 1 结束 → `context-summary.md`
+## Sub-Phase Context Tracking
+
+Each sub-phase completion appends a structured section to `context-summary.md`. This ensures fine-grained knowledge continuity even within a single phase.
+
+### Phase 0 Sub-Phases
+
+| Sub-Phase | Description | Context Contributed |
+|-----------|-------------|---------------------|
+| 0.1 | File verification & index loading | Source file paths, index row counts, any missing files |
+| 0.2 | Per-book deep reading | Per-Book Core Methodology, style observations |
+| 0.3 | Cross-book comparison | Key Findings, methodology conflicts, complementarities |
+| 0.4 | Style baseline extraction | Style Baseline Points, prose patterns, code conventions |
+| 0.5 | Integration challenge identification | Potential Integration Challenges, gap list |
+
+### Phase 1 Sub-Phases
+
+| Sub-Phase | Description | Context Contributed |
+|-----------|-------------|---------------------|
+| 1.1 | Target reader definition | Target Reader, assumptions, use cases |
+| 1.2 | Per-book role assignment | Per-Book Role, rationale for each assignment |
+| 1.3 | Skeleton construction | Final Skeleton, volume/chapter breakdown |
+| 1.4 | Methodology decisions | Key Methodology Decisions, evidence for each choice |
+| 1.5 | Exclusion & scope | Exclusion Scope, downgrade rationale |
+| 1.6 | Plan statistics & finalization | Integration Plan Statistics, estimated increment |
+
+### Phase 2 Per-Chapter Sub-Phases
+
+| Sub-Phase | Description | Context Contributed |
+|-----------|-------------|---------------------|
+| 2.1 | Chapter plan review | Chapter-specific source mapping, methodology selection |
+| 2.2 | Content synthesis | Draft length, integration markers placed, code block count |
+| 2.3 | Self-review & gate check | Gate results (G1-G6), issues found and resolutions |
+| 2.4 | Chapter completion record | Final length, all gate passes, notes |
+
+Each per-chapter sub-phase appends chapter-specific context so that subsequent chapters can reference decisions made in earlier chapters without re-reading the full output.
+
+## Per-Phase Summary Format
+
+### Phase 0 Sub-Phase Completion → append to `context-summary.md`
+
+Each sub-phase (0.1-0.5) appends its own section. The complete Phase 0 contribution looks like:
 
 ```markdown
-# 知识提取摘要
+# Deep Reading Summary
 
-## 源书概况
-- [源书1]: [N] 章，[M] 个知识点
-- [源书2]: [N] 章，[M] 个知识点
+## Source Book Overview
+- [Source Book 1]: [N] chapters, index [M] rows, role [mainline/reinforcement/specialty/reference]
+- [Source Book 2]: [N] chapters, index [M] rows, role [...]
+- [Source Book 3]: [N] chapters, index [M] rows, role [...]
 
-## 覆盖热区
-- [概念]：[源书1] Ch3 + [源书2] Ch5
-- [概念]：[源书1] Ch7 + [源书3] Ch2
+## Per-Book Core Methodology
+- [Source Book 1]: [one-sentence summary of teaching approach]
+- [Source Book 2]: [one-sentence summary of teaching approach]
+- [Source Book 3]: [one-sentence summary of teaching approach]
 
-## 覆盖缺口
-- [概念]：仅 [源书2] 覆盖，主书缺
-- [概念]：三本书均未深入
+## Key Findings
+- [Important insights discovered during reading, e.g.: Book A and Book B have fundamentally different methodologies on topic X]
+- [...]
 
-## 关键发现
-- [提取中发现的重要问题或洞察]
+## Style Baseline Points
+- [Summary of each book's style characteristics, for later style harmonization]
+
+## Potential Integration Challenges
+- [Expected difficulties during integration]
 ```
 
-### 阶段 2 结束 → 追加到 `context-summary.md`
+Individual sub-phase contributions:
+
+- **Sub-phase 0.1** appends: Source Book Overview
+- **Sub-phase 0.2** appends: Per-Book Core Methodology
+- **Sub-phase 0.3** appends: Key Findings
+- **Sub-phase 0.4** appends: Style Baseline Points
+- **Sub-phase 0.5** appends: Potential Integration Challenges
+
+### Phase 1 Sub-Phase Completion → append to `context-summary.md`
+
+Each sub-phase (1.1-1.6) appends its own section. The complete Phase 1 contribution looks like:
 
 ```markdown
-## 映射结果
+## Architecture Design Summary
 
-### 高冲突区（需重点处理）
-- [概念]：[源书1] 译法 A vs [源书2] 译法 B
-- [概念]：API 签名不一致（v3.8 vs v3.12）
+### Target Reader
+- Assumptions: ...
+- Use cases: ...
 
-### 已确定的统一译法
-| 英文 | 统一译法 | 出处 |
-|------|----------|------|
-| ... | ... | ... |
+### Per-Book Role
+- [Source Book 1]: [mainline/reinforcement/specialty/excluded], rationale...
+- [Source Book 2]: [mainline/reinforcement/specialty/excluded], rationale...
+
+### Final Skeleton
+- Volumes: [list]
+- Core path: [chapter range]
+- Support path: [chapter range]
+- Advanced path: [chapter range]
+
+### Key Methodology Decisions
+- [Topic A]: chose [Source Book X]'s methodology, because [rationale]
+- [Topic B]: redesigned, because [rationale]
+
+### Exclusion Scope
+- [Topic]: exclusion/downgrade rationale
+
+### Integration Plan Statistics
+- Total chapters: [N]
+- New chapters: [list]
+- Estimated increment: [N] lines
 ```
 
-### 阶段 3 结束 → 追加到 `context-summary.md`
+Individual sub-phase contributions:
+
+- **Sub-phase 1.1** appends: Target Reader
+- **Sub-phase 1.2** appends: Per-Book Role
+- **Sub-phase 1.3** appends: Final Skeleton
+- **Sub-phase 1.4** appends: Key Methodology Decisions
+- **Sub-phase 1.5** appends: Exclusion Scope
+- **Sub-phase 1.6** appends: Integration Plan Statistics
+
+### Phase 2 Per-Chapter Completion → append to `progress.md`
 
 ```markdown
-## 整合计划摘要
-- 新增章节：[列表]
-- 新增边栏：[N] 个
-- 预估增量：[N] 行
-
-## 风格基线要点
-- 叙事风格：[核心特征]
-- 代码风格：[核心特征]
-- 术语约定：[核心特征]
+## Ch[N] Completion Record
+- Completed at: YYYY-MM-DD HH:MM
+- Gate results: G1-G6 [pass/pass/pass/pass/pass/pass]
+- Integration markers: [N]
+- Code blocks: [N]
+- Chapter length: [N] lines
+- Notes: [if issues arose, record how they were handled]
 ```
 
-## 读取规则
+Phase 2 per-chapter sub-phase context appended to `context-summary.md`:
 
-所有路径相对于当前运行目录 `.book-doc/runs/{当前运行ID}/`。
+```markdown
+## Ch[N] Context
+- Source mapping: [which source books contributed, roles]
+- Methodology applied: [which teaching approach, with evidence]
+- Key decisions: [chapter-specific methodology or content choices]
+- Cross-references: [terms/concepts bridging to other chapters]
+```
 
-| 阶段 | 必读 | 按需读 |
-|------|------|--------|
-| 恢复/启动 | progress.md | — |
-| 2 | progress.md + context-summary.md（阶段1部分） | references/integration-discipline.md, .book-doc/knowledge_base/ |
-| 3 | progress.md + context-summary.md（阶段1-2部分） | references/synthesis-methodology.md, .book-doc/knowledge_base/ |
-| 4 | progress.md + context-summary.md（阶段1-3部分） | 当前章的知识点条目 + plan.md 当前章部分 |
-| 5 | progress.md + context-summary.md（全文） | review-tech-book skill |
+Individual sub-phase contributions for each chapter:
 
-## 阶段 4 的自包含指令块
+- **Sub-phase 2.1** appends: Source mapping and methodology selection
+- **Sub-phase 2.2** appends: Draft statistics (length, markers, code blocks)
+- **Sub-phase 2.3** appends: Gate results and issue resolutions
+- **Sub-phase 2.4** appends: Final completion record
 
-阶段 4 的每章执行改为自包含：整合指令中包含该章需要的所有信息，不需要回读其他文件。`plan.md` 中每章的指令块应该包含：
+### Phase 3 Completion → append to `context-summary.md`
 
-1. 当前章节状态（现有内容和结构）
-2. 待整合知识点（使用知识库条目 ID 引用，如 `[FP/Ch3/item-12]`，执行时按需读取对应条目）
-3. 整合指令（新增/替换/改写）
-4. 风格基线示例（1-2 段主书原文）
-5. 相关术语约定（该章涉及的术语）
+```markdown
+## Validation Results Summary
+- Coverage: [N]%
+- Terminology consistency: [pass / issue count]
+- Code runnability: [N/M passed]
+- Style consistency: [pass / issue count]
+- Known limitations: [list]
+```
 
-**为什么用 ID 引用而非内联摘要**：知识库条目可能很长（单条 500-2000 字），内联到 plan.md 会导致其膨胀至不可管理的规模。ID 引用保持 plan.md 精简，执行阶段按需读取实际内容。
+## Reading Rules
+
+All paths are relative to the current run directory `.book-doc/runs/{current-run-id}/`.
+
+| Phase | Must Read | Read on Demand |
+|-------|-----------|----------------|
+| Start / Resume | progress.md | -- |
+| 0.1 | progress.md | references/knowledge-index-format.md |
+| 0.2-0.5 | progress.md + context-summary.md (prior sub-phases) | references/agent-orchestration.md |
+| 1.1 | progress.md + context-summary.md (Phase 0 section) | all knowledge indexes |
+| 1.2-1.6 | progress.md + context-summary.md (Phase 0-1, prior sub-phases) | all knowledge indexes, references/book-architecture.md |
+| 2.1 | progress.md + context-summary.md (Phase 0-1 sections) + current chapter's plan.md section | relevant knowledge index chapters |
+| 2.2-2.4 | progress.md + context-summary.md (Phase 0-1 + prior Ch sections) + current chapter's plan.md section | references/full-integration.md |
+| 3 | progress.md + context-summary.md (full) | references/quality-gate.md |
+| 4 | progress.md + context-summary.md (full) | ../shared/report-templates.md |
+
+Key rule: when starting any sub-phase, read the `context-summary.md` sections produced by all prior sub-phases (within the same phase and earlier phases) to maintain continuity. Do not re-read raw outputs from earlier sub-phases.
+
+## Self-Contained Instruction Block for Phase 2
+
+Each chapter execution in Phase 2 is self-contained: the integration instructions include all information the chapter needs, with no need to re-read other files. The instruction block for each chapter in `plan.md` should contain:
+
+1. Current chapter state (existing content and structure)
+2. Source mapping (which source books contribute what content, and their roles)
+3. Methodology selection (which book's teaching approach is chosen, with evidence)
+4. Depth alignment strategy (target depth, how each source's content aligns)
+5. Content synthesis plan (section-by-section instructions)
+6. Style baseline samples (1-2 paragraphs from the primary book's original text)
+7. Relevant terminology conventions (terms involved in this chapter)
+8. Concept bridging (connection to previous chapter, internal bridges, setup for next chapter)
+
+**Knowledge indexes are read on demand**: the source mapping in `plan.md` indicates which chapters of which knowledge indexes to read. During Phase 2 execution, read them on demand rather than loading everything upfront.

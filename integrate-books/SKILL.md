@@ -1,202 +1,281 @@
 ---
 name: integrate-books
-description: "Use when merging/synthesizing content from multiple technical books into one main book. Trigger on: 整合多本书, 补充源书到主书, merge books, enrich chapters, combine sources. Do NOT trigger for: translating a single book (use translate-book), quality review (use review-tech-book), single-file edits, or content not from another book."
+description: "Merge multiple technical books into one unified book. Trigger: integrate books, merge books, combine sources, enrich chapters. Do NOT trigger for: single book translation (use translate-book), quality review (use review-tech-book)."
 ---
 
 # Integrate Books
 
-将多本同领域技术书籍的核心知识整合到一本主书中，产出内容更完整、深度更均衡、风格一致的新版本。
+Merge multiple technical books into one unified book. Output must read like a single book, not a collage.
 
-## 核心约束
+## Workflow
 
-**整合后必须像一本书，而不是多本书的摘录拼接**。读者不应能分辨出哪些段落来自哪本书——如果读者能看出来，说明风格适配和去重没做好。这是整合失败的标志。
-
-**每条新增知识都有三个属性**：来源（哪本书哪个章节）、位置（放在主书哪里）、读者收益（读者看了之后能做什么之前做不到的事）。缺少任意一个属性的新增内容是冗余。
-
-**重复内容必须合并或交叉引用**。如果同一个概念在两章都有完整讲解，读者会被迫读两遍同样的东西。合并时保留更完整或更清晰的版本，另一个改为交叉引用。
-
-**风格必须适配主书基线**。从源书摘录的段落不能保留源书的语气、用词密度和叙述节奏——必须改写为主书的风格。具体方法见 `references/synthesis-methodology.md`。
-
-## 引用文件
-
-每个阶段开始前执行该阶段的读取指令。
-
-| 阶段 | 必读文件 | 读取目标 |
-|------|----------|----------|
-| 启动 | `../shared/progress-protocol.md` | 运行发现和恢复协议 |
-| 启动 | `../shared/runtime-pruning.md` | 运行时剪枝和停止条件 |
-| 启动 | `../shared/agent-compatibility.md` | 路径变量 |
-| 阶段 1 | `references/knowledge-entry-format.md` | 知识点条目格式 |
-| 阶段 2 | `references/integration-discipline.md` | 去重、来源、风格适配规则 |
-| 阶段 2 | `../shared/verification-levels.md` | V1-V4 验证等级 |
-| 阶段 3 | `references/synthesis-methodology.md` | 叙事整合方法 |
-| 阶段 3 | `references/context-passing.md` | 阶段间上下文传递 |
-| 阶段 4 | 当前章的 plan.md 指令块 | 整合指令 |
-| 阶段 4 | `../shared/quality-ownership.md` | 整合阶段质量责任 |
-| 阶段 5 | `scripts/check_coverage.sh` | 覆盖率校验 |
-| 报告 | `../shared/report-templates.md` | 报告模板 |
-
-## 运行状态
-
-先执行共享进度协议，使用 run slug `integrate`。运行目录形如：
-
-```text
-.book-doc/runs/{YYYYMMDD}-integrate-{label}/
+```
+Phase 0: Deep Reading → Phase 1: Architecture → Phase 2: Chapter Generation → Phase 3: Validation → Phase 4: Report
 ```
 
-本 skill 的关键状态：
+**Phase lock**: Run `python scripts/workflow.py integrate-books <run_dir> check_gate <phase> [<sub_phase>] [chapter]` before entering any phase/sub-phase. If gate fails, fix and retry. Do not proceed.
 
-- run 目录内：`progress.md`、`context-summary.md`、`plan.md`、`report.md`
-- 跨轮次知识库：`.book-doc/knowledge_base/`
-- 主书输出：默认 `output/`，除非用户指定
+**Sub-agent constraints**: See `references/agent-orchestration.md`. Max concurrent agents: 5. Respect dependency ordering.
 
-幂等性检查：
+## Phase 0: Deep Reading (5 Sub-phases)
 
-- 阶段 1：`.book-doc/knowledge_base/` 下源书知识点文件与 `progress.md` 源书列表一致。
-- 阶段 2：`.book-doc/knowledge_base/INDEX/dsp_mapping.md` 和 `gaps.md` 存在。
-- 阶段 3：当前 run 的 `plan.md` 存在，且每章指令自包含。
-- 阶段 4：目标 HTML `<head>` 含 `<!-- integrated: ... -->` 标记，且标记覆盖计划中的知识点 ID。
-- 阶段 5：当前 run 的 `report.md` 存在且记录校验结果。
+**Auto-load**: `references/knowledge-index-format.md`, `references/agent-orchestration.md`
 
-## 模式
+### 0.1 Book Inventory
+- List all source books with chapter structure
+- Record: book name, chapter count, total pages, file paths
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.1`
 
-### 全量整合
+### 0.2 Per-Book Reading
+- For each book: read EVERY chapter in order (no skipping, no title-only inference)
+- One agent per book, max 3 books parallel
+- For web sources: follow links within a chapter before moving to next
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.2`
 
-用于多本源书整合到主书。执行完整五阶段流程，建立全书知识库、冲突映射、逐章计划和最终校验。
+### 0.3 Index Generation
+- Generate knowledge index per book following `references/knowledge-index-format.md`
+- Each index >= 1000 lines, covering:
+  - Per-chapter content analysis (topics, sequence, emphasis)
+  - Methodology and teaching approach
+  - Explanation depth calibration
+  - Boundary mapping (scope limits, prerequisites)
+  - Unique insights and perspectives
+  - Code example inventory (count, quality, patterns)
+  - Cross-reference map
+  - Style and tone profile
+  - Integration readiness assessment
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.3`
 
-### 快速模式
+### 0.4 Coverage Comparison
+- Compare indexes across books
+- Identify: overlaps, gaps, unique contributions, depth differences
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.4`
 
-用户明确指定源书和目标章节，或使用"补充""添加"且范围限定时启用快速模式。
-
-快速模式缩小的是修改范围，不是阅读范围。为了发现新增内容与主书已有内容的冲突，快速模式仍需通读主书和源书的相关内容：
-
-- 阶段 1：通读源书全部内容提取知识点，但只为目标章节建立详细条目。
-- 阶段 2：通读主书全部内容，检测目标章节知识点与主书已有内容的术语冲突、概念重叠和视角差异。不建立全书映射表，但冲突检测结果不能省略。
-- 阶段 3：只制定目标章节指令。
-- 阶段 4：只修改目标章节。
-- 阶段 5：校验目标章节 + 主书相邻章节的术语和风格一致性。
-
-仍需在 `progress.md` 记录跳过条件、源书范围、目标章节和通读范围。
-
-## 流程
-
-```text
-Extract Knowledge → Map Conflicts → Plan Integration → Apply Chapter Changes → Validate → Report
-```
-
-每阶段结束写 `context-summary.md`（≤120 行）并更新 `progress.md`。下阶段只读 `progress.md`、`context-summary.md` 和当前阶段必要参考文件。
-
-## 阶段 1：提取知识
-
-**读取 `references/knowledge-entry-format.md`**。
-
-目标：从源书提取可追踪知识点。
-
-1. 查找最新 completed 的 `*-translate-*` 报告；若源书仍是 EPUB，先要求 translate-book 或经用户确认后从英文提取并在阶段 4 翻译表达。
-2. 为每本源书在 `.book-doc/knowledge_base/` 下创建子目录。
-3. 按知识点条目格式每章提取 5-15 个知识点。判断标准：读者未来会独立查找、引用或迁移这个知识点吗？如果不会，它可能不是独立知识点。
-4. 运行：
-
+### 0.5 Gate 0
 ```bash
-"${SKILL_DIR}/scripts/check_coverage.sh" .book-doc/knowledge_base/ output/ stage1
+python scripts/workflow.py integrate-books <run_dir> check_gate 0
+```
+- Every source book has index file in `.book-doc/knowledge_base/`
+- Each index >= 1000 lines
+- Each index contains all required sections
+- Reading evidence exists for every chapter
+
+**Reading evidence** (record in progress.md for each chapter):
+```markdown
+### [BookName] Ch[N] Read Evidence
+- Paragraphs: [count]
+- Code blocks: [count]
+- Core concepts: [list >=3 specific terms]
+- Unique to this book: [what this chapter contributes uniquely]
 ```
 
-关卡：所有目标源书章节已提取或明确排除，覆盖统计已写入，`context-summary.md` 已更新。
+**THIS PHASE IS THE FOUNDATION. Do not proceed until every index is verified.**
 
-**阅读证据**（遵循 `../shared/progress-protocol.md`）：提取知识点时必须逐章打开源文件阅读，不允许凭目录或标题推断内容。每章提取记录中必须包含结构证据（该章节的段落数或核心概念数），作为已实际阅读的证明。
+## Phase 1: Architecture Design (6 Sub-phases)
 
-## 阶段 2：映射冲突
+**Auto-load**: `references/book-architecture.md`, all knowledge indexes from Phase 0
 
-**读取 `references/integration-discipline.md` 和 `../shared/verification-levels.md`**。
+### 1.1 Load Indexes
+- Read ALL knowledge indexes completely (do not skim)
+- Record read confirmation with structure evidence
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.1`
 
-目标：识别术语冲突、内容重叠、覆盖缺口和风格基线。
+### 1.2 Cross-Book Analysis
+- Methodology comparison: how each book approaches same topic
+- Depth alignment: where books overlap at different depths
+- Boundary complementarity: where one book's limits are another's strengths
+- Style reconciliation: identify and resolve style conflicts
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.2`
 
-1. 交叉比对知识点，标记术语冲突、重复概念、视角差异。
-2. 写 `.book-doc/knowledge_base/INDEX/dsp_mapping.md`，将主书章节映射到知识点 ID。
-3. 写 `.book-doc/knowledge_base/INDEX/gaps.md`，记录主书有源书无、源书有主书无和处置决策。
-4. 通读主书全部章节，基于通读结果从不同位置（前/中/后）各提取 2-3 段作为风格基线样本。风格基线需要记录：平均句长、术语密度、叙述节奏（先概念后示例 vs 先示例后概念）、技术深度预期、风格是否跨章节变化。
+### 1.3 Target TOC
+- Design target table of contents
+- Each chapter must have clear purpose and source mapping
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.3`
 
-关卡：术语冲突有统一方案，覆盖缺口有处置决策，知识库条目映射率是否 ≥95% 的风险已记录。
+### 1.4 Per-Chapter Plans
+For EACH chapter, write detailed integration plan:
+- Source contribution map (primary/secondary/reference)
+- Methodology choice with justification
+- Depth target and achievement strategy
+- Content synthesis strategy
+- Gap filling requirements
+- Dependency chain
+- Expected output (length, code count, key concepts)
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.4`
 
-## 阶段 3：规划整合
+### 1.5 Reverse Coverage
+- Build reverse coverage matrix
+- Every source chapter must map to: target chapter / sidebar / appendix / explicit exclusion
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.5`
 
-**读取 `references/synthesis-methodology.md` 和 `references/context-passing.md`**。
-
-目标：生成逐章可执行整合指令。
-
-对主书每章制定指令：新增、替换、改写、新增边栏或不处理。
-
-每章指令必须包含：
-
-- 知识点 ID 列表（来自阶段 1-2 的映射）
-- 目标位置（在主书哪一段之后插入，或替换哪一段）
-- 整合方式（新增/替换/改写/边栏）
-- 来源证据（源书原文摘录）
-- 术语约定（使用统一术语表中的哪个译法）
-- 风格适配要求（参照风格基线的哪些特征）
-- 去重说明（与主书已有内容的重叠部分如何处理）
-
-写当前 run 的 `plan.md`。
-
-关卡：每章指令自包含（不需要回头查阶段 1-2 的文件就能执行），净增量估算完成，非处理章节有跳过理由。执行阶段完成协议。
-
-## 阶段 4：执行章节修改
-
-对每章：
-
-1. 读取 `plan.md` 当前章指令块、目标 HTML、必要知识点条目。
-2. 执行新增/替换/改写/边栏。改写时参照阶段 2 的风格基线调整语气和节奏。
-3. 写入整合标记：
-
-```html
-<!-- integrated: [源书]Ch3-[知识点ID], [源书]Ch5-[知识点ID] -->
-```
-
-4. 更新学习目标、代码清单编号、跨章链接。
-
-每章修改完成后立即执行去重验证（不能跳到下一章）。去重验证**必须在 progress.md 留下证据**：
-
-- **重复检测**：读取修改后的 HTML，搜索同一概念的完整讲解是否出现两次。记录：`ChN 去重: "生成器" Ch7行120 + Ch9行340 → 合并为交叉引用` 或 `ChN 去重: 0重复`。
-- **风格一致性**：检查新增段落与前后文的语气、深度和术语是否一致。记录：`ChN 风格: 新增段落句长均值28字 vs 基线25字, 可接受`。
-- **代码标注**：检查新增代码块的验证等级标注（V1-V3），无标注则补上。记录：`ChN 代码: 新增3块, V2标注完成`。
-
-关卡（读取修改后 HTML 逐项确认并留证据）：
-① 整合标记覆盖 plan.md 中所有知识点 ID
-② 无重复完整讲解（去重证据已记录）
-③ 新增代码标注 V1-V3
-④ 术语与统一术语表一致
-⑤ progress.md 已更新（含具体证据）
-
-## 阶段 5：校验
-
-运行：
-
+### 1.6 Gate 1
 ```bash
-"${SKILL_DIR}/scripts/check_coverage.sh" .book-doc/knowledge_base/ output/ stage5
+python scripts/workflow.py integrate-books <run_dir> check_gate 1
+```
+- `source-architecture.md` exists with all required sections
+- `plan.md` exists with per-chapter integration plan for EVERY target chapter
+- Each plan contains: source map, methodology choice, depth target, synthesis strategy, gap list, dependency chain
+- Reverse coverage matrix accounts for 100% of source chapters
+- No "TBD" or placeholder text
+
+## Phase 2: Chapter Generation (5 Sub-phases per Chapter)
+
+**Auto-load**: `references/full-integration.md`, `references/agent-orchestration.md`
+
+### 2.1 Load Plan + Sources
+- Load chapter's integration plan from plan.md
+- Load relevant knowledge index sections
+- Load style baseline from source-architecture.md
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.1 <chapter>`
+
+### 2.2 Deconstruct & Rewrite
+Execute 5-step rewrite:
+1. Deconstruct all sources' relevant content
+2. Design new section structure (do not reuse any source's original structure)
+3. Assign primary/secondary sources per section
+4. Rewrite in unified style
+5. Add markers: `<!-- integrated: [source]Ch[N]-[id] -->`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.2 <chapter>`
+
+### 2.3 Quality Gate (G1-G8)
+```bash
+python scripts/workflow.py integrate-books <run_dir> check_gate 2 <chapter>
 ```
 
-再执行：
+| Check | Pass Criteria | Fail Action |
+|-------|--------------|-------------|
+| G1: Coverage | All plan.md IDs have markers | Rewrite chapter |
+| G2: Code quality | New code has V1-V3 tags | Add tags + verify |
+| G3: Style match | No translationese, matches baseline | Rewrite sections |
+| G4: No duplicates | No repeated explanations | Merge/cross-ref |
+| G5: Narrative flow | Transitions natural, arc complete | Rewrite |
+| G6: Depth match | Matches plan's depth target | Expand or trim |
+| G7: Source ratio | >=3 markers per 1000 words | Add source integration |
+| G8: Output size | >= 80% of max source chapter size | Expand content |
 
-- 术语一致性全量校验。
-- 代码块可运行性验证覆盖所有修改过的章节（不能只抽查部分章节）。
-- 连续阅读 3 章检查风格一致性、重复度和拼贴感。
-- 对照 `plan.md` 确认每个目标知识点有处置。
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.3 <chapter>`
 
-覆盖率低于 95% 必须修复后重跑，不能只写警告。
+### 2.4 Progress Record
+- Record gate results in progress.md
+- Only proceed to next chapter if gate PASSES
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.4 <chapter>`
 
-所有失败项必须修复或写入已知限制。
+### 2.5 Batch Check (Every 5 Chapters)
+```bash
+python scripts/workflow.py integrate-books <run_dir> check_gate 2b
+```
+- Cross-chapter terminology consistent
+- Source unidentifiable test (3 random paragraphs from different chapters)
+- Narrative arc connects across chapters
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.5 batch`
 
-## 阶段 6：报告
+**Sub-agent strategy**:
+- One chapter at a time (sequential)
+- Within a chapter: max 3 section agents parallel
+- Failed gate = rewrite chapter (do not accumulate fixes)
 
-**读取 `../shared/report-templates.md`** 的 integrate-books 段。
+**Output**: `output/{chapter}.html` files, one per chapter
 
-在当前 run 写 `report.md`。
+**Fail = rewrite chapter. Do not proceed. Do not accumulate issues for Phase 3.**
 
-完成后将 `progress.md` 状态改为 `completed`。
+## Phase 3: Validation
 
-## 质量标准
+**Do**:
+1. Run coverage validation across all chapters
+2. Term consistency check (full book grep)
+3. Code runnability check (all code blocks)
+4. Style consistency (read 3 consecutive chapters from different parts)
+5. Cross-reference integrity (all chapter links valid)
+6. Reverse coverage: verify 100% source material accounted for
 
-- 整合后的书像一本书，而不是多本书摘录拼接。
-- 每条新增知识都有来源、位置和读者收益。
-- 重复内容被合并或交叉引用，不让读者反复读同一解释。
-- 输出可被 review-tech-book 通过 `.book-doc/runs/*-integrate-*/report.md` 接续审阅。
+**Coverage Guardian checks**:
+```bash
+python scripts/workflow.py integrate-books <run_dir> coverage_report
+python scripts/workflow.py integrate-books <run_dir> coverage_guard
+```
+
+**Auto-check scripts**:
+```bash
+python scripts/validate_tech.py output/
+python scripts/validate_terms.py output/
+python scripts/workflow.py integrate-books <run_dir> check_gate 3
+```
+
+**Gate**:
+- Coverage >= 95%
+- All terms consistent
+- All code runnable
+- All cross-references valid
+- No style jumps between chapters
+- Coverage Guardian: no chapter below floor (10% of total markers)
+- Coverage Guardian: no chapter below per-chapter minimum (3 markers)
+
+## Phase 4: Report
+
+**Auto-load**: `shared/report-templates.md`
+
+**Do**: Write `report.md` with summary, per-chapter scores, issues, coverage matrix, known limits, Coverage Guardian results.
+
+**Gate**:
+```bash
+python scripts/workflow.py integrate-books <run_dir> check_gate 4
+```
+- report.md exists
+- Contains: summary, scores, issues, fix batches, coverage matrix
+- Coverage Guardian results included
+
+## Coverage Guardian
+
+**Purpose**: Detect and prevent coverage gaps, slacking, and superficial integration.
+
+**Rules**:
+
+1. **Floor Rule**: No chapter can have less than 10% of total markers. If chapter N has < floor, flag for review.
+
+2. **Per-Chapter Minimum**: Every chapter must have >= 3 integration markers. Zero markers = automatic fail.
+
+3. **Patch-Style Detection**: If a chapter has markers only in one section (e.g., all in intro, none in body), flag as patch-style integration.
+
+4. **Output Size Guard**: Chapter output size must be >= 80% of the largest source chapter it integrates. Smaller = likely content loss.
+
+**Commands**:
+```bash
+python scripts/workflow.py integrate-books <run_dir> coverage_report
+python scripts/workflow.py integrate-books <run_dir> coverage_guard
+```
+
+**Coverage Guardian runs**:
+- After Phase 2 completion (full scan)
+- In Phase 3 validation
+- In Phase 4 report
+
+## Anti-Slacking Rules
+
+Per `shared/anti-slacking.md`:
+- Every phase start: re-read reference files, record read confirmation in progress.md
+- Every claimed read: attach structure evidence (paragraph count, code block count, specific terms)
+- No "I remember" — always re-read
+- No title-only inference — open and read actual content
+- No "approximately" — gate either passes or fails, no partial credit
+- No skipping sub-phases — each sub-phase must complete and record before next
+
+## Sub-Agent Orchestration
+
+See `references/agent-orchestration.md` for full rules. Key constraints:
+
+1. **Max concurrency**: 5 agents simultaneously
+2. **Phase 0**: One agent per book, max 3 books parallel. Within a book: sequential chapter reading.
+3. **Phase 1**: Single agent (architecture requires holistic view, not parallel).
+4. **Phase 2**: One chapter at a time. Within a chapter: max 3 section agents parallel.
+5. **Phase 3**: Validation agents can run parallel (max 3).
+6. **Dependency ordering**: For web sources, resolve all links/references within a page before moving to next page.
+7. **Error recovery**: Failed agent = retry once with different approach. Second failure = pause and ask user.
+
+## Quality Standards
+
+- Reader cannot identify content sources
+- Chapter skeleton survives reverse coverage check
+- Every addition has source, location, benefit
+- Duplicates merged or cross-referenced
+- Output ready for review-tech-book via `report.md`
+- Integration level: L3 (reorganize) or L4 (full fusion) only — see `references/full-integration.md`

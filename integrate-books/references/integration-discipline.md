@@ -1,275 +1,188 @@
-# 整合纪律协议
+# Integration Discipline
 
-> 供 integrate-books skill 使用。定义确保整合正确性、完整性和风格一致性的结构性纪律。
-> SKILL.md 在阶段 1、2、4 中引用本文件。
+> Rules for correctness, completeness, style consistency.
 
----
+## Correctness
 
-## 一、正确性保障
+### Verification Levels
 
-### 1.1 验证等级体系
+| Level | Meaning | Method | Tag |
+|-------|---------|--------|-----|
+| V1 | Runtime verified | Ran code, called `hasattr()` | `[V1]` |
+| V2 | Source confirmed | Read source file lines | `[V2]` |
+| V3 | Docs checked | Read PEP/What's New | `[V3]` |
+| V4 | Inferred | General knowledge, unverified | `[V4]` |
 
-验证等级定义和强制规则见 `../../shared/verification-levels.md`。整合产出的额外要求：
+**Rules**:
+- Critical/High severity = at least V2
+- API existence/removal = V1 or V3
+- V4 = severity auto-downgraded, mark "unverified"
+- New code blocks in integration = V2 or V1, never V4
 
-- 阶段 4 产出中，所有新增代码块必须至少 V2（从已验证的知识库条目复制）或 V1（实际运行）
-- 不允许用 V4 推断产出新增代码
-- 验证证据格式：在代码块后标注 `<!-- V1: 已通过 Python 3.14 验证 -->` 或 `<!-- V2: 来源 [源书缩写] §[章节] -->`
+### Code Verification (3 steps)
 
-**与 translate-book 的代码处理协调**：translate-book 保留源书代码的可执行语义；变量名、字符串、异常文本和程序输出不翻译，面向读者的代码注释可翻译为中文。当整合阶段发现 translate-book 产出的代码有错误时：
-1. **保留原始翻译**：不修改 translate-book 的产出文件
-2. **在整合中修复**：integrate-books 阶段 4 可以用修正后的代码替换原代码块，但必须在整合标记中注明 `<!-- fix: 修正原书代码错误 -->`
-3. **新增说明**：如果原书代码错误具有教学价值（常见陷阱），可在代码后新增 GOTCHA ALERT 边栏说明
+1. **Block review**: Check imports, API names, parameter signatures
+2. **Runtime**: Run code blocks with version-specific APIs
+3. **Version**: Confirm version-specific APIs match baseline
 
-### 1.2 代码产出三步验证
+### Common Traps
 
-对阶段 4 中每个包含代码的章节，执行以下三步：
+| Trap | Prevention |
+|------|------------|
+| API hallucination | V1 runtime check |
+| Version timeline error | V3 check What's New |
+| Import path error | V1 runtime check |
+| Parameter drift | V1 or V3 verify |
 
-**第一步：逐块审查**
-- 提取每个代码块，检查：import 是否存在、API 名称拼写是否正确、参数是否匹配目标版本
-- 对代码块中的每个 API 调用，确认它在目标版本基线中存在
+## Completeness
 
-**第二步：实机运行验证**
-- 运行每章中涉及版本差异或新 API 的代码块（不能只运行部分章节）
-- 运行命令：`python3 -c "..."` 或提取到临时脚本执行
-- 运行失败则修复后重新验证，标注为 V1
+### Coverage Check (Phase 1)
 
-**第三步：版本基线校验**
-- 全部代码块中的版本特定 API（如 `match/case` 需要 3.10+、`ExceptionGroup` 需要 3.11+），检查是否与阶段 2 确定的风格基线中记录的目标版本一致
-- 在目标版本不可用的 API，必须加版本说明或条件导入
+| Chapter | Keywords | Extracted | Status |
+|---------|----------|-----------|--------|
+| Ch1 | ... | N | Pass/Warning/Fail |
 
-### 1.3 常见正确性陷阱
+**Standard**: >=80% per source, all core topics covered, proportional to length.
 
-从实际整合经验中提炼的高频错误模式：
+### Mapping Check (Phase 2)
 
-| 陷阱 | 表现 | 防护 |
-|------|------|------|
-| API 幻觉 | 知识点条目中记录了不存在的 API（如 `template.parts`）| V1 实机验证 |
-| 版本时间线错误 | "X 在 3.10 移除"但实际是 3.10 弃用、3.12 移除 | V3 查 What's New |
-| 来源混淆 | 将原英文文本误标为译者注 | 逐条检查来源标记 |
-| import 路径错误 | `from string import Template` 应为 `from string.templatelib import Template` | V1 实机验证 |
-| 参数签名漂移 | 知识点记录的 API 签名与目标版本不一致 | V1 或 V3 校验 |
+- **Forward**: Every KB ID mapped to a chapter?
+- **Reverse**: Every chapter checked against all sources?
+- **Gaps**: Every gap has decision (add/exclude/deferred)?
 
----
+### Output Check (Phase 4)
 
-## 二、完整性保障
+- Every "insert" action executed?
+- Every sidebar added?
+- Every mapped KB item appears in output?
+- Conflicts resolved?
+- Gaps addressed?
 
-### 2.1 提取覆盖率校验
+## Style Consistency
 
-阶段 1 完成后，对每本源书执行覆盖率校验：
+### Baseline Extraction
 
-**校验方法**：从源书的目录中提取所有章节标题和主题关键词，逐章检查知识库中是否有对应条目。
+| Dimension | What to Extract |
+|-----------|----------------|
+| Person | "we" / "you" / none |
+| Sentence length | Average characters |
+| Code comment language | EN / mixed |
+| Term introduction | EN only / EN+CN |
+| Code block size | Average lines |
+| Sidebar density | Per 1000 lines |
+| Explanation depth | Concept -> principle -> example -> pitfall -> best practice |
+| Tone | Formal / casual / conversational |
 
-**覆盖率报告格式**（示例）：
+### Source Adaptation
 
-```markdown
-## [源书名称] 覆盖率
+| Source Type | Typical Bias | Adaptation |
+|-------------|-------------|------------|
+| Deep textbook | Long, detailed | Keep depth, trim wording |
+| Advice book | Itemized, no context | Add motivation, merge related |
+| Beginner book | Shallow, simple | Deepen, upgrade examples |
+| Reference docs | Dry, authoritative | Add analogy, practice guidance |
 
-| 章节 | 主题关键词 | 提取条目数 | 状态 |
-|------|-----------|-----------|------|
-| Ch1 [主题] | [关键词] | 8 | ✅ 完整 |
-| Ch2 [主题] | [关键词] | 6 | ⚠ 偏少（章较长，可能遗漏） |
-| Ch3 [主题] | [关键词] | 0 | ❌ 缺失 |
-```
+**Rule**: New content adapts to main book style. Main book doesn't adapt to new content.
 
-**合格标准**：
-- 每章至少 1 个条目（空章节 = 完全遗漏）
-- 条目数与章节数量/长度成比例（800 行的章节应有 8-15 个条目，200 行的章节 3-5 个）
-- 所有 `core` 主题（与目标读者最相关的概念）必须有对应条目
-- 覆盖率低于 80% 的源书需重新提取
+### Per-Paragraph Self-Check
 
-### 2.2 映射完整性校验
+After writing each paragraph from non-main source:
+- [ ] Person matches baseline?
+- [ ] Sentence length within +/-30%?
+- [ ] Term introduction follows convention?
+- [ ] Code block size matches baseline?
+- [ ] Context transition added?
+- [ ] Tone matches baseline?
 
-阶段 2 完成后，对映射结果执行完整性校验：
+Fix before writing next paragraph. Don't fix after.
 
-**校验一：正向完整性**——知识库中每个条目的 `id` 是否都映射到了某个章节？
+## Phase Gates
 
-```markdown
-## 正向完整性校验
-
-| 源书 | 总条目 | 已映射 | 未映射 | 覆盖率 |
-|------|--------|--------|--------|--------|
-| [源书1] | N | N | N | X% |
-| [源书2] | N | N | N | X% |
-```
-
-未映射的 ID 必须逐条审查——是故意排除（与目标读者不相关）还是遗漏？如果是遗漏，补充映射。
-
-**校验二：反向完整性**——主书每个章节是否都检查了所有源书的映射？
-
-对每个章节，确认已检查所有源书的相关知识点。如果某章节只映射了一本源书的条目但完全没看其他源书，需要补充检查。
-
-**校验三：缺口覆盖校验**——gaps.md 中的每个缺口是否有明确的处置决策？
-
-```markdown
-## 缺口处置校验
-
-| 缺口 | 处置 | 来源 | 状态 |
-|------|------|------|------|
-| [概念A] | 新增边栏 | [源书] item-N | ✅ 已规划 |
-| [概念B] | 暂不补充 | 无 | ⚠ 待决策 |
-| [概念C] | 超出范围 | — | ✅ 明确排除 |
-```
-每个缺口只能是三种状态之一：已规划补充 / 明确排除（附理由）/ 待决策（不允许多个待决策拖到阶段 4）。
-
-### 2.3 产出完整性校验
-
-阶段 4 每章完成后，对照该章的整合指令逐项确认：
+### Phase 1 Gate
 
 ```
-□ 整合指令中的每个"插入"动作是否都已执行？
-□ 整合指令中的每个"新增边栏"是否都已添加？
-□ 映射到该章节的所有知识点条目是否都在产出中出现？
-□ 整合指令中标记的冲突是否已解决？
-□ 缺口处置中的"已规划补充"项是否已落地？
+[ ] Coverage >=80% per source?
+[ ] Every chapter has >=1 item?
+[ ] All core topics covered?
+[ ] Item format uniform?
+[ ] Dependencies annotated?
 ```
 
----
-
-## 三、风格一致性保障
-
-> 整合时直接粘贴源书内容而未做风格适配是翻译腔、排版不一致、软化词等问题的主要根源。以下纪律必须严格执行。
-
-### 3.1 风格基线
-
-整合前从主书中提取风格基线——主书的写作风格就是全书的风格标准。具体提取：
-
-| 维度 | 提取内容 | 量化方法 |
-|------|----------|----------|
-| **人称** | 第一人称复数（"我们"）/ 第二人称（"你"）/ 无主语 | 统计每 1000 字中各人称出现次数 |
-| **句式长度** | 平均句长 | 统计主书前 3 章的平均句长（字数） |
-| **代码注释语言** | 中文 / 英文 / 混合 | 确认主书的代码注释习惯 |
-| **术语首次出现** | 英文原文+中文翻译 / 仅中文 / 仅英文 | 确认主书的术语引入方式 |
-| **代码示例规模** | 平均每块行数 | 统计主书代码块的平均行数 |
-| **边栏频率** | 每千行边栏数 | 统计主书边栏密度 |
-| **讲解深度** | 概念→原理→示例→坑→最佳实践 的完整度 | 确认主书的讲解链条典型长度 |
-| **语气** | 正式 / 轻松 / 对话式 | 确认主书的整体语气 |
-
-产出一份《风格基线表》，阶段 4 执行时对照此表调整所有新增内容。
-
-### 3.2 来源内容风格适配规则
-
-不同源书的内容在整合时需要风格适配，不能直接粘贴：
-
-| 来源类型 | 典型风格偏差 | 适配规则 |
-|----------|-------------|----------|
-| 深入型教材 | 讲解深、篇幅长、底层原理多 | 保留深度但精简表述；底层原理可移入边栏（PEDANTIC NOTE） |
-| 建议型教材 | 条目式、每条独立、缺上下文衔接 | 为每条补充上下文动机（"为什么需要这个建议"）；多条相关建议合并为一个主题小节 |
-| 入门型教材 | 讲解浅、示例简单、篇幅短 | 加深讲解（补充"为什么"和"常见坑"）；简单示例升级为实用场景示例 |
-| 参考型/官方文档 | 干燥、权威、缺乏教学性 | 加入类比和动机说明；补充从"知道"到"做到"的实践引导 |
-
-**核心原则**：新增内容的风格必须向主书靠拢，而不是让主书已有的内容风格向新增内容妥协。读者感受应该是"这一章的写作风格很统一"，而不是"这段明显是从另一本书搬过来的"。
-
-### 3.3 逐段风格自检
-
-阶段 4 中，每写入一段来自非主书的内容后，执行以下自检：
+### Phase 2 Gate
 
 ```
-□ 人称是否与风格基线一致？（不是"作者认为"而是"你可以"或"我们会看到"）
-□ 句式长度是否在基线的 ±30% 范围内？（不是连续 5 个 40 字长句，也不是连续 10 个 5 字短句）
-□ 术语首次出现是否按基线方式引入？（中文+英文 / 仅中文）
-□ 代码块规模是否与基线一致？（不是主书平均 8 行但新增了 40 行的超长代码块）
-□ 是否添加了与主书风格一致的上下文衔接？（不是突兀插入，而是"刚才我们看了 X，接下来看看 Y——"）
-□ 语气是否与基线一致？（不是突然变成论文腔或口语化）
+[ ] Forward mapping >=95%?
+[ ] Reverse mapping complete?
+[ ] Unmapped items reviewed?
+[ ] All gaps have decision?
+[ ] Conflicts identified?
 ```
 
-如果不一致，调整后再写入。不允许写入后再回头修风格——风格修正比直接写对更耗时。
-
-### 3.4 章节级风格校验
-
-每章完成后，对全章执行风格一致性扫描：
-
-1. **语气跳变检测**：读取全章，标记所有"语气明显不同于上下文"的段落（通常是直接粘贴未适配的来源内容）
-2. **代码块规模异常检测**：标记所有超过主书平均代码块长度 2 倍的代码块
-3. **术语不一致检测**：用 grep 检查该章中的关键术语是否与全局术语表一致
-4. **衔接缺失检测**：标记所有缺少上下文过渡的新增段落（前一段讲 A，下一段突然讲 C，没有 B→C 的过渡）
-
----
-
-## 四、阶段关卡汇总
-
-每个关卡按 3 项一组执行。完成一组后确认全部通过，再进入下一组。不要一次性扫完全部条目。
-
-### 阶段 1 关卡（知识提取完成后）
-
-第一组（覆盖率）：
-```
-□ 每本源书的覆盖率是否 ≥80%？
-□ 每章是否至少有 1 个条目？
-□ core 主题是否全部覆盖？
-```
-→ 通过后继续
-
-第二组（质量）：
-```
-□ 条目格式是否统一？（逐条检查所有条目的必填字段完整性）
-□ 依赖关系是否标注？（前置概念、后续概念）
-□ 覆盖率统计已写入 progress.md
-```
-
-### 阶段 2 关卡（体系映射完成后）
-
-第一组（映射完整性）：
-```
-□ 正向完整性：知识库条目映射率是否 ≥95%？
-□ 反向完整性：每个章节是否检查了所有源书？
-□ 未映射条目是否逐条审查（排除 vs 遗漏）？
-```
-→ 通过后继续
-
-第二组（冲突处理）：
-```
-□ 缺口处置：是否所有缺口都有明确决策（补充/排除/待决策）？
-□ 冲突检测：术语/观点/版本冲突是否全部识别并记录？
-□ 映射结果已写入 dsp_mapping.md 和 gaps.md
-```
-
-### 阶段 3 关卡（整合规划完成后）
+### Phase 3 Gate
 
 ```
-□ 全局约束是否完整？（术语表/代码风格/版本基线/教学元素/来源标注）
-□ 每章整合指令是否包含：当前状态/源教材映射/新增内容/术语统一/预估改动？
-□ 工作量估算是否合理？（总增量在主书的 15-35% 范围内，除非用户另有要求）
-□ 是否有章节的整合指令过于粗略？（缺少具体插入位置或内容描述）
+[ ] Global constraints complete?
+[ ] Per-chapter instruction: state/source/content/terms/estimate?
+[ ] Estimate reasonable (15-35% increment)?
+[ ] No vague instructions?
 ```
 
-### 阶段 4 关卡（每章产出完成后）
+### Phase 4 Gate (per chapter)
 
-第一组（正确性）：
 ```
-□ 代码块是否逐块审查？≥2 个是否实机运行？
-□ 版本特定 API 是否与基线一致？
-□ 整合指令的每个动作是否都已执行？
-```
-→ 通过后继续
-
-第二组（完整性 + 来源）：
-```
-□ 映射到该章的所有知识点是否都在产出中？
-□ 新增内容的来源是否标注（`<!-- integrated: ... -->`）？
-□ 版本差异是否已标注译者注？
-```
-→ 通过后继续
-
-第三组（风格 + 去重）：
-```
-□ 新增内容是否经过风格适配（不是直接粘贴）？
-□ 术语是否与全局术语表一致？
-□ 同一概念在本章是否未重复完整讲解？
+[ ] Code blocks reviewed, >=2 run?
+[ ] Version APIs match baseline?
+[ ] Every plan action executed?
+[ ] All KB items in output?
+[ ] Markers present?
+[ ] Style adapted?
+[ ] Terms consistent?
+[ ] No duplicate explanations?
 ```
 
-### 全书完成关卡
+### Full Book Gate
 
-第一组（全局一致性）：
 ```
-□ 全书术语是否一致？（用 grep 遍历术语表中全部术语）
-□ 交叉引用是否全部正确？（引用的章节/编号是否存在）
-□ 代码清单编号插入新代码后是否重编了连续序号？
+[ ] Terms consistent (grep full book)?
+[ ] Cross-references valid?
+[ ] Code listings renumbered?
+[ ] No duplicate concepts?
+[ ] Learning objectives updated?
+[ ] All chapter gates passed?
 ```
-→ 通过后继续
 
-第二组（去重 + 对齐）：
-```
-□ 同一概念是否未在多处重复出现？（应合并或交叉引用）
-□ 扩展内容后是否同步更新了章节的学习目标？
-□ 阶段 4 的所有章节关卡是否全部通过？
-```
+## Coverage Guardian
+
+### Per-Source Coverage Ratio
+
+Per-chapter rule: If a source book is mapped as "primary" or "secondary" for a chapter, it MUST contribute >=3 integration markers in that chapter.
+
+Per-book rule: Each source book's total markers >= (total_source_chapters * 0.5).
+- Example: Will has 30 chapters -> minimum 15 markers
+- Example: Mindset has 15 chapters -> minimum 8 markers
+
+Floor rule: No source book may have fewer than 10% of total markers across the integrated book.
+- If total markers = 700, minimum per source = 70.
+
+### Patch-Style Detection
+
+A source is "patch-style" if ANY of these is true:
+1. All its markers appear in <=2 chapters (concentrated, not integrated)
+2. Its markers never appear as the first marker in any section (always supplemental)
+3. Its content always appears after the primary source content within every section
+
+Detection timing:
+- After each chapter gate (sub-phase 2.3)
+- After batch check (sub-phase 2.5)
+- During Phase 3 validation
+
+Escalation:
+- First detection: WARNING logged to progress.md
+- Second detection for same source: REQUIRE REWRITE of affected chapters
+
+### Output Size Guard
+
+Per-chapter rule: Output chapter size MUST be >= max(source_chapter_sizes_for_this_topic) * 0.8
+
+This prevents the "integrated book has less content than a single source book" problem.
+- Example: If Will Ch8 = 50KB and Stroustrup Ch7 = 40KB cover the same topic, the integrated chapter must be >= 40KB (50KB * 0.8).

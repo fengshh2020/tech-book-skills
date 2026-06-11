@@ -1,222 +1,222 @@
-# 内容合成方法论
+# Content Synthesis Methodology
 
-> 供 integrate-books skill 使用。定义阶段 4 中如何将不同来源的知识点合成为连贯、优秀的教学内容——而非简单的知识点堆砌。
-> SKILL.md 阶段 4 中引用本文件。
+> For use by the integrate-books skill. Defines how to synthesize knowledge points from different sources into coherent, excellent teaching content in Phase 4 — rather than simple knowledge stacking.
+> SKILL.md Phase 4 references this file.
 
 ---
 
-## 一、核心问题：知识点堆砌 vs 教学叙事
+## 1. Core Problem: Knowledge Stacking vs Teaching Narrative
 
-多书整合最容易犯的错误：把知识点按顺序排好，加上过渡句，就认为完成了。结果是一本"内容正确但读起来像百科全书"的书——每个知识点都讲到了，但读者无法形成连贯的心智模型。
+The most common mistake in multi-book integration: arranging knowledge points in order, adding transition sentences, and calling it done. The result is a book that is "factually correct but reads like an encyclopedia" — every knowledge point is covered, but the reader cannot form a coherent mental model.
 
-**差的结构**（知识点堆砌）：
+**Bad structure** (Knowledge Stacking):
 
 ```
-Ch10 生成器与协程
-├── 10.1 生成器基础
-├── 10.2 yield 语义
-├── 10.3 生成器表达式
-├── 10.4 itertools 模块
-├── 10.5 协程入门          ← 突然跳到新话题，无动机
+Ch10 Generators and Coroutines
+├── 10.1 Generator Basics
+├── 10.2 yield Semantics
+├── 10.3 Generator Expressions
+├── 10.4 itertools Module
+├── 10.5 Coroutine Intro          ← Sudden jump to a new topic, no motivation
 ├── 10.6 yield from
-├── 10.7 async/await       ← 又一个突然跳跃
+├── 10.7 async/await              ← Another sudden jump
 ```
 
-**好的结构**（教学叙事）：
+**Good structure** (Teaching Narrative):
 
 ```
-Ch10 生成器与协程
-├── 10.1 问题引入：为什么需要"惰性求值"
-│     （10GB 日志文件的场景 → 一次性读入会崩溃）
-├── 10.2 生成器基础：从函数到生产者
-│     （yield 让函数变成数据生产者）
-├── 10.3 yield 语义：暂停与恢复
-│     （生成器不是返回值，而是暂停执行——这个区分是关键洞察）
-├── 10.4 生成器表达式：惰性的列表推导式
-│     （回到 10.1 的问题——用生成器表达式逐行处理日志）
-├── 10.5 桥梁：从"数据管道"到"协作调度"
-│     （yield 既能生产数据，也能接收数据——双用途是过渡关键）
-├── 10.6 协程：yield 的另一面
-│     （用 yield 实现简单的生产者-消费者协作）
-├── 10.7 yield from：委托给子生成器
-│     （嵌套协作的痛点 → yield from 的解决方案）
-├── 10.8 async/await：协程的现代语法
-│     （从 yield 协程到 async/await 的进化——为什么要发明新语法？）
+Ch10 Generators and Coroutines
+├── 10.1 Problem Introduction: Why "Lazy Evaluation" Is Needed
+│     (Scenario: a 10GB log file → loading it all at once will crash)
+├── 10.2 Generator Basics: From Function to Producer
+│     (yield turns a function into a data producer)
+├── 10.3 yield Semantics: Pause and Resume
+│     (A generator doesn't return a value — it pauses execution. This distinction is the key insight)
+├── 10.4 Generator Expressions: Lazy List Comprehensions
+│     (Return to the 10.1 problem — process the log line by line with a generator expression)
+├── 10.5 Bridge: From "Data Pipeline" to "Cooperative Scheduling"
+│     (yield can both produce data and receive data — this dual purpose is the transition key)
+├── 10.6 Coroutines: The Other Side of yield
+│     (Use yield to implement a simple producer-consumer collaboration)
+├── 10.7 yield from: Delegating to Sub-Generators
+│     (The pain point of nested cooperation → yield from as the solution)
+├── 10.8 async/await: Modern Syntax for Coroutines
+│     (The evolution from yield coroutines to async/await — why was new syntax invented?)
 ```
 
-**差异的本质**：知识点堆砌是按"主题分类"组织的，教学叙事是按"问题驱动的认知递进"组织的。每个小节的存在不是因为"这个主题属于这里"，而是因为"读者在理解了上一节之后，自然会产生一个问题，而这一节回答了那个问题"。
+**The essence of the difference**: Knowledge Stacking is organized by "topic classification"; Teaching Narrative is organized by "problem-driven cognitive progression." Each section exists not because "this topic belongs here," but because "after understanding the previous section, the reader naturally has a question, and this section answers that question."
 
 ---
 
-## 二、章节叙事弧线构建法
+## 2. Chapter Narrative Arc Construction
 
-### 2.1 三层叙事结构
+### 2.1 Three-Layer Narrative Structure
 
-每个章节（不是每个小节）应该有完整的三层叙事结构：
+Every chapter (not every section) should have a complete three-layer narrative structure:
 
-**第一层：章节级弧线**
+**Layer 1: Chapter-Level Arc**
 
-从"读者的痛点"出发，经过"概念构建"，到达"能力交付"。
-
-```
-痛点 → 概念 A → 概念 B → 概念 C → 能力交付
-  ↑                                    ↓
-  └──── 为什么需要回到痛点？──────────┘
-         （用新能力重新解决开头的痛点，形成闭环）
-```
-
-示例（Ch10）：
-- 痛点：大文件处理时内存溢出
-- 概念构建：生成器 → yield → 协程 → async/await
-- 能力交付：能用 async/await 写一个并发文件处理器
-- 闭环：回到开头的大文件场景，但这次用异步 I/O 处理
-
-**第二层：小节间衔接**
-
-每个小节的结尾应该为下一个小节创造"认知需求"——读者读完后自然会问"但是……"，下一节就回答这个"但是"。
-
-| 小节结尾 | 创造的"但是" | 下一节回答 |
-|----------|-------------|-----------|
-| "生成器通过 yield 暂停执行" | "但是 yield 只能产出数据吗？" | 协程：yield 的接收端 |
-| "yield from 委托给子生成器" | "但是多层 yield from 太复杂了" | async/await 的简洁语法 |
-| "生成器表达式处理大文件" | "但是磁盘 I/O 还是会阻塞" | 异步 I/O 的解决方案 |
-
-如果两个相邻小节之间没有自然的"但是"衔接，说明：
-- 顺序不对（应该重排）
-- 缺少桥梁内容（应该补充过渡段）
-- 主题不该在同一章（应该移走）
-
-**第三层：段落内逻辑**
-
-每个段落遵循"主张→证据→意义"结构：
-- 主张：用一个判断句开头（"生成器不是返回值，而是暂停执行"）
-- 证据：用代码示例或推理证明
-- 意义：说明这对读者意味着什么（"这意味着你可以用生成器处理任意大的数据流"）
-
-不要用"接下来我们看看 X"作为段落开头——这是知识点堆砌的标志。用判断句或问题开头。
-
-### 2.2 来源混合的叙事合成
-
-当一个小节的内容来自多个源书时，按以下优先级组织叙事：
-
-1. **从主书取框架**：主书如何引入这个概念、用什么类比、按什么顺序展开
-2. **从 EP 取实践建议**：Effective Python 的条目式建议转化为叙事中的"常见陷阱"和"最佳实践"段落
-3. **从 PP 取简化解释**：Python Programming 的入门级解释作为"类比补充"或"初学者视角"边栏
-4. **从官方文档取精确性**：API 签名、参数说明、版本差异
-
-**具体操作**：不要先写完主书内容再粘贴 EP 建议。而是：
-1. 先写主书的叙事框架（引入 → 概念 → 示例）
-2. 在叙事中找到"常见误解"或"这个概念容易用错"的自然位置
-3. 在那个位置插入 EP 的建议，但不是"EP 建议这样做"，而是"你可能以为应该这样写，但实际上……"
-4. 这样建议就融入了叙事，而不是贴在末尾的附加说明
-
-### 2.3 新增内容的教学深度校准
-
-从非主书插入的内容，容易是"浅层插入"——只加了定义和示例，没有动机、原理和常见坑。用以下清单校准：
+Start from the "reader's pain point," go through "concept construction," and arrive at "capability delivery."
 
 ```
-□ 动机段：读者为什么要学这个？（不是"因为 X 章需要"而是"因为你会遇到 Y 场景"）
-□ 定义段：这个概念是什么？（用读者已知的概念做类比）
-□ 原理段：为什么它这样工作？（不是黑箱——解释底层机制）
-□ 示例段：怎么用？（至少一个实用场景，不是一个玩具示例）
-□ 常见坑段：新手最容易犯什么错？（来自 EP 的建议通常在这里最有价值）
-□ 最佳实践段：生产代码应该怎么写？
+Pain Point → Concept A → Concept B → Concept C → Capability Delivery
+  ↑                                              ↓
+  └──── Why return to the pain point? ──────────┘
+         (Re-solve the opening pain point with the new capability, forming a closed loop)
 ```
 
-如果插入的内容只有定义和示例，缺少动机/原理/坑/最佳实践，需要补充。不允许写"浅层插入"——要么补全教学链条，要么不插入。
+Example (Ch10):
+- Pain point: Memory overflow when processing large files
+- Concept construction: Generators → yield → Coroutines → async/await
+- Capability delivery: Able to write a concurrent file processor using async/await
+- Closed loop: Return to the large file scenario from the beginning, but this time handle it with async I/O
+
+**Layer 2: Inter-Section Bridging**
+
+The end of each section should create a "cognitive need" for the next section — after reading, the reader naturally asks "but...?", and the next section answers that "but."
+
+| Section Ending | "But" Created | Next Section Answers |
+|----------------|---------------|---------------------|
+| "Generators pause execution via yield" | "But can yield only produce data?" | Coroutines: the receiving side of yield |
+| "yield from delegates to a sub-generator" | "But nested yield from is too complex" | The cleaner syntax of async/await |
+| "Generator expressions handle large files" | "But disk I/O still blocks" | The async I/O solution |
+
+If there is no natural "but" bridge between two adjacent sections, it means:
+- The order is wrong (should be rearranged)
+- Bridge content is missing (a transition paragraph should be added)
+- The topic doesn't belong in the same chapter (should be moved out)
+
+**Layer 3: In-Paragraph Logic**
+
+Each paragraph follows a "claim → evidence → significance" structure:
+- Claim: Start with a declarative sentence ("A generator doesn't return a value — it pauses execution")
+- Evidence: Prove it with a code example or reasoning
+- Significance: Explain what this means for the reader ("This means you can use generators to process arbitrarily large data streams")
+
+Do not start paragraphs with "Next, let's look at X" — that is a hallmark of Knowledge Stacking. Start with a declarative sentence or a question.
+
+### 2.2 Source-Mixed Narrative Synthesis
+
+When a section's content comes from multiple source books, organize the narrative by the following priority:
+
+1. **Take the framework from the primary book**: How the primary book introduces the concept, what analogy it uses, what order it follows
+2. **Take practical advice from EP**: Effective Python's item-style recommendations are converted into "common pitfalls" and "best practices" paragraphs within the narrative
+3. **Take simplified explanations from PP**: Python Programming's introductory-level explanations serve as "analogy supplements" or "beginner perspective" sidebars
+4. **Take precision from official documentation**: API signatures, parameter descriptions, version differences
+
+**Specific procedure**: Do not write the primary book content first and then paste EP recommendations. Instead:
+1. First write the primary book's narrative framework (introduction → concept → example)
+2. Find the natural position in the narrative for "common misconceptions" or "this concept is easy to misuse"
+3. Insert EP's advice at that position — not as "EP recommends doing this," but as "You might think you should write it this way, but actually..."
+4. This way the advice is woven into the narrative, rather than appended as a footnote
+
+### 2.3 Inserted Content Depth Calibration
+
+Content inserted from non-primary books tends to be "shallow insertions" — only a definition and an example, without motivation, principles, or common pitfalls. Calibrate using the following checklist:
+
+```
+□ Motivation paragraph: Why should the reader learn this? (Not "because Chapter X needs it" but "because you will encounter scenario Y")
+□ Definition paragraph: What is this concept? (Use an analogy from concepts the reader already knows)
+□ Principle paragraph: Why does it work this way? (Not a black box — explain the underlying mechanism)
+□ Example paragraph: How to use it? (At least one practical scenario, not a toy example)
+□ Common pitfall paragraph: What mistake do beginners most often make? (EP's advice is usually most valuable here)
+□ Best practice paragraph: How should production code be written?
+```
+
+If the inserted content only has a definition and an example, lacking motivation/principles/pitfalls/best practices, it must be supplemented. "Shallow insertions" are not allowed — either complete the teaching chain or do not insert.
 
 ---
 
-## 三、示例演化设计
+## 3. Example Evolution Design
 
-### 3.1 持续示例 vs 独立示例
+### 3.1 Continuous vs Standalone Examples
 
-技术书中有两种代码示例策略：
+There are two code example strategies in technical books:
 
-**持续示例**：在同一个场景/项目上逐步叠加新特性。读者跟着一个例子从头到尾，看到概念如何在实际项目中组合。
+**Continuous Examples**: Gradually stack new features on the same scenario/project. The reader follows one example from start to finish, seeing how concepts combine in a real project.
 
-**独立示例**：每个概念用独立的小示例说明。清晰但缺乏整合感。
+**Standalone Examples**: Each concept is illustrated with its own small example. Clear but lacking a sense of integration.
 
-**整合书的最佳策略**：主书原有的示例保持独立（不要替换掉已验证的好示例），新增内容优先使用持续示例——在主书示例的同一场景上叠加新知识点。
+**Best strategy for integrated books**: Keep the primary book's original examples standalone (do not replace verified good examples); for newly added content, prefer continuous examples — stack new knowledge points on the same scenario as the primary book's examples.
 
-例如：如果主书 Ch5 用"书店库存"示例讲变量和类型，Ch9 新增"字典推导式"内容时，不要用一个全新的"学生成绩"示例，而是用"书店库存"的字典推导版本。读者已经熟悉这个场景，认知负担更小。
+For example: If the primary book Ch5 uses a "bookstore inventory" example to teach variables and types, when Ch9 adds "dictionary comprehension" content, do not use a brand-new "student grades" example. Instead, use a dictionary comprehension version of "bookstore inventory." The reader is already familiar with the scenario, so the cognitive load is lower.
 
-### 3.2 示例质量标准
+### 3.2 Example Quality Standards
 
-每个代码示例必须满足：
+Every code example must satisfy:
 
-1. **可运行**：在目标版本基线上实际执行过
-2. **自包含**：不需要外部文件或未定义的变量
-3. **有输出**：附上运行结果的注释
-4. **真实场景**：不是 `foo = "bar"` 类的玩具示例
-5. **规模适度**：3-15 行（主书风格基线内的长度）
-6. **注释最少**：代码本身应该足够清晰，只在"为什么"不明显时注释
+1. **Runnable**: Actually executed on the target version baseline
+2. **Self-contained**: No external files or undefined variables needed
+3. **Has output**: Include comments showing the execution result
+4. **Real-world scenario**: Not a `foo = "bar"` type toy example
+5. **Appropriate scale**: 3–15 lines (within the primary book's style baseline)
+6. **Minimal comments**: The code itself should be clear enough; only comment when "why" is not obvious
 
-超过 20 行的代码示例需要特别审视——是否可以拆成两个更小的示例？如果不能，加"逐步构建"的中间态。
-
----
-
-## 四、概念桥接设计
-
-### 4.1 桥梁概念识别
-
-整合过程中最容易被忽略的是"桥梁概念"——两个主要概念之间的中间步骤。如果缺少桥梁，读者会遇到认知鸿沟。
-
-**识别方法**：对整合指令中每个"插入 X 后插入 Y"的序列，问自己：
-
-> "读者刚理解了 X，能否直接理解 Y？如果不能，中间缺少什么？"
-
-常见缺少桥梁的场景：
-
-| 概念 A | 概念 B | 缺少的桥梁 |
-|--------|--------|-----------|
-| 闭包 | 装饰器 | 高阶函数 / 函数作为参数 |
-| 生成器 | 协程 | yield 的双用途（产出 + 接收）|
-| 类基础 | 元类 | 描述符 / 属性访问机制 |
-| 函数 | 闭包 | LEGB 作用域 + 自由变量 |
-| 同步代码 | async/await | 事件循环 + 协作式调度 |
-
-如果发现桥梁缺失，在整合指令中补充桥梁内容（约 500-1500 字 + 1-2 个示例）。桥梁不需要很深，只需要让读者"不跳步"。
-
-### 4.2 跨章回溯引用
-
-当一章内容依赖前序章节的概念时，必须提供回溯引用。格式：
-
-> "我们在第 6 章看到了闭包如何捕获外部变量。现在你会看到，装饰器正是利用了这个机制——"
-
-不要只写"如第 6 章所述"——要**一句话提醒读者那个概念的关键点**，这样他们不需要翻回去也能跟上。
+Code examples over 20 lines require special scrutiny — can they be split into two smaller examples? If not, add intermediate "step-by-step build" stages.
 
 ---
 
-## 五、质量感知检查清单
+## 4. Concept Bridging Design
 
-阶段 4 中，每章完成后除技术正确性/完整性/风格关卡外，还需通过以下**教学感知检查**：
+### 4.1 Bridge Concept Identification
 
-### 章节级感知检查
+The most easily overlooked element in the integration process is "bridge concepts" — intermediate steps between two major concepts. If a bridge is missing, the reader encounters a cognitive gap.
+
+**Identification method**: For every "insert X then insert Y" sequence in the integration instructions, ask yourself:
+
+> "The reader just understood X. Can they directly understand Y? If not, what is missing in between?"
+
+Common scenarios with missing bridges:
+
+| Concept A | Concept B | Missing Bridge |
+|-----------|-----------|----------------|
+| Closures | Decorators | Higher-order functions / functions as parameters |
+| Generators | Coroutines | The dual purpose of yield (produce + receive) |
+| Class basics | Metaclasses | Descriptors / attribute access mechanism |
+| Functions | Closures | LEGB scope + free variables |
+| Synchronous code | async/await | Event loop + cooperative scheduling |
+
+If a missing bridge is found, add bridge content in the integration instructions (approximately 500–1500 words + 1–2 examples). The bridge does not need to be deep; it just needs to ensure the reader does not "skip a step."
+
+### 4.2 Cross-Chapter Back-Reference
+
+When a chapter's content depends on concepts from earlier chapters, a back-reference must be provided. Format:
+
+> "In Chapter 6, we saw how closures capture outer variables. Now you'll see that decorators exploit exactly this mechanism —"
+
+Do not just write "as discussed in Chapter 6" — **remind the reader of the key point of that concept in one sentence**, so they can follow along without having to flip back.
+
+---
+
+## 5. Quality Perception Checklist
+
+In Phase 4, after each chapter is completed, in addition to the technical correctness/completeness/style gates, it must also pass the following **teaching perception checks**:
+
+### Chapter-Level Perception Check
 
 ```
-□ 章节开头是否有明确的"读者痛点"或"能力承诺"？
-□ 章节结尾是否有闭环（回到开头的痛点，用新能力解决）？
-□ 小节间是否有自然的"但是"衔接？（不是"接下来我们看看"）
-□ 是否存在缺少桥梁的认知鸿沟？（相邻两节无法自然过渡）
-□ 每个新增小节是否覆盖了完整的教学链条？（动机→定义→原理→示例→坑→最佳实践）
+□ Does the chapter opening have a clear "reader pain point" or "capability promise"?
+□ Does the chapter ending have a closed loop (returning to the opening pain point, solved with the new capability)?
+□ Is there a natural "but" bridge between sections? (Not "next, let's look at")
+□ Are there any cognitive gaps missing a bridge? (Two adjacent sections cannot transition naturally)
+□ Does every newly added section cover the complete teaching chain? (Motivation → Definition → Principle → Example → Pitfall → Best Practice)
 ```
 
-### 段落级感知检查
+### Paragraph-Level Perception Check
 
 ```
-□ 段落是否用判断句或问题开头？（不是"接下来"或"现在"）
-□ 是否有连续3个以上的段落只是陈述事实而无解释"为什么"？
-□ 示例是否有真实场景？（不是 foo/bar 玩具示例）
-□ EP 建议是否融入叙事？（不是"EP 建议 X"的附加说明式）
+□ Do paragraphs start with a declarative sentence or a question? (Not "next" or "now")
+□ Are there 3 or more consecutive paragraphs that merely state facts without explaining "why"?
+□ Do examples have real-world scenarios? (Not foo/bar toy examples)
+□ Is EP advice woven into the narrative? (Not appended as "EP recommends X" footnotes)
 ```
 
-### 读者体验自测
+### Reader Experience Self-Test
 
-在脑海中模拟一个目标读者按顺序阅读这一章。在每个小节结束时问：
+Mentally simulate a target reader reading this chapter in order. At the end of each section, ask:
 
-1. "我现在能做什么之前不能做的事？"
-2. "我自然想问的下一个问题是什么？"
-3. "下一节是否回答了那个问题？"
+1. "What can I do now that I couldn't do before?"
+2. "What is the next question I naturally want to ask?"
+3. "Does the next section answer that question?"
 
-如果第 3 个答案为"否"，说明叙事弧线有问题——需要调整顺序或补充桥梁。
+If the answer to question 3 is "no," the narrative arc has a problem — the order needs to be adjusted or a bridge needs to be added.
