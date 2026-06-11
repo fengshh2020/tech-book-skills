@@ -25,19 +25,22 @@ Each sub-phase completion appends a structured section to `context-summary.md`. 
 
 | Sub-Phase | Description | Context Contributed |
 |-----------|-------------|---------------------|
-| 0.1 | File verification & index loading | Source file paths, index row counts, any missing files |
-| 0.2 | Per-book deep reading | Per-Book Core Methodology, style observations |
-| 0.3 | Cross-book comparison | Key Findings, methodology conflicts, complementarities |
-| 0.4 | Style baseline extraction | Style Baseline Points, prose patterns, code conventions |
-| 0.5 | Integration challenge identification | Potential Integration Challenges, gap list |
+| 0.1 | Book Inventory | Source book paths, chapter counts, file formats, total scope |
+| 0.2 | Per-Book Reading | Per-chapter reading evidence: paragraph counts, code block counts, specific terms |
+| 0.3 | Index Generation | Per-book knowledge indexes (Teaching Philosophy, Depth Calibration, Integration Readiness) |
+| 0.4 | Coverage Comparison | Topic overlaps, gaps, unique contributions, depth differences across books |
+| 0.5 | Gate 0 | Verification: all indexes >=1000 lines, reading evidence complete, coverage comparison done |
 
 ### Phase 1 Sub-Phases
 
 | Sub-Phase | Description | Context Contributed |
 |-----------|-------------|---------------------|
-| 1.1 | Target reader definition | Target Reader, assumptions, use cases |
-| 1.2 | Per-book role assignment | Per-Book Role, rationale for each assignment |
-| 1.3 | Skeleton construction | Final Skeleton, volume/chapter breakdown |
+| 1.1 | Load All Indexes | Read confirmation per book, key findings, methodology differences (>=3 points) |
+| 1.2 | Cross-Book Analysis | Methodology differences, depth alignment, boundary complementarity, style resolution |
+| 1.3 | Target TOC Design | Per-chapter cognitive load, prerequisites, capability output, methodology choices |
+| 1.4 | Per-Chapter Plans | Self-contained integration plans: source mapping, synthesis strategy, concept bridging |
+| 1.5 | Reverse Coverage | 100% source chapter disposition: main content / sidebar / appendix / exclusion |
+| 1.6 | Gate 1 | Verification: all plans complete, no TBD, reverse coverage 100% |
 | 1.4 | Methodology decisions | Key Methodology Decisions, evidence for each choice |
 | 1.5 | Exclusion & scope | Exclusion Scope, downgrade rationale |
 | 1.6 | Plan statistics & finalization | Integration Plan Statistics, estimated increment |

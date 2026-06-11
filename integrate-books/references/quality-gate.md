@@ -12,7 +12,7 @@ Prevent "reviewed 30 rounds, still problems". Catch issues during generation, no
 ```
 □ Every source book has an index.md file?
 □ Every index.md >= 1000 lines?
-□ Every index.md contains all required sections? (overall teaching philosophy, chapter-by-chapter deep analysis, cross-chapter theme mapping, integration preparation summary)
+□ Every index.md contains all required sections? (Teaching Philosophy, Per-Chapter Deep Analysis, Cross-Chapter Theme Mapping, Integration Readiness Summary)
 □ Every chapter has reading evidence? (paragraph count, code block count, specific terminology)
 □ No two consecutive chapters have identical reading evidence format?
 □ No content inferred from titles alone? (every topic has specific supporting evidence)

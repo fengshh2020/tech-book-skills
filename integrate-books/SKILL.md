@@ -24,13 +24,13 @@ Phase 0: Deep Reading → Phase 1: Architecture → Phase 2: Chapter Generation 
 ### 0.1 Book Inventory
 - List all source books with chapter structure
 - Record: book name, chapter count, total pages, file paths
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.1`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 0 --sub-phase 0.1 --status completed`
 
 ### 0.2 Per-Book Reading
 - For each book: read EVERY chapter in order (no skipping, no title-only inference)
 - One agent per book, max 3 books parallel
 - For web sources: follow links within a chapter before moving to next
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.2`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 0 --sub-phase 0.2 --status completed`
 
 ### 0.3 Index Generation
 - Generate knowledge index per book following `references/knowledge-index-format.md`
@@ -44,12 +44,12 @@ Phase 0: Deep Reading → Phase 1: Architecture → Phase 2: Chapter Generation 
   - Cross-reference map
   - Style and tone profile
   - Integration readiness assessment
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.3`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 0 --sub-phase 0.3 --status completed`
 
 ### 0.4 Coverage Comparison
 - Compare indexes across books
 - Identify: overlaps, gaps, unique contributions, depth differences
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 0.4`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 0 --sub-phase 0.4 --status completed`
 
 ### 0.5 Gate 0
 ```bash
@@ -78,19 +78,19 @@ python scripts/workflow.py integrate-books <run_dir> check_gate 0
 ### 1.1 Load Indexes
 - Read ALL knowledge indexes completely (do not skim)
 - Record read confirmation with structure evidence
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.1`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 1 --sub-phase 1.1 --status completed`
 
 ### 1.2 Cross-Book Analysis
 - Methodology comparison: how each book approaches same topic
 - Depth alignment: where books overlap at different depths
 - Boundary complementarity: where one book's limits are another's strengths
 - Style reconciliation: identify and resolve style conflicts
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.2`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 1 --sub-phase 1.2 --status completed`
 
 ### 1.3 Target TOC
 - Design target table of contents
 - Each chapter must have clear purpose and source mapping
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.3`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 1 --sub-phase 1.3 --status completed`
 
 ### 1.4 Per-Chapter Plans
 For EACH chapter, write detailed integration plan:
@@ -101,12 +101,12 @@ For EACH chapter, write detailed integration plan:
 - Gap filling requirements
 - Dependency chain
 - Expected output (length, code count, key concepts)
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.4`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 1 --sub-phase 1.4 --status completed`
 
 ### 1.5 Reverse Coverage
 - Build reverse coverage matrix
 - Every source chapter must map to: target chapter / sidebar / appendix / explicit exclusion
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 1.5`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 1 --sub-phase 1.5 --status completed`
 
 ### 1.6 Gate 1
 ```bash
@@ -126,7 +126,7 @@ python scripts/workflow.py integrate-books <run_dir> check_gate 1
 - Load chapter's integration plan from plan.md
 - Load relevant knowledge index sections
 - Load style baseline from source-architecture.md
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.1 <chapter>`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 2 --sub-phase 2.1 --chapter <chapter> --status completed`
 
 ### 2.2 Deconstruct & Rewrite
 Execute 5-step rewrite:
@@ -135,7 +135,7 @@ Execute 5-step rewrite:
 3. Assign primary/secondary sources per section
 4. Rewrite in unified style
 5. Add markers: `<!-- integrated: [source]Ch[N]-[id] -->`
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.2 <chapter>`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 2 --sub-phase 2.2 --chapter <chapter> --status completed`
 
 ### 2.3 Quality Gate (G1-G8)
 ```bash
@@ -150,15 +150,15 @@ python scripts/workflow.py integrate-books <run_dir> check_gate 2 <chapter>
 | G4: No duplicates | No repeated explanations | Merge/cross-ref |
 | G5: Narrative flow | Transitions natural, arc complete | Rewrite |
 | G6: Depth match | Matches plan's depth target | Expand or trim |
-| G7: Source ratio | >=3 markers per 1000 words | Add source integration |
+| G7: Source ratio | Each mapped source has >=3 markers in this chapter | Expand source contribution |
 | G8: Output size | >= 80% of max source chapter size | Expand content |
 
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.3 <chapter>`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 2 --sub-phase 2.3 --chapter <chapter> --status completed`
 
 ### 2.4 Progress Record
 - Record gate results in progress.md
 - Only proceed to next chapter if gate PASSES
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.4 <chapter>`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 2 --sub-phase 2.4 --chapter <chapter> --status completed`
 
 ### 2.5 Batch Check (Every 5 Chapters)
 ```bash
@@ -167,7 +167,7 @@ python scripts/workflow.py integrate-books <run_dir> check_gate 2b
 - Cross-chapter terminology consistent
 - Source unidentifiable test (3 random paragraphs from different chapters)
 - Narrative arc connects across chapters
-- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress 2.5 batch`
+- Command: `python scripts/workflow.py integrate-books <run_dir> record_progress --phase 2 --sub-phase 2.5 --status completed`
 
 **Sub-agent strategy**:
 - One chapter at a time (sequential)
@@ -230,11 +230,11 @@ python scripts/workflow.py integrate-books <run_dir> check_gate 4
 
 **Rules**:
 
-1. **Floor Rule**: No chapter can have less than 10% of total markers. If chapter N has < floor, flag for review.
+1. **Floor Rule**: No source book may have fewer than 10% of total markers across the integrated book. If a source is below floor, flag for review and expansion.
 
-2. **Per-Chapter Minimum**: Every chapter must have >= 3 integration markers. Zero markers = automatic fail.
+2. **Per-Chapter Minimum**: If a source book is mapped as "primary" or "secondary" for a chapter, it must contribute >=3 integration markers in that chapter. Zero markers from a mapped source = automatic fail.
 
-3. **Patch-Style Detection**: If a chapter has markers only in one section (e.g., all in intro, none in body), flag as patch-style integration.
+3. **Patch-Style Detection**: If a source book's markers all appear in <=2 chapters, or its markers never appear as the first/primary marker in any section, flag as patch-style integration.
 
 4. **Output Size Guard**: Chapter output size must be >= 80% of the largest source chapter it integrates. Smaller = likely content loss.
 
