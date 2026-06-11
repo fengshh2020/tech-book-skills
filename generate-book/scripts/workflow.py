@@ -1,17 +1,29 @@
 #!/usr/bin/env python3
 """
-Workflow orchestrator for integrate-books skill (v3).
+Workflow orchestrator for generate-book skill (v3).
 Ensures phases execute in order, gates pass before proceeding.
 
-Phase structure (v3):
+Supports dual-mode operation:
+  - single: Single source book generation
+  - multi:  Multi-source book integration
+
+Phase structure (v3, multi-mode):
   Phase 0: Deep Reading & Knowledge Indexing (5 sub-phases)
   Phase 1: Architecture Design (6 sub-phases)
-  Phase 2: Chapter Generation (5 sub-phases per chapter)
+  Phase 2: Chapter Generation (6 sub-phases per chapter)
   Phase 3: Validation (4 sub-phases)
+  Phase 4: Report (2 sub-phases)
+
+Phase structure (v3, single-mode):
+  Phase 0: Deep Reading & Knowledge Indexing (3 sub-phases)
+  Phase 1: Architecture Design (5 sub-phases)
+  Phase 2: Chapter Generation (4 sub-phases per chapter)
+  Phase 3: Validation (5 sub-phases)
   Phase 4: Report (2 sub-phases)
 
 Features:
   - Sub-phase tracking with progress blocking
+  - Dual-mode support (single/multi source)
   - CoverageGuardian for per-source coverage checks
   - Auto-progress recording to progress.md
   - Gate checkers for each sub-phase
@@ -26,11 +38,20 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 
-# Sub-phase definitions
-SUB_PHASES = {
+# Sub-phase definitions — single source mode
+SINGLE_MODE_SUB_PHASES = {
+    "0": ["0.1", "0.2", "0.3"],
+    "1": ["1.1", "1.2", "1.3", "1.4", "1.5"],
+    "2": ["2.1", "2.2", "2.3", "2.4"],
+    "3": ["3.1", "3.2", "3.3", "3.4", "3.5"],
+    "4": ["4.1", "4.2"],
+}
+
+# Sub-phase definitions — multi source mode
+MULTI_MODE_SUB_PHASES = {
     "0": ["0.1", "0.2", "0.3", "0.4", "0.5"],
     "1": ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6"],
-    "2": ["2.1", "2.2", "2.3", "2.4", "2.5"],
+    "2": ["2.1", "2.2", "2.3", "2.4", "2.5", "2.6"],
     "3": ["3.1", "3.2", "3.3", "3.4"],
     "4": ["4.1", "4.2"],
 }
@@ -55,14 +76,48 @@ SOURCE_ALIASES = {
 KNOWN_SOURCES = ["Will", "Stroustrup", "Cookbook", "LowLatency", "Mindset", "StepByStep"]
 
 
-class SubPhaseWorkflowLock:
-    """Manages workflow state with sub-phase tracking and progress blocking."""
+def detect_mode(run_dir: Path) -> str:
+    """Auto-detect single vs multi source mode."""
+    inventory = run_dir / ".book-doc" / "knowledge_base" / "INVENTORY.md"
+    if not inventory.exists():
+        return "multi"  # default to multi-mode
+    content = inventory.read_text()
+    # Count source book entries in inventory table
+    book_lines = [l for l in content.splitlines()
+                  if l.startswith("|")
+                  and not l.startswith("|---")
+                  and not l.startswith("| Book")
+                  and not l.startswith("| Source")]
+    if len(book_lines) <= 1:
+        return "single"
+    return "multi"
 
-    def __init__(self, run_dir: str):
+
+class SubPhaseWorkflowLock:
+    """Manages workflow state with sub-phase tracking and progress blocking.
+
+    Supports dual-mode operation (single/multi source).
+    """
+
+    def __init__(self, run_dir: str, mode: Optional[str] = None):
         self.run_dir = Path(run_dir)
         self.state_file = self.run_dir / ".workflow_state.json"
         self.progress_file = self.run_dir / "progress.md"
         self.state = self._load_state()
+        # Mode: prefer constructor arg if explicitly set, else loaded state, else auto-detect
+        if mode in ("single", "multi"):
+            self.mode = mode
+        elif self.state.get("mode") in ("single", "multi"):
+            self.mode = self.state["mode"]
+        else:
+            self.mode = detect_mode(self.run_dir)
+        self.state["mode"] = self.mode
+
+    def get_active_sub_phases(self) -> Dict[str, List[str]]:
+        """Return the correct sub-phase dict based on current mode."""
+        if self.mode == "single":
+            return SINGLE_MODE_SUB_PHASES
+        return MULTI_MODE_SUB_PHASES
 
     def _load_state(self) -> Dict:
         if self.state_file.exists():
@@ -78,6 +133,7 @@ class SubPhaseWorkflowLock:
             "chapter_sub_phases": {},  # {chapter: {sub_phase: status}}
             "markers_count": {},
             "last_updated": None,
+            "mode": None,
         }
 
     def _save_state(self):
@@ -87,10 +143,12 @@ class SubPhaseWorkflowLock:
 
     def _update_progress_md(self):
         """Auto-update progress.md with current state."""
+        sub_phases_map = self.get_active_sub_phases()
         lines = [
             "# Integration Progress",
             "",
             f"**Last Updated**: {self.state.get('last_updated', 'N/A')}",
+            f"**Mode**: {self.mode}",
             "",
             "## Phase Status",
             "",
@@ -101,7 +159,7 @@ class SubPhaseWorkflowLock:
             lines.append(f"- Phase {phase}: **{status}**")
 
             # Sub-phase details
-            sub_phases = SUB_PHASES.get(phase, [])
+            sub_phases = sub_phases_map.get(phase, [])
             completed_subs = self.state["completed_sub_phases"].get(phase, [])
             for sp in sub_phases:
                 sp_status = "completed" if sp in completed_subs else "pending"
@@ -131,29 +189,31 @@ class SubPhaseWorkflowLock:
 
     def can_enter_phase(self, phase: str) -> bool:
         """Check if phase can be entered (previous phase completed)."""
-        if phase not in SUB_PHASES:
+        sub_phases_map = self.get_active_sub_phases()
+        if phase not in sub_phases_map:
             return False
 
-        phase_idx = list(SUB_PHASES.keys()).index(phase)
+        phase_idx = list(sub_phases_map.keys()).index(phase)
         if phase_idx == 0:
             return True
 
-        prev_phase = list(SUB_PHASES.keys())[phase_idx - 1]
+        prev_phase = list(sub_phases_map.keys())[phase_idx - 1]
         return prev_phase in self.state["completed_phases"]
 
     def can_enter_sub_phase(self, phase: str, sub_phase: str, chapter: Optional[str] = None) -> Tuple[bool, str]:
         """Check if sub-phase can be entered (previous sub-phase completed)."""
-        if phase not in SUB_PHASES:
+        sub_phases_map = self.get_active_sub_phases()
+        if phase not in sub_phases_map:
             return False, f"Unknown phase: {phase}"
 
-        sub_phases = SUB_PHASES[phase]
+        sub_phases = sub_phases_map[phase]
         if sub_phase not in sub_phases:
             return False, f"Unknown sub-phase: {sub_phase}"
 
         # Check phase entry
         if not self.can_enter_phase(phase):
-            phase_idx = list(SUB_PHASES.keys()).index(phase)
-            prev_phase = list(SUB_PHASES.keys())[phase_idx - 1]
+            phase_idx = list(sub_phases_map.keys()).index(phase)
+            prev_phase = list(sub_phases_map.keys())[phase_idx - 1]
             return False, f"Cannot enter Phase {phase}. Phase {prev_phase} not completed."
 
         # For Phase 2, check chapter-specific progress
@@ -217,8 +277,10 @@ class SubPhaseWorkflowLock:
                 self.state["chapter_sub_phases"][chapter] = {}
             self.state["chapter_sub_phases"][chapter][sub_phase] = status
 
-            # If 2.5 completed, mark chapter as done
-            if sub_phase == "2.5" and status == "completed":
+            # If last sub-phase completed, mark chapter as done
+            active_subs = self.get_active_sub_phases()
+            last_chapter_sub = active_subs[phase][-1] if phase in active_subs else "2.5"
+            if sub_phase == last_chapter_sub and status == "completed":
                 if chapter not in self.state["chapters_completed"]:
                     self.state["chapters_completed"].append(chapter)
                 if chapter in self.state["chapters_failed"]:
@@ -236,7 +298,8 @@ class SubPhaseWorkflowLock:
             self.state["markers_count"][phase] = self.state["markers_count"].get(phase, 0) + markers
 
         # Check if all sub-phases completed for this phase
-        all_subs = SUB_PHASES.get(phase, [])
+        active_subs = self.get_active_sub_phases()
+        all_subs = active_subs.get(phase, [])
         completed_subs = self.state["completed_sub_phases"].get(phase, [])
         if all(sp in completed_subs for sp in all_subs):
             if phase not in self.state["completed_phases"]:
@@ -249,6 +312,7 @@ class SubPhaseWorkflowLock:
     def get_status(self) -> Dict:
         """Get current workflow status."""
         return {
+            "mode": self.mode,
             "current_phase": self.state["current_phase"],
             "current_sub_phase": self.state["current_sub_phase"],
             "completed_phases": self.state["completed_phases"],
@@ -785,6 +849,26 @@ class GateChecker:
 
         return {"passed": True, "reason": f"Chapter validated: {line_count} lines, coverage OK", "details": coverage_details}
 
+    def check_2_6(self, chapter: str) -> Dict:
+        """2.6: Assemble - chapter assembled with all integration markers and cross-references."""
+        chapter_file = self.run_dir / "output" / f"{chapter}.html"
+        if not chapter_file.exists():
+            return {"passed": False, "reason": f"Chapter file {chapter}.html not found"}
+
+        content = chapter_file.read_text()
+
+        # Check for integration markers (must have at least one per source in multi-mode)
+        markers = re.findall(r'<!-- integrated:.*?-->', content)
+        if not markers:
+            return {"passed": False, "reason": "No integration markers found in assembled chapter"}
+
+        # Check for cross-reference links
+        xrefs = re.findall(r'<a[^>]*href=["\'][^"\']*#', content)
+        if not xrefs:
+            return {"passed": False, "reason": "No cross-reference links found in assembled chapter"}
+
+        return {"passed": True, "reason": f"Chapter assembled: {len(markers)} markers, {len(xrefs)} cross-refs"}
+
     # Phase 3 gates
     def check_3_1(self) -> Dict:
         """3.1: All chapters generated - check chapter count."""
@@ -858,6 +942,34 @@ class GateChecker:
 
         return {"passed": True, "reason": "All Phase 3 gates passed"}
 
+    def check_3_5(self) -> Dict:
+        """3.5: Single-mode final validation - completeness and quality checks."""
+        # Check all previous phase 3 gates
+        gates = [
+            self.check_3_1(),
+            self.check_3_2(),
+            self.check_3_3(),
+            self.check_3_4(),
+        ]
+
+        failed = [g for g in gates if not g["passed"]]
+        if failed:
+            return {"passed": False, "reason": f"Previous gates failed: {[g['reason'] for g in failed]}"}
+
+        # Single-mode specific: check that each chapter has substantial content
+        output_dir = self.run_dir / "output"
+        if output_dir.exists():
+            chapters = list(output_dir.glob("*.html"))
+            short_chapters = []
+            for ch in chapters:
+                line_count = len(ch.read_text().splitlines())
+                if line_count < 100:
+                    short_chapters.append(f"{ch.stem}: {line_count} lines")
+            if short_chapters:
+                return {"passed": False, "reason": f"Short chapters: {short_chapters}"}
+
+        return {"passed": True, "reason": "Single-mode final validation passed"}
+
     # Phase 4 gates
     def check_4_1(self) -> Dict:
         """4.1: Report drafted - report.md exists with required sections."""
@@ -911,7 +1023,7 @@ class GateChecker:
 def main():
     """CLI entry point."""
     if len(sys.argv) < 4:
-        print("Usage: workflow.py <skill_dir> <run_dir> <command> [args]")
+        print("Usage: workflow.py generate-book <run_dir> <command> [args]")
         print("Commands:")
         print("  status                                    - Show current workflow status")
         print("  check_gate <phase> [<sub_phase>] [chapter] - Check if a gate passes")
@@ -919,8 +1031,10 @@ def main():
         print("            --status completed|failed [--markers count] [--gate-result json]")
         print("  coverage_report                           - Per-source coverage report")
         print("  coverage_guard <chapter>                  - Per-chapter coverage check")
+        print("  detect_mode                               - Auto-detect single/multi mode")
         print("Phases: 0, 1, 2, 3, 4")
-        print("Sub-phases: 0.1-0.5, 1.1-1.6, 2.1-2.5, 3.1-3.4, 4.1-4.2")
+        print("Sub-phases (multi): 0.1-0.5, 1.1-1.6, 2.1-2.6, 3.1-3.4, 4.1-4.2")
+        print("Sub-phases (single): 0.1-0.3, 1.1-1.5, 2.1-2.4, 3.1-3.5, 4.1-4.2")
         sys.exit(1)
 
     skill_dir = sys.argv[1]
@@ -930,16 +1044,18 @@ def main():
     lock = SubPhaseWorkflowLock(run_dir)
     checker = GateChecker(run_dir)
     guardian = CoverageGuardian(run_dir)
+    active_sub_phases = lock.get_active_sub_phases()
 
     if command == "status":
         status = lock.get_status()
         print("=== Workflow Status ===")
+        print(f"Mode: {status['mode']}")
         print(f"Current phase: {status['current_phase'] or 'Not started'}")
         print(f"Current sub-phase: {status['current_sub_phase'] or 'N/A'}")
         print(f"Completed phases: {status['completed_phases']}")
         print("")
         print("=== Sub-phase Progress ===")
-        for phase, subs in SUB_PHASES.items():
+        for phase, subs in active_sub_phases.items():
             completed = status['completed_sub_phases'].get(phase, [])
             phase_status = "completed" if phase in status['completed_phases'] else "in-progress" if completed else "pending"
             print(f"Phase {phase}: {phase_status}")
@@ -959,9 +1075,13 @@ def main():
         for source, count in status.get('markers_count', {}).items():
             print(f"  {source}: {count} markers")
 
+    elif command == "detect_mode":
+        mode = detect_mode(Path(run_dir))
+        print(f"Detected mode: {mode}")
+
     elif command == "check_gate":
         if len(sys.argv) < 5:
-            print("Usage: workflow.py <skill_dir> <run_dir> check_gate <phase> [<sub_phase>] [chapter]")
+            print("Usage: workflow.py generate-book <run_dir> check_gate <phase> [<sub_phase>] [chapter]")
             sys.exit(1)
 
         phase = sys.argv[4]
@@ -970,7 +1090,7 @@ def main():
 
         # If no sub_phase specified, check all sub-phases for the phase
         if not sub_phase:
-            sub_phases = SUB_PHASES.get(phase, [])
+            sub_phases = active_sub_phases.get(phase, [])
             if not sub_phases:
                 print(f"ERROR: Unknown phase: {phase}")
                 sys.exit(1)
