@@ -1,6 +1,0 @@
-{
-  "name": "tech-book-skills",
-  "version": "1.0.0",
-  "description": "Agent skills for translating, generating, integrating, and reviewing technical books",
-  "dependencies": {}
-}
