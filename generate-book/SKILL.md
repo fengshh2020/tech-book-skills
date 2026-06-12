@@ -47,7 +47,10 @@ Use when exactly one source book is provided. The workflow is: extract, translat
 
 ### Phase 0: Extract & Read (3 Sub-phases)
 
-**Auto-load**: `references/agent-orchestration.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/agent-orchestration.md` completely (no skimming)
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] If unchecked: STOP. Do not proceed.
 
 #### 0.1 Source Inventory
 - Parse source file (EPUB or HTML)
@@ -69,6 +72,15 @@ Use when exactly one source book is provided. The workflow is: extract, translat
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 0 --sub-phase 0.2 --status completed`
 
 #### 0.3 Gate 0
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 0
 ```
@@ -78,7 +90,12 @@ python scripts/workflow.py generate-book <run_dir> check_gate 0
 
 ### Phase 1: Translate (5 Sub-phases)
 
-**Auto-load**: `references/translation-rules.md`, `shared/translationese-patterns.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/translation-rules.md` completely (no skimming)
+- [ ] Read `shared/translationese-patterns.md` completely (no skimming)
+- [ ] Read any existing `.book-doc/spec.md` for terminology
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 #### 1.1 Load Translation Rules
 - Read `references/translation-rules.md` completely
@@ -108,6 +125,15 @@ python scripts/workflow.py generate-book <run_dir> check_gate 0
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 1 --sub-phase 1.4 --status completed`
 
 #### 1.5 Gate 1
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 1
 ```
@@ -119,7 +145,11 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 
 ### Phase 2: Assemble (4 Sub-phases)
 
-**Auto-load**: `references/book-assembly.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/book-assembly.md` completely (no skimming)
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] Gate 1 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 #### 2.1 HTML Scaffold
 - Create output directory structure following `references/book-assembly.md`
@@ -146,6 +176,15 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 2 --sub-phase 2.3 --status completed`
 
 #### 2.4 Gate 2
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 2
 ```
@@ -166,6 +205,15 @@ python scripts/workflow.py generate-book <run_dir> check_gate 2
 6. Paragraph count verification (source = target for every chapter)
 
 **Auto-check scripts**:
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/validate_tech.py output/
 python scripts/validate_terms.py output/
@@ -182,11 +230,23 @@ python scripts/workflow.py generate-book <run_dir> check_gate 3
 
 ### Phase 4: Report
 
-**Auto-load**: `shared/report-templates.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `shared/report-templates.md` completely (no skimming)
+- [ ] Gate 3 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Do**: Write `report.md` with summary, per-chapter scores, issues, terminology table, known limits.
 
 **Gate**:
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 4
 ```
@@ -201,7 +261,11 @@ Use when two or more source books are provided. The workflow is: deep reading, a
 
 ### Phase 0: Deep Reading (5 Sub-phases)
 
-**Auto-load**: `references/knowledge-index-format.md`, `references/agent-orchestration.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/knowledge-index-format.md` completely (no skimming)
+- [ ] Read `references/agent-orchestration.md` completely (no skimming)
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 #### 0.1 Book Inventory
 - List all source books with chapter structure
@@ -234,6 +298,15 @@ Use when two or more source books are provided. The workflow is: deep reading, a
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 0 --sub-phase 0.4 --status completed`
 
 #### 0.5 Gate 0
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 0
 ```
@@ -255,7 +328,12 @@ python scripts/workflow.py generate-book <run_dir> check_gate 0
 
 ### Phase 1: Architecture Design (6 Sub-phases)
 
-**Auto-load**: `references/book-architecture.md`, all knowledge indexes from Phase 0
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/book-architecture.md` completely (no skimming)
+- [ ] Re-read ALL knowledge indexes from Phase 0 (no "I remember")
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] Gate 0 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 #### 1.1 Load Indexes
 - Read ALL knowledge indexes completely (do not skim)
@@ -291,6 +369,15 @@ For EACH chapter, write detailed integration plan:
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 1 --sub-phase 1.5 --status completed`
 
 #### 1.6 Gate 1
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 1
 ```
@@ -302,7 +389,12 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 
 ### Phase 2: Chapter Generation (6 Sub-phases per Chapter)
 
-**Auto-load**: `references/full-integration.md`, `references/agent-orchestration.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/full-integration.md` completely (no skimming)
+- [ ] Read `references/agent-orchestration.md` completely (no skimming)
+- [ ] Re-read chapter's integration plan from plan.md
+- [ ] Gate 1 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 #### 2.1 Load Plan + Sources
 - Load chapter's integration plan from plan.md
@@ -320,6 +412,15 @@ Execute 5-step rewrite:
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 2 --sub-phase 2.2 --chapter <chapter> --status completed`
 
 #### 2.3 Quality Gate (G1-G8)
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 2 <chapter>
 ```
@@ -343,6 +444,15 @@ python scripts/workflow.py generate-book <run_dir> check_gate 2 <chapter>
 - Command: `python scripts/workflow.py generate-book <run_dir> record_progress --phase 2 --sub-phase 2.4 --chapter <chapter> --status completed`
 
 #### 2.5 Batch Check (Every 5 Chapters)
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 2b
 ```
@@ -384,6 +494,15 @@ python scripts/workflow.py generate-book <run_dir> coverage_guard
 ```
 
 **Auto-check scripts**:
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/validate_tech.py output/
 python scripts/validate_terms.py output/
@@ -401,11 +520,23 @@ python scripts/workflow.py generate-book <run_dir> check_gate 3
 
 ### Phase 4: Report
 
-**Auto-load**: `shared/report-templates.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `shared/report-templates.md` completely (no skimming)
+- [ ] Gate 3 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Do**: Write `report.md` with summary, per-chapter scores, issues, coverage matrix, known limits, Coverage Guardian results.
 
 **Gate**:
+
+**STOP -- Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Output size < 80% of source for any chapter
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 4
 ```
