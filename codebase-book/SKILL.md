@@ -75,6 +75,14 @@ Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate �
 
 **Output**: `{RUN}/codebase-map.md`
 
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I analyzed" claim lacks file:line evidence
+- [ ] Any module analyzed by name only (no source code read)
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 **Gate (must pass)**:
 - [ ] Every relevant file classified or excluded with reason
 
@@ -82,7 +90,11 @@ Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate �
 
 ## Phase 2: Analyze
 
-**Read**: `references/analysis-guide.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/analysis-guide.md` completely (no skimming)
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] Gate 1 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **What to do** (per core module):
 - **Interface & behavior**: public API, parameter semantics, core logic, data/control flow
@@ -92,7 +104,24 @@ Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate �
 - **Implicit knowledge**: what reader needs to know (language features, framework mechanisms, algorithm theory)
 - **Position in execution path**: where this module sits in global chain
 
+**Evidence required per module** (write to analysis/{module}.md):
+```
+### [Module] Analysis Evidence
+- Source files read: [list with line counts]
+- Functions analyzed: [count, with file:line references]
+- Design decisions: [count, each with "why" documented]
+- Key terms: [≥3 specific implementation details, NOT generic descriptions]
+```
+
 **Output**: `{RUN}/analysis/{module}.md`
+
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I analyzed" claim lacks file:line evidence
+- [ ] Any module analyzed by name only (no source code read)
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
 
 **Gate (must pass)**:
 - [ ] Core modules covered for interface, design, algorithm, implicit knowledge
@@ -101,7 +130,11 @@ Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate �
 
 ## Phase 3: Plan
 
-**Read**: `references/writing-and-content.md`, `references/writing-guide.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/writing-and-content.md` completely (no skimming)
+- [ ] Read `references/writing-guide.md` completely (no skimming)
+- [ ] Gate 2 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **What to do**:
 1. Define target audience and prerequisites
@@ -116,6 +149,14 @@ Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate �
 
 **Output**: `{RUN}/chapter-plan.md`
 
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I analyzed" claim lacks file:line evidence
+- [ ] Any module analyzed by name only (no source code read)
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 **Gate (must pass)**:
 - [ ] Core execution paths have no gaps
 - [ ] Repeated mechanisms have first detailed + subsequent referenced
@@ -124,7 +165,11 @@ Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate �
 
 ## Phase 4: Generate
 
-**Read**: `references/writing-and-content.md`, `references/writing-guide.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Re-read `references/writing-and-content.md` completely (no "I remember")
+- [ ] Re-read `references/writing-guide.md` completely (no "I remember")
+- [ ] Gate 3 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 Copy `assets/style.css` and `assets/script.js` to `output/`.
 
@@ -164,7 +209,10 @@ python ../shared/validate_tech.py output/
 python ../shared/validate_terms.py output/
 ```
 
-**Read**: `../shared/report-templates.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `shared/report-templates.md` completely (no skimming)
+- [ ] All chapters generated with `<!-- generated: complete -->` marker
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 Write `{RUN}/report.md`. Mark `progress.md` as completed.
 
