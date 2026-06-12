@@ -1,4 +1,0 @@
-interface:
-  display_name: "Integrate Books"
-  short_description: "Synthesize multiple technical books"
-  default_prompt: "Use $integrate-books to design the book architecture first, then synthesize these technical books into one coherent book."

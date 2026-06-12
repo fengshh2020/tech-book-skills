@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Validate generated codebase-book HTML output.
+# Validate generated HTML book output.
+# Supports all modes (single-source, multi-source, codebase).
+# Some checks (diagrams, file:line) are codebase-mode-specific and will warn gracefully.
 # Usage: validate_output.sh [output_dir]
 
 set -euo pipefail
@@ -11,7 +13,7 @@ fi
 
 ERRORS=0
 
-echo "=== codebase-book output validation ==="
+echo "=== generate-book output validation ==="
 echo "output: $DIR"
 echo ""
 
@@ -296,7 +298,7 @@ fi
 
 echo ""
 if [ "$ERRORS" -eq 0 ]; then
-  echo "OK: codebase-book output validation passed"
+  echo "OK: generate-book output validation passed"
 else
   echo "FAIL: $ERRORS hard validation issue(s)"
   exit 1
