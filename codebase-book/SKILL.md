@@ -3,256 +3,257 @@ name: codebase-book
 description: "Generate project mastery guide from codebase. Trigger: 生成项目书籍, codebase walkthrough, 掌握项目, 架构学习指南. Do NOT trigger for: code review, README, API reference."
 ---
 
-# Codebase Book
+# Codebase Book（代码库书籍）
 
-## ⛊ IRON LAW
+## ⛊ IRON LAW（铁律）
 
 **NO COVERAGE CLAIM WITHOUT FILE:LINE EVIDENCE. NO GATE SKIP. NO LISTING WITHOUT EXPLAINING. NO CONTENT SHRINKAGE.**
+（没有 file:line 证据不得声称已覆盖。不得跳过关卡。不得只列不解释。不得缩减内容。）
 
-Violating the letter of this rule IS violating the spirit of this rule.
+违反这条规则的字面含义，就是违反这条规则的精神。
 
-### Anti-Rationalization Table
+### Anti-Rationalization Table（反合理化表）
 
-| If you think... | The truth is... |
+| 如果你认为... | 事实是... |
 |-----------------|-----------------|
-| "I remember this module" | You don't. Re-read the source. |
-| "The function name tells me enough" | It doesn't. Read the body. |
-| "Gate probably passes" | Run it. No probably. |
-| "This is ~20KB per chapter" | Shrinkage = lost understanding. Expand. |
-| "I'll add depth later" | Add depth now. Later never comes. |
-| "Just this once" | "Just this once" is how it starts. |
-| "The user wants speed" | The user wants mastery-level depth. |
-| "I already analyzed this" | Re-analyze. Fresh evidence only. |
+| "我记得这个模块" | 你不记得。重新读源码。 |
+| "函数名已经告诉我足够多了" | 并没有。读函数体。 |
+| "关卡大概能通过" | 运行它。没有"大概"。 |
+| "每章大概 20KB 差不多" | 内容缩减 = 理解丢失。扩展它。 |
+| "深度我以后再加" | 现在就加深度。"以后"永远不会来。 |
+| "就这一次" | "就这一次"就是堕落的开始。 |
+| "用户想要速度" | 用户想要的是精通级别的深度。 |
+| "我已经分析过这个了" | 重新分析。只用新鲜证据。 |
 
-Generate a deep learning guide from a codebase. Focus: design decisions, code understanding, algorithms, knowledge points.
+从代码库生成深度学习指南。聚焦：设计决策、代码理解、算法、知识点。
 
-## What Success Looks Like
+## 成功标准
 
-A reader finishing the book can trace every key behavior to its source location, understand why the design choice was made, and master all background knowledge needed.
+读者读完本书后，能够将每个关键行为追溯到其源码位置，理解设计选择背后的原因，并掌握所有必需的背景知识。
 
-## What Failure Looks Like (Common Model Mistakes)
+## 失败模式识别（常见模型错误）
 
-**Mistake 1: Listing functions**
-- Model behavior: "Function A does X, Function B does Y"
-- Result: Reader sees isolated facts, no understanding
-- Fix: Follow execution paths, tell a coherent story
+**错误 1：罗列函数**
+- 模型行为："函数 A 做 X，函数 B 做 Y"
+- 后果：读者看到孤立事实，无法形成理解
+- 修复：追踪执行路径，讲述连贯的故事
 
-**Mistake 2: Shallow coverage**
-- Model behavior: "15 chapters covering everything"
-- Result: Each topic gets 1 paragraph, reader learns nothing
-- Fix: Depth over breadth. 5 thorough chapters > 15 shallow ones.
+**错误 2：浅层覆盖**
+- 模型行为："15 章覆盖全部内容"
+- 后果：每个主题只有 1 段话，读者什么也学不到
+- 修复：深度优先于广度。5 个扎实的章节 > 15 个浅尝辄止的章节。
 
-**Mistake 3: No source evidence**
-- Model behavior: "This function handles errors"
-- Result: Reader cannot verify, cannot trace
-- Fix: Every claim needs file path + line number
+**错误 3：缺少源码证据**
+- 模型行为："这个函数处理错误"
+- 后果：读者无法验证，无法追溯
+- 修复：每个论断都需要文件路径 + 行号
 
-**Mistake 4: Skipping error paths**
-- Model behavior: "The happy path works like this"
-- Result: Reader crashes on first exception
-- Fix: Cover error handling, boundary conditions
+**错误 4：跳过错误路径**
+- 模型行为："正常路径是这样工作的"
+- 后果：读者遇到第一个异常就崩溃
+- 修复：覆盖错误处理、边界条件
 
-**Mistake 5: Repetition**
-- Model behavior: "This pattern appears in 5 places, I'll explain it 5 times"
-- Result: Reader reads the same thing 5 times
-- Fix: Explain once, cross-reference afterwards
+**错误 5：重复**
+- 模型行为："这个模式出现在 5 个地方，我解释 5 遍"
+- 后果：读者读了 5 遍同样的内容
+- 修复：解释一次，之后交叉引用
 
-**Mistake 6: Re-read skip**
-- **Model behavior**: "I already analyzed this module in Phase 2"
-- **Result**: Stale analysis, missing code changes, wrong design decisions
-- **Fix**: Re-read source files before writing. Record evidence with line counts.
+**错误 6：跳过重读**
+- **模型行为**："我在第二阶段已经分析过这个模块了"
+- **后果**：分析过时，遗漏代码变更，设计决策错误
+- **修复**：写之前重读源文件。用行数记录证据。
 
-**Mistake 7: Name-only analysis (title inference variant)**
-- **Model behavior**: "Function `processData` processes data" (reads name, not body)
-- **Result**: Misses error handling, side effects, algorithm complexity, actual logic
-- **Fix**: Read function body. Document what it ACTUALLY does, not what the name says.
+**错误 7：仅凭名称分析（标题推断变体）**
+- **模型行为**："函数 `processData` 处理数据"（只读名称，没读函数体）
+- **后果**：遗漏错误处理、副作用、算法复杂度、实际逻辑
+- **修复**：读函数体。记录它实际做了什么，而不是名称说它做了什么。
 
-**Mistake 8: Gate bypass**
-- **Model behavior**: "Gate passes — all modules covered"
-- **Result**: Core modules analyzed by name only; no file:line evidence
-- **Fix**: Run gate check. Paste output. Verify every core module has analysis file.
+**错误 8：绕过关卡检查**
+- **模型行为**："关卡通过 — 所有模块已覆盖"
+- **后果**：核心模块仅凭名称分析；没有 file:line 证据
+- **修复**：运行关卡检查。粘贴输出。验证每个核心模块都有分析文件。
 
-**Mistake 9: Content shrinkage**
-- **Model behavior**: "Chapter generated" (5KB for what should be 20KB core chapter)
-- **Result**: Reader sees superficial overview, cannot trace behavior to source
-- **Fix**: Check output size against minimums (core ≥ 20KB, overview ≥ 10KB). Expand shallow sections.
+**错误 9：内容缩减**
+- **模型行为**："章节已生成"（核心章节只有 5KB，应该有 20KB）
+- **后果**：读者只看到表面概述，无法将行为追溯到源码
+- **修复**：对照最低要求检查输出大小（核心章节 ≥ 20KB，概览 ≥ 10KB）。扩展浅层部分。
 
-## Phase Flow (Mandatory Sequence)
+## 阶段流程（强制顺序）
 
 ```
-Phase 1: Discover → Phase 2: Analyze → Phase 3: Plan → Phase 4: Generate → Phase 5: Validate
+阶段 1: 发现 → 阶段 2: 分析 → 阶段 3: 规划 → 阶段 4: 生成 → 阶段 5: 验证
 ```
 
-**Critical rule**: You cannot enter Phase N until Phase N-1 is complete with evidence.
+**关键规则**：在阶段 N-1 附带证据完成之前，不得进入阶段 N。
 
-## Phase 1: Discover
+## 阶段 1：发现
 
-**What to do**:
-1. Identify source files, tests, configs, resources
-2. Determine languages, frameworks, dependencies, build commands, entry points
-3. Classify each file: core path (deep) / support path (summary) / reference (confirm)
-4. Identify natural execution paths: input → modules → output
+**要做什么**：
+1. 识别源文件、测试、配置、资源
+2. 确定语言、框架、依赖、构建命令、入口点
+3. 分类每个文件：核心路径（深度）/ 支撑路径（概要）/ 参考（确认）
+4. 识别自然执行路径：输入 → 模块 → 输出
 
-**Output**: `{RUN}/codebase-map.md`
+**输出**：`{RUN}/codebase-map.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I analyzed" claim lacks file:line evidence
-- [ ] Any module analyzed by name only (no source code read)
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重读
+- [ ] 任何"我已分析"的声明缺少 file:line 证据
+- [ ] 任何模块仅凭名称分析（未读源码）
+- [ ] 关卡检查未实际运行（只是声称）
 
-**If ANY checked: Fix before running gate.**
+**如果有任何勾选：修复后再运行关卡。**
 
-**Gate (must pass)**:
-- [ ] Every relevant file classified or excluded with reason
+**关卡（必须通过）**：
+- [ ] 每个相关文件已分类，或附理由排除
 
-**If gate fails**: Re-classify. Do not enter Phase 2.
+**如果关卡未通过**：重新分类。不得进入阶段 2。
 
-## Phase 2: Analyze
+## 阶段 2：分析
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `references/analysis-guide.md` completely (no skimming)
-- [ ] Record read confirmation in progress.md with structure evidence
-- [ ] Gate 1 passed with evidence in progress.md
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整阅读 `references/analysis-guide.md`（不得略读）
+- [ ] 在 progress.md 中记录阅读确认及结构证据
+- [ ] 关卡 1 已通过，progress.md 中有证据
+- [ ] 如有未勾选项：停止。不得继续。
 
-**What to do** (per core module):
-- **Interface & behavior**: public API, parameter semantics, core logic, data/control flow
-- **Design decisions**: why this data structure/algorithm/pattern? alternatives? trade-offs?
-- **Key algorithms**: core idea, complexity, parameter effects
-- **Error handling**: exception paths, degradation, boundary conditions
-- **Implicit knowledge**: what reader needs to know (language features, framework mechanisms, algorithm theory)
-- **Position in execution path**: where this module sits in global chain
+**要做什么**（针对每个核心模块）：
+- **接口与行为**：公共 API、参数语义、核心逻辑、数据/控制流
+- **设计决策**：为什么选择这个数据结构/算法/模式？替代方案？权衡取舍？
+- **核心算法**：核心思想、复杂度、参数影响
+- **错误处理**：异常路径、降级策略、边界条件
+- **隐含知识**：读者需要了解什么（语言特性、框架机制、算法理论）
+- **在执行路径中的位置**：该模块在全局链路中的位置
 
-**Evidence required per module** (write to analysis/{module}.md):
+**每个模块需要的证据**（写入 analysis/{module}.md）：
 ```
-### [Module] Analysis Evidence
-- Source files read: [list with line counts]
-- Functions analyzed: [count, with file:line references]
-- Design decisions: [count, each with "why" documented]
-- Key terms: [≥3 specific implementation details, NOT generic descriptions]
+### [模块] 分析证据
+- 已读源文件：[列出，附带行数]
+- 已分析函数：[数量，附带 file:line 引用]
+- 设计决策：[数量，每条都有"为什么"的记录]
+- 关键术语：[≥3 个具体实现细节，不是泛泛描述]
 ```
 
-**Output**: `{RUN}/analysis/{module}.md`
+**输出**：`{RUN}/analysis/{module}.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I analyzed" claim lacks file:line evidence
-- [ ] Any module analyzed by name only (no source code read)
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重读
+- [ ] 任何"我已分析"的声明缺少 file:line 证据
+- [ ] 任何模块仅凭名称分析（未读源码）
+- [ ] 关卡检查未实际运行（只是声称）
 
-**If ANY checked: Fix before running gate.**
+**如果有任何勾选：修复后再运行关卡。**
 
-**Gate (must pass)**:
-- [ ] Core modules covered for interface, design, algorithm, implicit knowledge
+**关卡（必须通过）**：
+- [ ] 核心模块已覆盖接口、设计、算法、隐含知识
 
-**If gate fails**: Add missing analysis. Do not enter Phase 3.
+**如果关卡未通过**：补充缺失分析。不得进入阶段 3。
 
-## Phase 3: Plan
+## 阶段 3：规划
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `references/writing-and-content.md` completely (no skimming)
-- [ ] Read `references/writing-guide.md` completely (no skimming)
-- [ ] Gate 2 passed with evidence in progress.md
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整阅读 `references/writing-and-content.md`（不得略读）
+- [ ] 完整阅读 `references/writing-guide.md`（不得略读）
+- [ ] 关卡 2 已通过，progress.md 中有证据
+- [ ] 如有未勾选项：停止。不得继续。
 
-**What to do**:
-1. Define target audience and prerequisites
-2. Chapter list ordered by content logic (not directory tree)
-3. Per chapter: core content, covered source files, knowledge expansion points, deferred scope
+**要做什么**：
+1. 定义目标读者和前置知识要求
+2. 章节列表按内容逻辑排序（不是按目录树结构）
+3. 每章：核心内容、覆盖的源文件、知识扩展点、延后范围
 
-**Planning principles**:
-- Structure serves content logic
-- Each pattern explained once, rest cross-referenced
-- Each chapter has clear focus
-- No forced components unless natural
+**规划原则**：
+- 结构服务于内容逻辑
+- 每个模式只详细解释一次，其余交叉引用
+- 每章有明确焦点
+- 不强行安排组件，除非自然需要
 
-**Output**: `{RUN}/chapter-plan.md`
+**输出**：`{RUN}/chapter-plan.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I analyzed" claim lacks file:line evidence
-- [ ] Any module analyzed by name only (no source code read)
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重读
+- [ ] 任何"我已分析"的声明缺少 file:line 证据
+- [ ] 任何模块仅凭名称分析（未读源码）
+- [ ] 关卡检查未实际运行（只是声称）
 
-**If ANY checked: Fix before running gate.**
+**如果有任何勾选：修复后再运行关卡。**
 
-**Gate (must pass)**:
-- [ ] Core execution paths have no gaps
-- [ ] Repeated mechanisms have first detailed + subsequent referenced
+**关卡（必须通过）**：
+- [ ] 核心执行路径没有缺口
+- [ ] 重复机制已有首次详述 + 后续引用
 
-**If gate fails**: Revise plan. Do not enter Phase 4.
+**如果关卡未通过**：修订计划。不得进入阶段 4。
 
-## Phase 4: Generate
+## 阶段 4：生成
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Re-read `references/writing-and-content.md` completely (no "I remember")
-- [ ] Re-read `references/writing-guide.md` completely (no "I remember")
-- [ ] Gate 3 passed with evidence in progress.md
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 重新完整阅读 `references/writing-and-content.md`（不得说"我记得"）
+- [ ] 重新完整阅读 `references/writing-guide.md`（不得说"我记得"）
+- [ ] 关卡 3 已通过，progress.md 中有证据
+- [ ] 如有未勾选项：停止。不得继续。
 
-Copy `assets/style.css` and `assets/script.js` to `output/`.
+将 `assets/style.css` 和 `assets/script.js` 复制到 `output/`。
 
-**Per chapter**:
-1. First line: `<!-- generated: complete -->`
-2. Code excerpts: copy from source, annotate file path + line range
-3. **Narrative-driven**: follow execution path or design thread
-4. **Diagrams first**: complex flows → `{RUN}/diagram-specs/*.json` → `output/diagrams/*.drawio`
-5. Core functions: show code + explain logic + analyze design
-6. Design decisions: what, why, alternatives, trade-offs
-7. Key algorithms: core idea, data structures, parameter effects
-8. Knowledge expansion: sidebar (not in code walkthrough)
-9. No `[待确认]` in final HTML
+**每章**：
+1. 第一行：`<!-- generated: complete -->`
+2. 代码摘录：从源码复制，标注文件路径 + 行范围
+3. **叙事驱动**：沿执行路径或设计线索展开
+4. **图表优先**：复杂流程 → `{RUN}/diagram-specs/*.json` → `output/diagrams/*.drawio`
+5. 核心函数：展示代码 + 解释逻辑 + 分析设计
+6. 设计决策：是什么、为什么、替代方案、权衡取舍
+7. 核心算法：核心思想、数据结构、参数影响
+8. 知识扩展：侧边栏（不在代码走读中穿插）
+9. 最终 HTML 中不得有 `[待确认]`
 
-**Content depth**:
-- Core chapters ≥ 20KB, overview ≥ 10KB
-- Core path: every function has code + explanation
-- Core path: every parameter explained
-- Error paths covered
-- Code:explanation ratio ≥ 1:1
+**内容深度**：
+- 核心章节 ≥ 20KB，概览 ≥ 10KB
+- 核心路径：每个函数都有代码 + 解释
+- 核心路径：每个参数都有说明
+- 错误路径已覆盖
+- 代码:解释比例 ≥ 1:1
 
-**Parallel writing** (chapters > 5):
-- Batch by 2-3 chapters
-- Each writer prompt: full source + chapter plan + HTML template + cross-reference info
-- Cover, TOC, CSS/JS by main agent before parallel
+**并行写作**（章节数 > 5 时）：
+- 每批 2-3 章
+- 每个写作者的提示词：完整源码 + 章节计划 + HTML 模板 + 交叉引用信息
+- 封面、目录、CSS/JS 由主代理在并行之前完成
 
-## Phase 5: Validate
+## 阶段 5：验证
 
-Run: `scripts/validate_output.sh output/`
+运行：`scripts/validate_output.sh output/`
 
-**Auto-check scripts**:
+**自动检查脚本**：
 ```bash
-# Technical accuracy validation
+# 技术准确性验证
 python ../shared/validate_tech.py output/
 
-# Terminology consistency validation
+# 术语一致性验证
 python ../shared/validate_terms.py output/
 ```
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `shared/report-templates.md` completely (no skimming)
-- [ ] All chapters generated with `<!-- generated: complete -->` marker
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整阅读 `shared/report-templates.md`（不得略读）
+- [ ] 所有章节已生成并带有 `<!-- generated: complete -->` 标记
+- [ ] 如有未勾选项：停止。不得继续。
 
-Write `{RUN}/report.md`. Mark `progress.md` as completed.
+编写 `{RUN}/report.md`。将 `progress.md` 标记为已完成。
 
-## Pre-Chapter Red Flags
+## 章节完成前红线检查
 
-**Before marking any chapter complete, verify NONE of these:**
-- [ ] Source files were analyzed by name only (no code body read)
-- [ ] No file:line references in the chapter
-- [ ] Chapter size below minimum (core < 20KB, overview < 10KB)
-- [ ] Code:explanation ratio below 1:1
-- [ ] Error paths not covered for core modules
-- [ ] Design decisions stated without alternatives/trade-offs
+**标记任何章节完成前，确认以下均不为真：**
+- [ ] 源文件仅凭名称分析（未读代码体）
+- [ ] 章节中没有 file:line 引用
+- [ ] 章节大小低于最低要求（核心 < 20KB，概览 < 10KB）
+- [ ] 代码:解释比例低于 1:1
+- [ ] 核心模块未覆盖错误路径
+- [ ] 设计决策未给出替代方案/权衡取舍
 
-**If ANY checked: Expand chapter before proceeding.**
+**如果有任何勾选：扩展章节后再继续。**
 
-## Quality Standards
+## 质量标准
 
-- Reader understands design decisions and trade-offs
-- Reader can trace every key behavior to source location
-- Reader masters all background knowledge (language, framework, algorithm)
-- Depth: not "this function does X" but "why this way, alternatives, parameter effects"
-- No repetition: one detailed explanation, rest cross-referenced
-- Structure follows content logic, not template filling
+- 读者理解设计决策和权衡取舍
+- 读者能将每个关键行为追溯到源码位置
+- 读者掌握所有背景知识（语言、框架、算法）
+- 深度：不是"这个函数做 X"，而是"为什么这样做、替代方案、参数影响"
+- 无重复：一次详细解释，其余交叉引用
+- 结构遵循内容逻辑，不是模板填空
