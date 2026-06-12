@@ -57,6 +57,26 @@ A reader finishing the book can trace every key behavior to its source location,
 - Result: Reader reads the same thing 5 times
 - Fix: Explain once, cross-reference afterwards
 
+**Mistake 6: Re-read skip**
+- **Model behavior**: "I already analyzed this module in Phase 2"
+- **Result**: Stale analysis, missing code changes, wrong design decisions
+- **Fix**: Re-read source files before writing. Record evidence with line counts.
+
+**Mistake 7: Name-only analysis (title inference variant)**
+- **Model behavior**: "Function `processData` processes data" (reads name, not body)
+- **Result**: Misses error handling, side effects, algorithm complexity, actual logic
+- **Fix**: Read function body. Document what it ACTUALLY does, not what the name says.
+
+**Mistake 8: Gate bypass**
+- **Model behavior**: "Gate passes — all modules covered"
+- **Result**: Core modules analyzed by name only; no file:line evidence
+- **Fix**: Run gate check. Paste output. Verify every core module has analysis file.
+
+**Mistake 9: Content shrinkage**
+- **Model behavior**: "Chapter generated" (5KB for what should be 20KB core chapter)
+- **Result**: Reader sees superficial overview, cannot trace behavior to source
+- **Fix**: Check output size against minimums (core ≥ 20KB, overview ≥ 10KB). Expand shallow sections.
+
 ## Phase Flow (Mandatory Sequence)
 
 ```
@@ -215,6 +235,18 @@ python ../shared/validate_terms.py output/
 - [ ] If ANY unchecked: STOP. Do not proceed.
 
 Write `{RUN}/report.md`. Mark `progress.md` as completed.
+
+## Pre-Chapter Red Flags
+
+**Before marking any chapter complete, verify NONE of these:**
+- [ ] Source files were analyzed by name only (no code body read)
+- [ ] No file:line references in the chapter
+- [ ] Chapter size below minimum (core < 20KB, overview < 10KB)
+- [ ] Code:explanation ratio below 1:1
+- [ ] Error paths not covered for core modules
+- [ ] Design decisions stated without alternatives/trade-offs
+
+**If ANY checked: Expand chapter before proceeding.**
 
 ## Quality Standards
 
