@@ -27,6 +27,18 @@ description: "Generate a unified technical book from one or more sources. Single
 
 从一个或多个源材料生成统一的技术书籍。单一源 -> 翻译 + 组装。多个源 -> 整合 + 组装。输出必须读起来像一本书，而不是拼贴画。
 
+### 标准关卡自检清单 (Standard Gate Self-Check)
+
+> 以下自检清单适用于本文件中所有关卡。在每个关卡前必须确认：
+>
+> **⛔ 运行关卡前，确认以下均不为真：**
+> - [ ] 任何参考文件在本阶段未被重新阅读
+> - [ ] 任何"我已阅读"的声明缺少结构证据
+> - [ ] 任何章节的输出大小 < 源文件的 80%
+> - [ ] Gate 检查未实际运行（仅口头声称）
+>
+> **如有任何一项被勾选：先修复再运行关卡。**
+
 ## 模式选择
 
 自动检测：1 个源 -> 单源模式，2+ 个源 -> 多源模式。
@@ -72,15 +84,9 @@ description: "Generate a unified technical book from one or more sources. Single
   ```
 - 命令：`python scripts/workflow.py generate-book <run_dir> record_progress --phase 0 --sub-phase 0.2 --status completed`
 
-#### 0.3 Gate 0（关卡 0）
+#### 0.3 关卡（Gate 0）
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 0
@@ -125,15 +131,9 @@ python scripts/workflow.py generate-book <run_dir> check_gate 0
 - 修复所有检测到的翻译腔
 - 命令：`python scripts/workflow.py generate-book <run_dir> record_progress --phase 1 --sub-phase 1.4 --status completed`
 
-#### 1.5 Gate 1（关卡 1）
+#### 1.5 关卡（Gate 1）
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 1
@@ -149,7 +149,7 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整阅读 `references/book-assembly.md`（不可略读）
 - [ ] 在 progress.md 中记录阅读确认及结构证据
-- [ ] Gate 1 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 1）已通过，progress.md 中有证据
 - [ ] 如有任何一项未勾选：停止。不得继续。
 
 #### 2.1 HTML 脚手架 (HTML Scaffold)
@@ -176,15 +176,9 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 - 验证所有内部链接正确解析
 - 命令：`python scripts/workflow.py generate-book <run_dir> record_progress --phase 2 --sub-phase 2.3 --status completed`
 
-#### 2.4 Gate 2（关卡 2）
+#### 2.4 关卡（Gate 2）
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 2
@@ -207,13 +201,7 @@ python scripts/workflow.py generate-book <run_dir> check_gate 2
 
 **自动检查脚本**：
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/validate_tech.py output/
@@ -221,7 +209,7 @@ python scripts/validate_terms.py output/
 python scripts/workflow.py generate-book <run_dir> check_gate 3
 ```
 
-**Gate（关卡）**：
+**关卡（Gate 3）**：
 - 所有术语一致
 - 所有代码可运行
 - 所有交叉引用有效
@@ -233,20 +221,14 @@ python scripts/workflow.py generate-book <run_dir> check_gate 3
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整阅读 `shared/report-templates.md`（不可略读）
-- [ ] Gate 3 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 3）已通过，progress.md 中有证据
 - [ ] 如有任何一项未勾选：停止。不得继续。
 
 **执行操作**：编写 `report.md`，包含摘要、每章评分、问题列表、术语表、已知限制。
 
-**Gate（关卡）**：
+**关卡（Gate 4）**：
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 4
@@ -298,15 +280,9 @@ python scripts/workflow.py generate-book <run_dir> check_gate 4
 - 识别：重叠部分、空白区域、独特贡献、深度差异
 - 命令：`python scripts/workflow.py generate-book <run_dir> record_progress --phase 0 --sub-phase 0.4 --status completed`
 
-#### 0.5 Gate 0（关卡 0）
+#### 0.5 关卡（Gate 0）
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 0
@@ -333,7 +309,7 @@ python scripts/workflow.py generate-book <run_dir> check_gate 0
 - [ ] 完整阅读 `references/book-architecture.md`（不可略读）
 - [ ] 重新阅读 Phase 0 的所有知识索引（不要说"我记得"）
 - [ ] 在 progress.md 中记录阅读确认及结构证据
-- [ ] Gate 0 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 0）已通过，progress.md 中有证据
 - [ ] 如有任何一项未勾选：停止。不得继续。
 
 #### 1.1 加载索引 (Load Indexes)
@@ -369,15 +345,9 @@ python scripts/workflow.py generate-book <run_dir> check_gate 0
 - 每个源章节必须映射到：目标章节 / 侧边栏 / 附录 / 明确排除
 - 命令：`python scripts/workflow.py generate-book <run_dir> record_progress --phase 1 --sub-phase 1.5 --status completed`
 
-#### 1.6 Gate 1（关卡 1）
+#### 1.6 关卡（Gate 1）
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 1
@@ -394,7 +364,7 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 - [ ] 完整阅读 `references/full-integration.md`（不可略读）
 - [ ] 完整阅读 `references/agent-orchestration.md`（不可略读）
 - [ ] 重新阅读 plan.md 中该章节的整合计划
-- [ ] Gate 1 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 1）已通过，progress.md 中有证据
 - [ ] 如有任何一项未勾选：停止。不得继续。
 
 #### 2.1 加载计划与源材料 (Load Plan + Sources)
@@ -414,13 +384,7 @@ python scripts/workflow.py generate-book <run_dir> check_gate 1
 
 #### 2.3 质量关卡 (Quality Gate, G1-G8)
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 2 <chapter>
@@ -446,13 +410,7 @@ python scripts/workflow.py generate-book <run_dir> check_gate 2 <chapter>
 
 #### 2.5 批量检查（每 5 章）(Batch Check)
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 2b
@@ -496,13 +454,7 @@ python scripts/workflow.py generate-book <run_dir> coverage_guard
 
 **自动检查脚本**：
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/validate_tech.py output/
@@ -510,7 +462,7 @@ python scripts/validate_terms.py output/
 python scripts/workflow.py generate-book <run_dir> check_gate 3
 ```
 
-**Gate（关卡）**：
+**关卡（Gate）**：
 - 覆盖率 >= 95%
 - 所有术语一致
 - 所有代码可运行
@@ -523,20 +475,14 @@ python scripts/workflow.py generate-book <run_dir> check_gate 3
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整阅读 `shared/report-templates.md`（不可略读）
-- [ ] Gate 3 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 3）已通过，progress.md 中有证据
 - [ ] 如有任何一项未勾选：停止。不得继续。
 
 **执行操作**：编写 `report.md`，包含摘要、每章评分、问题列表、覆盖矩阵、已知限制、Coverage Guardian 结果。
 
-**Gate（关卡）**：
+**关卡（Gate 4）**：
 
-**⛔ 运行关卡前，确认以下均不为真：**
-- [ ] 任何参考文件在本阶段未被重新阅读
-- [ ] 任何"我已阅读"的声明缺少结构证据
-- [ ] 任何章节的输出大小 < 源文件的 80%
-- [ ] Gate 检查未实际运行（仅口头声称）
-
-**如有任何一项被勾选：先修复再运行 Gate。**
+*（执行标准关卡自检清单，见文件顶部。）*
 
 ```bash
 python scripts/workflow.py generate-book <run_dir> check_gate 4

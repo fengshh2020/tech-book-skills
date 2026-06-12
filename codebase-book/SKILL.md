@@ -3,18 +3,18 @@ name: codebase-book
 description: "Generate project mastery guide from codebase. Trigger: 生成项目书籍, codebase walkthrough, 掌握项目, 架构学习指南. Do NOT trigger for: code review, README, API reference."
 ---
 
-# Codebase Book（代码库书籍）
+# 代码库书籍 (Codebase Book)
 
-## ⛊ IRON LAW（铁律）
+## ⛊ 铁律 (IRON LAW)
 
 **NO COVERAGE CLAIM WITHOUT FILE:LINE EVIDENCE. NO GATE SKIP. NO LISTING WITHOUT EXPLAINING. NO CONTENT SHRINKAGE.**
 （没有 file:line 证据不得声称已覆盖。不得跳过关卡。不得只列不解释。不得缩减内容。）
 
 违反这条规则的字面含义，就是违反这条规则的精神。
 
-### Anti-Rationalization Table（反合理化表）
+### 反合理化表 (Anti-Rationalization Table)
 
-| 如果你认为... | 事实是... |
+| 如果你认为... | 真相是…… |
 |-----------------|-----------------|
 | "我记得这个模块" | 你不记得。重新读源码。 |
 | "函数名已经告诉我足够多了" | 并没有。读函数体。 |
@@ -88,6 +88,11 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 
 ## 阶段 1：发现
 
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 确认源代码库路径可访问
+- [ ] 确认有基本的项目构建/运行命令
+- [ ] 如果不满足：停止。不要开始本阶段。
+
 **要做什么**：
 1. 识别源文件、测试、配置、资源
 2. 确定语言、框架、依赖、构建命令、入口点
@@ -104,7 +109,7 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 
 **如果有任何勾选：修复后再运行关卡。**
 
-**关卡（必须通过）**：
+**关卡（Gate 1）**：
 - [ ] 每个相关文件已分类，或附理由排除
 
 **如果关卡未通过**：重新分类。不得进入阶段 2。
@@ -114,7 +119,7 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整阅读 `references/analysis-guide.md`（不得略读）
 - [ ] 在 progress.md 中记录阅读确认及结构证据
-- [ ] 关卡 1 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 1）已通过，progress.md 中有证据
 - [ ] 如有未勾选项：停止。不得继续。
 
 **要做什么**（针对每个核心模块）：
@@ -144,7 +149,7 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 
 **如果有任何勾选：修复后再运行关卡。**
 
-**关卡（必须通过）**：
+**关卡（Gate 2）**：
 - [ ] 核心模块已覆盖接口、设计、算法、隐含知识
 
 **如果关卡未通过**：补充缺失分析。不得进入阶段 3。
@@ -154,7 +159,7 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整阅读 `references/writing-and-content.md`（不得略读）
 - [ ] 完整阅读 `references/writing-guide.md`（不得略读）
-- [ ] 关卡 2 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 2）已通过，progress.md 中有证据
 - [ ] 如有未勾选项：停止。不得继续。
 
 **要做什么**：
@@ -178,7 +183,7 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 
 **如果有任何勾选：修复后再运行关卡。**
 
-**关卡（必须通过）**：
+**关卡（Gate 3）**：
 - [ ] 核心执行路径没有缺口
 - [ ] 重复机制已有首次详述 + 后续引用
 
@@ -189,7 +194,7 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 重新完整阅读 `references/writing-and-content.md`（不得说"我记得"）
 - [ ] 重新完整阅读 `references/writing-guide.md`（不得说"我记得"）
-- [ ] 关卡 3 已通过，progress.md 中有证据
+- [ ] 关卡（Gate 3）已通过，progress.md 中有证据
 - [ ] 如有未勾选项：停止。不得继续。
 
 将 `assets/style.css` 和 `assets/script.js` 复制到 `output/`。
@@ -217,7 +222,29 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 - 每个写作者的提示词：完整源码 + 章节计划 + HTML 模板 + 交叉引用信息
 - 封面、目录、CSS/JS 由主代理在并行之前完成
 
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重读
+- [ ] 任何"我已分析"的声明缺少 file:line 证据
+- [ ] 任何模块仅凭名称分析（未读源码）
+- [ ] 关卡检查未实际运行（只是声称）
+
+**如果有任何勾选：修复后再运行关卡。**
+
+**关卡（Gate 4）**：
+- [ ] 所有章节有 `<!-- generated: complete -->` 标记
+- [ ] 核心章节 ≥ 20KB，概览 ≥ 10KB
+- [ ] 所有核心函数有代码 + 解释
+- [ ] 代码:解释比例 ≥ 1:1
+
+**如果关卡未通过**：扩展缺失章节。不得进入阶段 5。
+
 ## 阶段 5：验证
+
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整阅读 `shared/report-templates.md`（不得略读）
+- [ ] 关卡（Gate 4）已通过，progress.md 中有证据
+- [ ] 所有章节已生成并带有 `<!-- generated: complete -->` 标记
+- [ ] 如有未勾选项：停止。不得继续。
 
 运行：`scripts/validate_output.sh output/`
 
@@ -230,12 +257,23 @@ python ../shared/validate_tech.py output/
 python ../shared/validate_terms.py output/
 ```
 
-**⚠️ 本阶段启动前必须完成：**
-- [ ] 完整阅读 `shared/report-templates.md`（不得略读）
-- [ ] 所有章节已生成并带有 `<!-- generated: complete -->` 标记
-- [ ] 如有未勾选项：停止。不得继续。
-
 编写 `{RUN}/report.md`。将 `progress.md` 标记为已完成。
+
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重读
+- [ ] 任何"我已分析"的声明缺少 file:line 证据
+- [ ] 任何模块仅凭名称分析（未读源码）
+- [ ] 关卡检查未实际运行（只是声称）
+
+**如果有任何勾选：修复后再运行关卡。**
+
+**关卡（Gate 5）**：
+- [ ] 所有章节通过技术准确性验证
+- [ ] 所有章节通过术语一致性验证
+- [ ] report.md 已生成
+- [ ] progress.md 标记为已完成
+
+**如果关卡未通过**：修复问题后重试验证。
 
 ## 章节完成前红线检查
 
@@ -257,3 +295,15 @@ python ../shared/validate_terms.py output/
 - 深度：不是"这个函数做 X"，而是"为什么这样做、替代方案、参数影响"
 - 无重复：一次详细解释，其余交叉引用
 - 结构遵循内容逻辑，不是模板填空
+
+## 参考文件 (Reference Files)
+
+| 文件 | 用途 | 使用阶段 |
+|------|------|----------|
+| `references/analysis-guide.md` | 模块分析方法指南 | 阶段 2 |
+| `references/writing-and-content.md` | 写作与内容深度指南 | 阶段 3、4 |
+| `references/writing-guide.md` | 写作风格指南 | 阶段 3、4 |
+| `shared/report-templates.md` | 报告格式模板 | 阶段 5 |
+| `shared/anti-slacking.md` | 反偷工减料规则 | 全阶段 |
+| `shared/validate_tech.py` | 技术准确性验证脚本 | 阶段 5 |
+| `shared/validate_terms.py` | 术语一致性验证脚本 | 阶段 5 |

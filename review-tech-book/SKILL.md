@@ -5,14 +5,14 @@ description: "Review technical books for quality. Trigger: review book, 审阅�
 
 # 审阅技术书籍
 
-## ⛊ IRON LAW（铁律）
+## ⛊ 铁律 (IRON LAW)
 
 **NO FINDING WITHOUT DIRECT QUOTE. NO GATE SKIP. NO SKIM-ONLY REVIEW. NO SHALLOW SCORING.**
 （没有直接引用就没有发现。不跳过关卡。不只扫不读。不浅层打分。）
 
 违反此规则的字面含义，就是违反此规则的精神。
 
-### Anti-Rationalization Table（反合理化对照表）
+### 反合理化表 (Anti-Rationalization Table)
 
 | 如果你这么想…… | 事实是…… |
 |----------------|----------|
@@ -30,12 +30,12 @@ description: "Review technical books for quality. Trigger: review book, 审阅�
 ## 工作流
 
 ```
-Phase 1: Scan（扫描） → Phase 2: Read（精读） → Phase 3: Score（打分） → Phase 4: Report（报告） → [Fix Mode（修复模式）]
+阶段 1: 扫描 (Scan) → 阶段 2: 精读 (Read) → 阶段 3: 打分 (Score) → 阶段 4: 报告 (Report) → [修复模式 (Fix Mode)]
 ```
 
 **阶段锁（Phase Lock）**：进入任何阶段前，运行 `python ../shared/workflow.py review-tech-book <run_dir> check_gate <phase>`。如果关卡未通过，先修复再重试。
 
-## Phase 1: Scan（扫描阶段）
+## 阶段 1：扫描 (Scan)
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整读取 `references/spec.md`（不允许略读）
@@ -59,7 +59,7 @@ Phase 1: Scan（扫描） → Phase 2: Read（精读） → Phase 3: Score（打
 
 **如有任意一项勾选：先修复再运行关卡。**
 
-**关卡（Gate）**（自动检查）：
+**关卡（Gate 1）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 ```
@@ -69,12 +69,12 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 - 验证摘要已记录
 - 问题已分类
 
-## Phase 2: Read（精读阶段）
+## 阶段 2：精读 (Read)
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整读取 `references/reviewer-discipline.md`（不允许略读）
 - [ ] 在 progress.md 中记录读取确认，附结构证据
-- [ ] 关卡 1 已通过，且有 progress.md 中的证据
+- [ ] 关卡（Gate 1）已通过，且有 progress.md 中的证据
 - [ ] 如有任意一项未勾选：停止，不得继续。
 
 **第一轮：略读所有章节**（不允许跳过）
@@ -97,13 +97,13 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 
 **发现格式（严格遵循）**：
 ```
-### [N]. [Chapter] [Title] [🔴/🟠/🟡]
-- **Location**: `ChX line NNN-NNN`
-- **Quote**: [original text]
-- **Issue**: [具体分析]
-- **Evidence**: [V1/V2/V3/V4]
-- **Impact**: [对读者的影响]
-- **Fix**: [具体修复方法]
+### [N]. [章节] [标题] [🔴/🟠/🟡]
+- **位置 (Location)**：`ChX line NNN-NNN`
+- **原文 (Quote)**：[原文引用]
+- **问题 (Issue)**：[具体分析]
+- **证据 (Evidence)**：[V1/V2/V3/V4]
+- **影响 (Impact)**：[对读者的影响]
+- **修复 (Fix)**：[具体修复方法]
 ```
 
 **没有直接引用 = 无效发现。不要写。**
@@ -118,7 +118,7 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 
 **如有任意一项勾选：先修复再运行关卡。**
 
-**关卡（Gate）**（自动检查）：
+**关卡（Gate 2）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
 ```
@@ -127,11 +127,11 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
 - 🔴/🟠 问题至少达到 V2 证据等级
 - 至少 2 个章节已进行代码验证
 
-## Phase 3: Score（打分阶段）
+## 阶段 3：打分 (Score)
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整读取 `references/excellence-dimensions.md`（不允许略读）
-- [ ] 关卡 2 已通过，且有 progress.md 中的证据
+- [ ] 关卡（Gate 2）已通过，且有 progress.md 中的证据
 - [ ] 如有任意一项未勾选：停止，不得继续。
 
 **执行事项**：
@@ -141,11 +141,26 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
 
 **输出**：`findings/phase3.md`
 
-## Phase 4: Report（报告阶段）
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件本阶段未重新阅读
+- [ ] 任何"我读了"的声明缺乏结构证据
+- [ ] 任何发现缺少直接引用
+- [ ] 关卡检查未实际运行（仅声称）
+
+**如果任何一项为真：先修复再运行关卡。**
+
+**关卡（Gate 3）**：
+- 所有维度已评分，每个评分有具体证据
+- 跨章节反模式已标记
+- 无"全部 7 分"式均匀评分
+
+**如果关卡未通过**：用具体证据重新打分。不得进入阶段 4。
+
+## 阶段 4：报告 (Report)
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整读取 `shared/report-templates.md`（不允许略读）
-- [ ] 关卡 3 已完成，各维度已打分
+- [ ] 关卡（Gate 3）已完成，各维度已打分
 - [ ] 如有任意一项未勾选：停止，不得继续。
 
 **执行事项**：撰写报告，包含：
@@ -186,7 +201,7 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 
 **如有任意一项勾选：先修复再运行关卡。**
 
-**关卡（Gate）**（自动检查）：
+**关卡（Gate 4）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 ```
@@ -194,11 +209,11 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 - 发现项包含直接引用
 - 评分有证据支撑
 
-## Fix Mode（修复模式，用户请求时启用）
+## 修复模式 (Fix Mode，用户请求时启用)
 
 **⚠️ 本阶段启动前必须完成：**
 - [ ] 完整读取 `references/apply-fixes.md`（不允许略读）
-- [ ] 关卡 4 已通过（报告已完成）
+- [ ] 关卡（Gate 4）已通过（报告已完成）
 - [ ] 用户已明确请求修复模式
 - [ ] 如有任意一项未勾选：停止，不得继续。
 
@@ -218,7 +233,7 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 
 **如有任意一项勾选：先修复再运行关卡。**
 
-**关卡（Gate）**（自动检查）：
+**关卡（Gate Fix）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate fix
 ```
@@ -256,3 +271,19 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate fix
 - 结论基于证据，而非直觉
 - 聚焦系统性问题，而非零散罗列
 - 修复模式：每个批次后验证 HTML、导航、编号、代码
+
+## 参考文件 (Reference Files)
+
+| 文件 | 用途 | 使用阶段 |
+|------|------|----------|
+| `references/spec.md` | 审阅规范定义 | 阶段 1 |
+| `references/execution-guardrails.md` | 执行护栏规则 | 阶段 1 |
+| `references/reviewer-discipline.md` | 审阅纪律要求 | 阶段 2 |
+| `references/excellence-dimensions.md` | 卓越维度评分标准 | 阶段 3 |
+| `references/apply-fixes.md` | 修复执行指南 | 修复模式 |
+| `references/quality-reference.md` | 质量参考基准 | 阶段 3 |
+| `references/teaching-reference.md` | 教学参考基准 | 阶段 2 |
+| `shared/report-templates.md` | 报告格式模板 | 阶段 4 |
+| `shared/anti-slacking.md` | 反偷工减料规则 | 全阶段 |
+| `shared/validate_tech.py` | 技术准确性验证脚本 | 阶段 4 |
+| `shared/validate_terms.py` | 术语一致性验证脚本 | 阶段 4 |
