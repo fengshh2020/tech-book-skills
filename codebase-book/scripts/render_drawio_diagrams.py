@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render codebase-book diagram JSON specs to draw.io XML files."""
+"""将 codebase-book 的图表 JSON 规格渲染为 draw.io XML 文件。"""
 
 from __future__ import annotations
 
@@ -47,51 +47,51 @@ def load_spec(path: Path) -> dict[str, Any]:
     try:
         spec = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        fail(f"{path}: invalid JSON: {exc}")
+        fail(f"{path}: 无效的 JSON: {exc}")
     if not isinstance(spec, dict):
-        fail(f"{path}: top-level value must be an object")
+        fail(f"{path}: 顶层值必须是对象")
     return spec
 
 
 def validate_spec(spec: dict[str, Any], path: Path) -> None:
     for key in ("id", "title", "nodes", "edges"):
         if key not in spec:
-            fail(f"{path}: missing required key: {key}")
+            fail(f"{path}: 缺少必需的键: {key}")
     if not isinstance(spec["nodes"], list) or len(spec["nodes"]) < 2:
-        fail(f"{path}: nodes must contain at least two entries")
+        fail(f"{path}: nodes 必须包含至少两个条目")
     if not isinstance(spec["edges"], list) or len(spec["edges"]) < 1:
-        fail(f"{path}: edges must contain at least one entry")
+        fail(f"{path}: edges 必须包含至少一个条目")
 
     node_ids: set[str] = set()
     for node in spec["nodes"]:
         if not isinstance(node, dict):
-            fail(f"{path}: every node must be an object")
+            fail(f"{path}: 每个节点必须是对象")
         for key in ("id", "label"):
             if not node.get(key):
-                fail(f"{path}: node missing {key}")
+                fail(f"{path}: 节点缺少 {key}")
         node_id = str(node["id"])
         if not node_id.replace("-", "").replace("_", "").isalnum():
-            fail(f"{path}: node id must be stable ASCII: {node_id}")
+            fail(f"{path}: 节点 id 必须为稳定的 ASCII 字符: {node_id}")
         if node_id in node_ids:
-            fail(f"{path}: duplicate node id: {node_id}")
+            fail(f"{path}: 重复的节点 id: {node_id}")
         node_ids.add(node_id)
 
     for group in spec.get("groups", []):
         if not isinstance(group, dict):
-            fail(f"{path}: every group must be an object")
+            fail(f"{path}: 每个分组必须是对象")
         for node_id in group.get("nodes", []):
             if node_id not in node_ids:
-                fail(f"{path}: group references missing node: {node_id}")
+                fail(f"{path}: 分组引用了不存在的节点: {node_id}")
 
     for edge in spec["edges"]:
         if not isinstance(edge, dict):
-            fail(f"{path}: every edge must be an object")
+            fail(f"{path}: 每条边必须是对象")
         if edge.get("from") not in node_ids:
-            fail(f"{path}: edge references missing source node: {edge.get('from')}")
+            fail(f"{path}: 边引用了不存在的源节点: {edge.get('from')}")
         if edge.get("to") not in node_ids:
-            fail(f"{path}: edge references missing target node: {edge.get('to')}")
+            fail(f"{path}: 边引用了不存在的目标节点: {edge.get('to')}")
         if not edge.get("evidence") and not edge.get("inferred_reason"):
-            fail(f"{path}: edge {edge.get('from')}->{edge.get('to')} needs evidence or inferred_reason")
+            fail(f"{path}: 边 {edge.get('from')}->{edge.get('to')} 需要 evidence 或 inferred_reason")
 
 
 def positions(spec: dict[str, Any]) -> dict[str, tuple[int, int]]:
@@ -253,16 +253,18 @@ def render_directory(spec_dir: Path, output_dir: Path) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("spec_dir", type=Path)
-    parser.add_argument("output_dir", type=Path)
+    parser = argparse.ArgumentParser(
+        description="将图表 JSON 规格文件渲染为 draw.io XML 文件"
+    )
+    parser.add_argument("spec_dir", type=Path, help="包含 JSON 规格文件的目录")
+    parser.add_argument("output_dir", type=Path, help="输出 draw.io 文件的目录")
     args = parser.parse_args(argv)
     try:
         count = render_directory(args.spec_dir, args.output_dir)
     except ValueError as exc:
-        print(f"FAIL: {exc}", file=sys.stderr)
+        print(f"失败: {exc}", file=sys.stderr)
         return 1
-    print(f"OK: rendered {count} draw.io diagram(s)")
+    print(f"成功: 已渲染 {count} 个 draw.io 图表")
     return 0
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Technical accuracy validator for tech books.
-Validates: API existence, version compatibility, code runnability.
+技术书籍技术准确性验证器。
+验证内容：API 存在性、版本兼容性、代码可运行性。
 """
 
 import ast
@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Tuple
 
 
 class TechValidator:
-    """Validates technical accuracy of code examples and API claims."""
+    """验证代码示例和 API 声明的技术准确性。"""
 
     def __init__(self, run_dir: str):
         self.run_dir = Path(run_dir)
@@ -23,8 +23,8 @@ class TechValidator:
         self.errors = []
 
     def extract_code_blocks(self, html_content: str) -> List[Dict]:
-        """Extract code blocks from HTML content."""
-        # Match <pre><code> blocks
+        """从 HTML 内容中提取代码块。"""
+        # 匹配 <pre><code> 块
         pattern = r'<pre><code(?:\s+class="([^"]*)")?>(.*?)</code></pre>'
         matches = re.findall(pattern, html_content, re.DOTALL)
 
@@ -39,22 +39,22 @@ class TechValidator:
         return blocks
 
     def validate_code_runnability(self, code: str, language: str = "python") -> Dict:
-        """Validate if code can run."""
+        """验证代码是否可运行。"""
         if language != "python":
-            return {"passed": True, "reason": "Non-Python code, skipped"}
+            return {"passed": True, "reason": "非 Python 代码，已跳过"}
 
         try:
-            # Try to compile the code
+            # 尝试编译代码
             compile(code, "<string>", "exec")
-            return {"passed": True, "reason": "Code compiles successfully"}
+            return {"passed": True, "reason": "代码编译成功"}
         except SyntaxError as e:
-            return {"passed": False, "reason": f"Syntax error: {e}"}
+            return {"passed": False, "reason": f"语法错误: {e}"}
         except Exception as e:
-            return {"passed": False, "reason": f"Compilation error: {e}"}
+            return {"passed": False, "reason": f"编译错误: {e}"}
 
     def extract_api_claims(self, content: str) -> List[Dict]:
-        """Extract API claims from content."""
-        # Match patterns like "function()", "module.function()", etc.
+        """从内容中提取 API 声明。"""
+        # 匹配 "function()"、"module.function()" 等模式
         patterns = [
             r'(\w+)\.(\w+)\(',  # module.function(
             r'(\w+)\(',  # function(
@@ -78,67 +78,67 @@ class TechValidator:
         return claims
 
     def validate_api_existence(self, api_name: str) -> Dict:
-        """Validate if API exists in current Python environment."""
+        """验证 API 是否存在于当前 Python 环境中。"""
         try:
-            # Try to evaluate the API
+            # 尝试解析 API
             parts = api_name.split(".")
             if len(parts) == 1:
-                # Built-in or imported - use ast.literal_eval for safety
+                # 内置函数或已导入的 — 使用 ast.literal_eval 确保安全
                 import builtins
                 if hasattr(builtins, parts[0]):
-                    return {"passed": True, "reason": f"API {api_name} exists"}
-                return {"passed": False, "reason": f"API {api_name} not found"}
+                    return {"passed": True, "reason": f"API {api_name} 存在"}
+                return {"passed": False, "reason": f"API {api_name} 未找到"}
             else:
                 # module.function
                 module_name = ".".join(parts[:-1])
                 func_name = parts[-1]
                 module = __import__(module_name)
                 getattr(module, func_name)
-                return {"passed": True, "reason": f"API {api_name} exists"}
+                return {"passed": True, "reason": f"API {api_name} 存在"}
         except (ImportError, AttributeError, NameError):
-            return {"passed": False, "reason": f"API {api_name} not found"}
+            return {"passed": False, "reason": f"API {api_name} 未找到"}
         except Exception as e:
-            return {"passed": False, "reason": f"Error checking {api_name}: {e}"}
+            return {"passed": False, "reason": f"检查 {api_name} 时出错: {e}"}
 
     def check_version_compatibility(self, code: str, target_version: str = "3.8") -> Dict:
-        """Check if code is compatible with target Python version."""
+        """检查代码是否兼容目标 Python 版本。"""
         try:
             tree = ast.parse(code)
 
             issues = []
             for node in ast.walk(tree):
-                # Check for match/case (Python 3.10+)
+                # 检查 match/case（Python 3.10+）
                 if isinstance(node, ast.Match):
-                    issues.append("match/case requires Python 3.10+")
+                    issues.append("match/case 需要 Python 3.10+")
 
-                # Check for walrus operator (Python 3.8+)
+                # 检查海象运算符（Python 3.8+）
                 if isinstance(node, ast.NamedExpr):
-                    issues.append("walrus operator requires Python 3.8+")
+                    issues.append("海象运算符需要 Python 3.8+")
 
-                # Check for positional-only parameters (Python 3.8+)
+                # 检查仅位置参数（Python 3.8+）
                 if isinstance(node, ast.arguments):
                     if hasattr(node, 'posonlyargs') and node.posonlyargs:
-                        issues.append("positional-only parameters require Python 3.8+")
+                        issues.append("仅位置参数需要 Python 3.8+")
 
             if issues:
                 return {
                     "passed": False,
-                    "reason": f"Version compatibility issues: {issues}"
+                    "reason": f"版本兼容性问题: {issues}"
                 }
 
-            return {"passed": True, "reason": "Code compatible with target version"}
+            return {"passed": True, "reason": "代码与目标版本兼容"}
 
         except SyntaxError as e:
-            return {"passed": False, "reason": f"Syntax error: {e}"}
+            return {"passed": False, "reason": f"语法错误: {e}"}
 
     def validate_chapter(self, chapter_path: Path) -> Dict:
-        """Validate a single chapter."""
+        """验证单个章节。"""
         if not chapter_path.exists():
-            return {"passed": False, "reason": f"Chapter {chapter_path} not found"}
+            return {"passed": False, "reason": f"章节 {chapter_path} 未找到"}
 
         content = chapter_path.read_text()
 
-        # Extract code blocks
+        # 提取代码块
         code_blocks = self.extract_code_blocks(content)
 
         results = {
@@ -151,7 +151,7 @@ class TechValidator:
         }
 
         for block in code_blocks:
-            # Validate runnability
+            # 验证可运行性
             run_result = self.validate_code_runnability(block["code"], block["language"])
             if run_result["passed"]:
                 results["runnable"] += 1
@@ -163,7 +163,7 @@ class TechValidator:
                     "error": run_result["reason"]
                 })
 
-            # Validate version compatibility
+            # 验证版本兼容性
             version_result = self.check_version_compatibility(block["code"])
             if not version_result["passed"]:
                 results["version_issues"].append(version_result["reason"])
@@ -173,7 +173,7 @@ class TechValidator:
                     "error": version_result["reason"]
                 })
 
-        # Extract and validate API claims
+        # 提取并验证 API 声明
         api_claims = self.extract_api_claims(content)
         for claim in api_claims:
             api_result = self.validate_api_existence(claim["api"])
@@ -189,16 +189,16 @@ class TechValidator:
         return results
 
     def validate_book(self, output_dir: str) -> Dict:
-        """Validate entire book."""
+        """验证整本书籍。"""
         output_path = Path(output_dir)
         if not output_path.exists():
-            return {"passed": False, "reason": f"Output directory {output_dir} not found"}
+            return {"passed": False, "reason": f"输出目录 {output_dir} 未找到"}
 
-        # Find all HTML files
+        # 查找所有 HTML 文件
         html_files = list(output_path.glob("*.html"))
 
         if not html_files:
-            return {"passed": False, "reason": "No HTML files found"}
+            return {"passed": False, "reason": "未找到 HTML 文件"}
 
         total_blocks = 0
         total_runnable = 0
@@ -214,7 +214,7 @@ class TechValidator:
 
         return {
             "passed": total_unrunnable == 0,
-            "reason": f"{total_runnable}/{total_blocks} code blocks runnable ({success_rate:.1%})",
+            "reason": f"{total_runnable}/{total_blocks} 个代码块可运行（成功率 {success_rate:.1%}）",
             "total_blocks": total_blocks,
             "runnable": total_runnable,
             "unrunnable": total_unrunnable,
@@ -223,10 +223,10 @@ class TechValidator:
 
 
 def main():
-    """CLI entry point."""
+    """命令行入口。"""
     if len(sys.argv) < 2:
-        print("Usage: validate_tech.py <output_dir>")
-        print("Validates technical accuracy of code examples and API claims")
+        print("用法: validate_tech.py <输出目录>")
+        print("验证代码示例和 API 声明的技术准确性")
         sys.exit(1)
 
     output_dir = sys.argv[1]
