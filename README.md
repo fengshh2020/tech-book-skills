@@ -6,54 +6,85 @@ AI agent skills for processing technical books — generate, review, and create 
 
 | Skill | Purpose |
 |-------|---------|
-| **generate-book** | Generate a unified book from one or more sources (single: translate+assemble, multi: integrate+assemble) |
-| **review-tech-book** | Structured quality review with evidence-based findings |
-| **codebase-book** | Generate project ownership mastery guides from codebases |
+| **generate-book** | Generate a unified book from sources or codebase (single-source: translate+assemble, multi-source: integrate+assemble, codebase: discover+analyze+generate) |
+| **review-tech-book** | Structured quality review with evidence-based findings and fix mode |
 
 ## Architecture
 
 ```
 tech_book_skills/
-├── generate-book/        # Book generation (single or multi source)
-│   ├── SKILL.md          # Dual-mode entry point
-│   ├── references/       # Translation rules, book assembly, integration methodology
-│   ├── scripts/          # workflow.py, check_coverage.sh
-│   ├── assets/           # style.css, script.js
-│   └── agents/           # openai.yaml
-├── review-tech-book/     # Quality review
-│   ├── SKILL.md
-│   ├── references/       # Scoring dimensions, reviewer discipline
-│   └── scripts/          # Code validation (validate_code.sh)
-├── codebase-book/        # Codebase → project ownership mastery guide
-│   ├── SKILL.md
-│   ├── references/       # Analysis guide, developer workflow, writing guide
-│   └── scripts/          # Output validation (validate_output.sh)
-├── shared/               # Cross-skill protocols
-│   ├── progress-protocol.md      # Run management & recovery
-│   ├── quality-ownership.md      # Quality responsibility boundaries
-│   ├── skill-boundaries.md       # When to use which skill
-│   ├── runtime-pruning.md        # Scope control for long runs
-│   ├── verification-levels.md    # V1-V4 evidence classification
-│   ├── translationese-patterns.md # Anti-pattern list
-│   ├── report-templates.md       # Report templates
-│   └── agent-compatibility.md    # Cross-agent path conventions
-└── evals/                # Validation
-    ├── evals.json        # Test cases
-    └── validate_skill_pack.py  # Structure & contract validation
+├── generate-book/                    # Book generation (3 modes)
+│   ├── SKILL.md                      # Hub: mode selection, core rules, reference index
+│   ├── references/
+│   │   ├── shared-rules.md           # Iron law, pre-flight, failure modes, coverage guardian, agent orchestration
+│   │   ├── mode-single.md            # Single-source mode: extract → translate → assemble
+│   │   ├── mode-multi.md             # Multi-source mode: deep-read → architect → integrate
+│   │   ├── mode-codebase.md          # Codebase mode: discover → analyze → plan → generate
+│   │   ├── agent-orchestration.md    # Sub-agent rules and constraints
+│   │   ├── book-assembly.md          # HTML scaffold and assembly
+│   │   ├── translation-rules.md      # Translation guidelines (single-source)
+│   │   ├── book-architecture.md      # Architecture design (multi-source)
+│   │   ├── full-integration.md       # Integration levels (multi-source)
+│   │   ├── analysis-guide.md         # Module analysis (codebase)
+│   │   ├── writing-and-content.md    # Content depth (codebase)
+│   │   ├── writing-guide.md          # Writing style (codebase)
+│   │   └── ...                       # Other reference files
+│   ├── scripts/
+│   │   ├── workflow.py               # Gate checks and progress recording
+│   │   ├── validate_output.sh        # HTML output validation
+│   │   ├── render_drawio_diagrams.py # Diagram rendering
+│   │   └── check_coverage.sh         # Coverage checking
+│   └── assets/
+│       ├── style.css                 # Book stylesheet
+│       └── script.js                 # Book interactivity
+├── review-tech-book/                 # Quality review
+│   ├── SKILL.md                      # Hub: workflow, phases, gate checks
+│   ├── references/
+│   │   ├── review-shared-rules.md    # Iron law, evidence levels, finding quality control
+│   │   ├── spec.md                   # Review specification
+│   │   ├── execution-guardrails.md   # Execution rules
+│   │   ├── reviewer-discipline.md    # Review discipline
+│   │   ├── excellence-dimensions.md  # Scoring dimensions
+│   │   ├── apply-fixes.md            # Fix mode guide
+│   │   └── ...                       # Other reference files
+│   ├── scripts/
+│   │   ├── review_workflow.py        # Review state management
+│   │   └── validate_code.sh          # Code validation
+│   └── assets/
+│       ├── style.css
+│       └── script.js
+└── shared/                           # Cross-skill resources
+    ├── discipline-framework.md       # Shared discipline: gate degradation, error recovery, progress tracking
+    ├── anti-slacking.md              # Anti-slacking rules
+    ├── report-templates.md           # Report templates
+    ├── translationese-patterns.md    # Anti-pattern list
+    ├── validate_tech.py              # Technical accuracy validation
+    ├── validate_terms.py             # Terminology consistency validation
+    └── workflow.py                   # Shared workflow engine
 ```
+
+## Skill Workflow
+
+```
+generate-book → review-tech-book → generate-book (fix mode)
+```
+
+1. **generate-book** creates the book (single/multi/codebase mode)
+2. **review-tech-book** reviews it (report only by default)
+3. If issues found, user requests **review-tech-book fix mode** or feeds report back to **generate-book**
 
 ## Quick Start
 
 1. Install as a skill pack in your agent's skills directory
 2. The agent discovers skills via `SKILL.md` frontmatter `description` field
-3. Skills reference each other through `.book-doc/runs/` reports
+3. Each skill uses progressive disclosure: SKILL.md (hub) → reference files (detail)
 
-## Skill Workflow
+## Design Principles
 
-```
-generate-book (single or multi) → review-tech-book
-codebase-book  → review-tech-book
-```
+- **Progressive disclosure**: SKILL.md under 150 lines, details in reference files
+- **Shared discipline**: Common gate/error/progress patterns in `shared/discipline-framework.md`
+- **Robustness**: Pre-flight checks, gate degradation, error recovery, output validation
+- **Evidence-based**: Every finding needs a direct quote (review), every claim needs file:line (codebase)
 
 ## Validation
 
@@ -61,7 +92,7 @@ codebase-book  → review-tech-book
 python3 evals/validate_skill_pack.py
 ```
 
-Checks skill metadata, resource links, script syntax, forbidden phrases, and cross-skill contracts.
+Checks skill metadata, resource links, script syntax, and cross-skill contracts.
 
 ## License
 
