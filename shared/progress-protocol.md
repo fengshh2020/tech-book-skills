@@ -23,7 +23,6 @@
 |-------|--------|
 | generate-book | generate |
 | review-tech-book | review |
-| codebase-book | codebase |
 
 ## 阶段完成协议
 
@@ -62,6 +61,6 @@
 按日期前缀查找最新的 `completed`（已完成）运行：
 - 生成类：`*-generate-*/report.md`
 - 审查类：`*-review-*/report.md`
-- 代码库类：`*-codebase-*/report.md`
+- 代码库类：`*-generate-*/report.md`（代码库模式）
 
 报告缺失时：记录并询问用户是否影响正确性。

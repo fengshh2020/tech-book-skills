@@ -1,6 +1,6 @@
 # 代码分析方法
 
-> 供 codebase-book 阶段 2 使用。
+> 供 generate-book（代码库模式）阶段 2 使用。
 
 ## 分析顺序
 

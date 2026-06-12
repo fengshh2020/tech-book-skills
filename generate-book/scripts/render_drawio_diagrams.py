@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""将 codebase-book 的图表 JSON 规格渲染为 draw.io XML 文件。"""
+"""将 generate-book（代码库模式）的图表 JSON 规格渲染为 draw.io XML 文件。"""
 
 from __future__ import annotations
 

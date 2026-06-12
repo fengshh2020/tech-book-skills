@@ -1,6 +1,6 @@
 # 写作规范
 
-> 供 codebase-book 阶段 4 使用。定义 HTML 结构、代码讲解模式和视觉规范。
+> 供 generate-book（代码库模式）阶段 4 使用。定义 HTML 结构、代码讲解模式和视觉规范。
 > 内容深度标准和知识扩展方法见 `references/writing-and-content.md`。
 
 ## HTML 模板

@@ -17,7 +17,6 @@ class WorkflowLock:
     PHASES = {
         "generate-book": ["0", "1", "2", "2b", "3", "4"],
         "review-tech-book": ["1", "2", "3", "4", "fix"],
-        "codebase-book": ["1", "2", "3", "4", "5"],
     }
 
     def __init__(self, skill: str, run_dir: str):
@@ -294,7 +293,7 @@ def main():
     """CLI entry point."""
     if len(sys.argv) < 4:
         print("Usage: workflow.py <skill> <run_dir> <command> [args]")
-        print("Skills: generate-book, review-tech-book, codebase-book")
+        print("Skills: generate-book, review-tech-book")
         print("Commands: status, check_gate <phase> [chapter]")
         sys.exit(1)
 

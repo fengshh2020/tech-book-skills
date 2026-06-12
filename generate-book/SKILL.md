@@ -9,7 +9,9 @@ description: "Generate a unified technical book from one or more sources, or fro
 
 ## 核心规则
 
-**先阅读 `references/shared-rules.md`**，其中包含：铁律、预检清单、标准关卡自检、反合理化表、反偷工减料规则、Gate 降级方案、错误恢复协议、进度追踪鲁棒性、失败模式识别、Coverage Guardian、质量标准、子 Agent 编排。
+**先阅读以下两个文件**：
+- `references/shared-rules.md` — 铁律、预检清单、标准关卡自检、反合理化表、反偷工减料规则、Gate 降级方案、错误恢复协议、进度追踪鲁棒性、失败模式识别、Coverage Guardian、质量标准、子 Agent 编排
+- `shared/discipline-framework.md` — Gate 降级方案、错误恢复协议、进度追踪、反合理化表
 
 关键原则：
 - 没有新鲜阅读证据就不产出。不跳过 Gate。不只凭标题推断。不缩减内容。

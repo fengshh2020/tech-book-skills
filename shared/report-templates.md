@@ -48,7 +48,7 @@
 
 ---
 
-## codebase-book
+## generate-book（代码库模式）
 
 ```markdown
 # 代码库书籍报告
