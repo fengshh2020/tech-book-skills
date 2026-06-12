@@ -1,6 +1,6 @@
 # 验证等级体系
 
-> 供 review-tech-book 和 integrate-books 共享。定义事实性断言的验证等级和强制规则。
+> 供 review-tech-book 和 generate-book 共享。定义事实性断言的验证等级和强制规则。
 
 ---
 

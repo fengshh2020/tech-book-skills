@@ -1,37 +1,33 @@
 # Tech Book Skills
 
-AI agent skills for processing technical books — translate, review, integrate, and generate project-driven learning guides.
+AI agent skills for processing technical books — generate, review, and create project-driven learning guides.
 
 ## Skills
 
 | Skill | Purpose |
 |-------|---------|
-| **translate-book** | Translate EPUB technical books into Chinese HTML sites |
+| **generate-book** | Generate a unified book from one or more sources (single: translate+assemble, multi: integrate+assemble) |
 | **review-tech-book** | Structured quality review with evidence-based findings |
-| **codebase-book** | Generate project-driven learning books from codebases |
-| **integrate-books** | Synthesize multiple technical books into one coherent book |
+| **codebase-book** | Generate project ownership mastery guides from codebases |
 
 ## Architecture
 
 ```
 tech_book_skills/
-├── translate-book/       # EPUB → Chinese HTML translation
-│   ├── SKILL.md          # Skill definition (start here)
-│   ├── references/       # Translation rules, templates, pitfalls
-│   ├── scripts/          # Output validation (validate_format.sh)
-│   └── assets/           # style.css, script.js
+├── generate-book/        # Book generation (single or multi source)
+│   ├── SKILL.md          # Dual-mode entry point
+│   ├── references/       # Translation rules, book assembly, integration methodology
+│   ├── scripts/          # workflow.py, check_coverage.sh
+│   ├── assets/           # style.css, script.js
+│   └── agents/           # openai.yaml
 ├── review-tech-book/     # Quality review
 │   ├── SKILL.md
 │   ├── references/       # Scoring dimensions, reviewer discipline
 │   └── scripts/          # Code validation (validate_code.sh)
-├── codebase-book/        # Codebase → learning book
+├── codebase-book/        # Codebase → project ownership mastery guide
 │   ├── SKILL.md
-│   ├── references/       # Analysis guide, writing guide
+│   ├── references/       # Analysis guide, developer workflow, writing guide
 │   └── scripts/          # Output validation (validate_output.sh)
-├── integrate-books/      # Multi-book synthesis
-│   ├── SKILL.md
-│   ├── references/       # Synthesis methodology, integration discipline
-│   └── scripts/          # Coverage check (check_coverage.sh)
 ├── shared/               # Cross-skill protocols
 │   ├── progress-protocol.md      # Run management & recovery
 │   ├── quality-ownership.md      # Quality responsibility boundaries
@@ -55,8 +51,8 @@ tech_book_skills/
 ## Skill Workflow
 
 ```
-translate-book → integrate-books → review-tech-book
-                 codebase-book  → review-tech-book
+generate-book (single or multi) → review-tech-book
+codebase-book  → review-tech-book
 ```
 
 ## Validation

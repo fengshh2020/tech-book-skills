@@ -194,12 +194,75 @@ check_links() {
   fi
 }
 
+# 检查 HTML 结构与侧栏覆盖
+check_html_structure() {
+  echo ""
+  echo "--- HTML 结构检查 ---"
+
+  FOUND=$(python3 -c "
+import glob, os, re
+issues = []
+for f in sorted(glob.glob('${DIR}*.html')):
+    content = open(f).read()
+    base = os.path.basename(f)
+    counts = {
+        '<main': len(re.findall(r'<main\\b', content)),
+        '</main>': content.count('</main>'),
+        '<article': len(re.findall(r'<article\\b', content)),
+        '</article>': content.count('</article>'),
+    }
+    if counts['<main'] != counts['</main>']:
+        issues.append(f'{base}: <main>={counts[\"<main\"]} </main>={counts[\"</main>\"]}')
+    if counts['<article'] != counts['</article>']:
+        issues.append(f'{base}: <article>={counts[\"<article\"]} </article>={counts[\"</article>\"]}')
+    if counts['<main'] and not counts['<article']:
+        issues.append(f'{base}: has <main> but no <article>')
+for issue in issues[:20]:
+    print(issue)
+" 2>/dev/null || true)
+  if [ -n "$FOUND" ]; then
+    echo "❌ HTML 结构不匹配:"
+    echo "$FOUND"
+    HARD_ERRORS=$((HARD_ERRORS + 1))
+  else
+    echo "✅ HTML 主体结构检查通过"
+  fi
+
+  FOUND=$(python3 -c "
+import glob, os, re
+files = sorted(os.path.basename(f) for f in glob.glob('${DIR}*.html'))
+sidebar_pages = []
+for f in sorted(glob.glob('${DIR}*.html')):
+    content = open(f).read()
+    if '<aside class=\"sb\"' in content:
+        sidebar_pages.append((os.path.basename(f), content))
+if not sidebar_pages:
+    raise SystemExit
+required = [f for f in files if f != '00_cover.html']
+issues = []
+for base, content in sidebar_pages:
+    for target in required:
+        if target not in content:
+            issues.append(f'{base}: sidebar missing {target}')
+            break
+for issue in issues[:20]:
+    print(issue)
+" 2>/dev/null || true)
+  if [ -n "$FOUND" ]; then
+    echo "⚠ 侧栏可能未覆盖新增页面:"
+    echo "$FOUND"
+  else
+    echo "✅ 侧栏覆盖检查通过"
+  fi
+}
+
 # 执行格式检查（始终运行）
 check_code_format
 echo ""
 check_terminology
 echo ""
 check_links
+check_html_structure
 
 # 翻译质量扫描（始终运行）
 echo ""
@@ -234,17 +297,31 @@ fi
 
 # 代码清单编号连续性
 NUMBERING=$(python3 -c "
-import re, glob
+import re, glob, os
 issues = []
 for f in sorted(glob.glob('${DIR}*.html')):
     content = open(f).read()
-    captions = re.findall(r'CodeListingCaption[^>]*>.*?(\d+)-(\d+)', content)
-    if captions:
-        chapter = captions[0][0]
-        nums = [int(c[1]) for c in captions]
-        for i in range(len(nums)-1):
-            if nums[i+1] != nums[i]+1 and nums[i+1] != nums[i]:
-                issues.append(f'{f}: {chapter}-{nums[i]} -> {chapter}-{nums[i+1]}')
+    captions = re.findall(r'<p class=\"CodeListingCaption\">.*?代码清单\\s+([^：:<]+)', content)
+    if not captions:
+        continue
+    by_prefix = {}
+    for cap in captions:
+        m = re.match(r'(\\d+)-(\\d+)[a-zA-Z]?$', cap.strip())
+        if m:
+            by_prefix.setdefault(m.group(1), []).append(int(m.group(2)))
+            continue
+        m = re.match(r'(\\d+)[a-zA-Z]?$', cap.strip())
+        if m:
+            by_prefix.setdefault('_file', []).append(int(m.group(1)))
+            continue
+        if not m:
+            issues.append(f'{os.path.basename(f)}: invalid caption {cap}')
+            continue
+    for chapter, nums in by_prefix.items():
+        for i in range(len(nums) - 1):
+            if nums[i + 1] not in (nums[i], nums[i] + 1):
+                issues.append(f'{os.path.basename(f)}: chapter {chapter} captions {nums[i]} -> {nums[i + 1]}')
+                break
 if issues:
     for iss in issues[:5]:
         print(f'⚠ {iss}')

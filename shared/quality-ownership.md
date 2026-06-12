@@ -1,31 +1,28 @@
-# 书籍质量归属
+# Quality Ownership
 
-> 供 translate-book、integrate-books、review-tech-book、codebase-book 共享。目标是减少重复检查和重复报告，让每个阶段承担自己最有效、最可验证的质量责任。
+> Shared by all book skills. Who fixes what, when.
 
-## 核心原则
+## Principles
 
-1. **一次做对**：生成阶段负责本阶段能机械确认和即时修正的问题，不把错字、格式、链接、标记、代码注释、来源标记等低层问题留给审阅阶段。
-2. **系统性残留**：审阅阶段不重复逐章 QA，只报告跨章节、批量出现、生成阶段自检难以发现的问题模式。
-3. **拼贴感**：整合阶段负责逐段风格适配和去重；审阅阶段只从读者体验判断新增内容是否显得拼贴、重复或节奏突兀。
-4. **模式化评分**：审阅报告按模式收缩评分范围。深度模式可完整评分；标准模式只评分有证据的风险维度和五转化维度；快速模式只给层面级结论。
-5. **源码可追溯**：代码库书籍生成阶段负责 file:line 证据、源码覆盖表和摘录一致性；审阅阶段通读验证这些证据是否支撑读者学习路径。
+1. **First-time right**: Generation phase fixes what it can verify. Don't pass typos, format, links to review.
+2. **Systemic only**: Review reports cross-chapter patterns, not point-by-point issues.
+3. **Integration owns style**: generate-book adapts style and removes duplicates. Review only checks reader-visible seams.
+4. **Source traceable**: codebase-book provides file:line evidence. Review verifies coverage and learning path.
 
-## 责任边界
+## Responsibility
 
-| 问题类型 | 首要负责 | 审阅阶段处理 |
-|----------|----------|--------------|
-| 错字、乱码、标点、间距 | translate-book | 只报告系统性残留，如某类乱码全书多处出现 |
-| 术语首次括注、术语表一致性 | translate-book / integrate-books | 全量检查并报告跨章节不一致模式 |
-| 代码块格式、图片路径、导航链接 | translate-book / codebase-book | 引用自动化验证摘要，不重复逐页枚举 |
-| 新增内容来源、去重、风格适配 | integrate-books | 判断读者可见的拼贴感、重复感和节奏断裂 |
-| 源码覆盖、摘录一致性、架构证据 | codebase-book | 通读验证覆盖表、证据链和章节学习顺序 |
-| 技术正确性、版本兼容、API 时效 | review-tech-book | 以 V1-V3 证据报告，形成修复批次 |
-| 学习路径、目标读者匹配、参考可用性 | review-tech-book | 作为审阅核心输出 |
+| Issue | Owner | Reviewer |
+|-------|-------|----------|
+| Typos, encoding, punctuation | generate-book | Report systemic patterns only |
+| Terminology, glossary | generate-book | Cross-chapter inconsistencies |
+| Code blocks, images, nav links | generate-book / codebase-book | Reference validation summary |
+| Content source, style, dedup | generate-book | Reader-visible seams |
+| Source coverage, excerpts | codebase-book | Coverage table, evidence chain |
+| Technical correctness, versions | review-tech-book | V1-V3 evidence |
+| Learning path, reader fit | review-tech-book | Core output |
 
-## 报告去重规则
+## Report Deduplication
 
-- 同一类低层问题超过 3 处时，合并为一个系统性发现，附代表性位置。
-- 自动化脚本已经完整列出的项目，报告只写摘要、失败类型和修复批次，不粘贴完整日志。
-- 评分表不重复问题清单：评分表只写关键判断，详细证据放在核心发现或修复批次。
-- 修复建议按批次组织，不按发现顺序散列。
-- 后续 skill 接收前置报告时，只读取会影响本轮决策的术语、限制、覆盖、验证摘要和修复批次。
+- Same issue type >3 times → merge into systemic finding
+- Automation already listed → report summary only
+- Score table ≠ issue list: scores are judgments, details in findings

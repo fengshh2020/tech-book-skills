@@ -1,4 +1,4 @@
 interface:
   display_name: "Codebase Book"
-  short_description: "Turn repositories into learning books"
-  default_prompt: "Use $codebase-book to turn this repository into a source-backed technical learning guide."
+  short_description: "Generate deep learning guides from codebases — focused on design, code, algorithms, and knowledge"
+  default_prompt: "Use $codebase-book to generate a deep learning guide from this codebase. Focus on project design decisions, core code walkthroughs with narrative coherence, key algorithms, and the knowledge points needed to understand the code. Use draw.io-editable diagrams backed by diagram-spec JSON to reduce cognitive load and keep flow diagrams reviewable."

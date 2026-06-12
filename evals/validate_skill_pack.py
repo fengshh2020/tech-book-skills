@@ -149,7 +149,7 @@ def validate_book_skill_contracts() -> None:
 
     progress = (shared / "progress-protocol.md").read_text(encoding="utf-8")
     for slug in ("translate", "integrate", "review", "codebase"):
-        if f"{slug}:" not in progress:
+        if f"`{slug}`" not in progress:
             fail(f"progress-protocol.md missing run slug definition for {slug!r}")
 
     review_skill = (ROOT / "review-tech-book" / "SKILL.md").read_text(encoding="utf-8")
@@ -228,9 +228,37 @@ def validate_book_skill_contracts() -> None:
         fail("translate-book must define missing-chapter mode to skip unnecessary full-book setup")
     if "缩小的是修改范围，不是阅读范围" not in integrate_skill:
         fail("integrate-books quick mode must read all content to detect conflicts, only narrowing modification scope")
+    for phrase in ("source-architecture.md", "章节骨架先于正文生成", "新书生成模式"):
+        if phrase not in integrate_skill:
+            fail(f"integrate-books must enforce architecture-first integration concept: {phrase}")
+    architecture_ref = (ROOT / "integrate-books" / "references" / "book-architecture.md").read_text(encoding="utf-8")
+    for phrase in ("源书反向覆盖矩阵", "每章只承担一个主要认知负担", "过早完成"):
+        if phrase not in architecture_ref:
+            fail(f"book-architecture reference missing architecture gate concept: {phrase}")
+    if "架构覆盖" not in (shared / "report-templates.md").read_text(encoding="utf-8"):
+        fail("integrate-books report template must include architecture coverage")
     codebase_skill = (ROOT / "codebase-book" / "SKILL.md").read_text(encoding="utf-8")
-    if "范围分层" not in codebase_skill or "核心路径优先" not in codebase_skill:
+    if "范围分层" not in codebase_skill or "核心路径" not in codebase_skill:
         fail("codebase-book must avoid full-depth analysis for every file by using scope tiers")
+    for phrase in ("叙事连贯", "深度优先", "结构服务内容", "不重复", "源码证据"):
+        if phrase not in codebase_skill:
+            fail(f"codebase-book must enforce core principle: {phrase}")
+    codebase_analysis = (ROOT / "codebase-book" / "references" / "analysis-guide.md").read_text(encoding="utf-8")
+    for phrase in ("运行路线", "模块分析", "设计决策", "file:line"):
+        if phrase not in codebase_analysis:
+            fail(f"codebase-book analysis guide missing concept: {phrase}")
+    codebase_content = (ROOT / "codebase-book" / "references" / "writing-and-content.md").read_text(encoding="utf-8")
+    for phrase in ("叙事驱动", "先图后文", "知识扩展", "不打断叙事"):
+        if phrase not in codebase_content:
+            fail(f"codebase-book writing-and-content missing concept: {phrase}")
+    codebase_writing = (ROOT / "codebase-book" / "references" / "writing-guide.md").read_text(encoding="utf-8")
+    for phrase in ("HTML 模板", "叙事驱动", "可选组件"):
+        if phrase not in codebase_writing:
+            fail(f"codebase-book writing guide missing concept: {phrase}")
+    codebase_validator = (ROOT / "codebase-book" / "scripts" / "validate_output.sh").read_text(encoding="utf-8")
+    for phrase in ("generated: complete", "file:line", "content depth"):
+        if phrase not in codebase_validator:
+            fail(f"codebase-book validator missing quality gate: {phrase}")
 
     review_guardrails_path = ROOT / "review-tech-book" / "references" / "execution-guardrails.md"
     if not review_guardrails_path.exists():

@@ -1,6 +1,6 @@
 # Deep Knowledge Index Format
 
-> For integrate-books Phase 0. Each source book generates a knowledge index of >=1000 lines.
+> For generate-book multi-mode Phase 0. Each source book generates a knowledge index of >=1000 lines.
 > Goal: Enable the LLM in subsequent phases to understand "how to integrate" — not just "what was covered," but "how it was taught," "why it was taught this way," and "where the boundaries lie."
 
 ## Why This Depth Is Needed

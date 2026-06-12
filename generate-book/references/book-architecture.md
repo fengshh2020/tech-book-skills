@@ -1,6 +1,6 @@
 # Book Architecture Assessment Protocol
 
-> For use by integrate-books Phase 1. Based on the deep knowledge indexes from Phase 0, design the architecture of the integrated book.
+> For use by generate-book Phase 1. Based on the deep knowledge indexes from Phase 0, design the architecture of the integrated book.
 > Core principle: architecture design must be built on deep understanding — you cannot draw blueprints without first understanding the material.
 
 ## When to Use

@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Tech Book"
-  short_description: "Review technical book quality"
-  default_prompt: "Use $review-tech-book to review this technical book for accuracy and learning quality."
+  short_description: "Review and repair technical book quality"
+  default_prompt: "Use $review-tech-book to review this technical book for accuracy and learning quality, then apply repair batches if requested."

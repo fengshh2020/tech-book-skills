@@ -1,6 +1,6 @@
 # Content Synthesis Methodology
 
-> For use by the integrate-books skill. Defines how to synthesize knowledge points from different sources into coherent, excellent teaching content in Phase 4 — rather than simple knowledge stacking.
+> For use by the generate-book skill. Defines how to synthesize knowledge points from different sources into coherent, excellent teaching content in Phase 4 — rather than simple knowledge stacking.
 > SKILL.md Phase 4 references this file.
 
 ---

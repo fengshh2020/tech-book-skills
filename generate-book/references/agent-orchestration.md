@@ -1,6 +1,6 @@
 # Sub-Agent Orchestration Protocol
 
-> For use across all phases of integrate-books. Defines sub-agent concurrency control, dependency ordering, error recovery, and progress tracking.
+> For use across all phases of generate-book. Defines sub-agent concurrency control, dependency ordering, error recovery, and progress tracking.
 > Core problem: LLM agents have limited parallelism (typically 3-5), web-based source books have link/reference ordering dependencies, and unconstrained execution leads to resource contention and context loss.
 
 ## Global Constraints

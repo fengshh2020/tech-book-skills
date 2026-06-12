@@ -1,186 +1,67 @@
-# 进度持久化协议
+# Progress Protocol
 
-> 供所有长流程书籍 skill 共享。定义运行目录、运行发现、状态文件、保存时机、幂等性保障、恢复协议和跨 skill 报告查找。
->
-> 各 skill 的 SKILL.md 必须引用本文件，并在自己的"幂等性检查"小节补充特有判断。
+> Shared by all book skills. Run discovery, state files, save timing, idempotency, recovery.
 
----
+## Run Directory
 
-## 运行目录
-
-所有进度、缓存和报告文件统一放在 `.book-doc/`，避免污染项目根目录。
-
-```text
+```
 .book-doc/
-├── spec.md                              # 跨轮次项目配置，translate-book 使用
-├── knowledge_base/                      # 跨轮次知识库，integrate-books 使用
-│   ├── INDEX/
-│   └── [源书]/
+├── spec.md                          # cross-run config
+├── knowledge_base/                  # cross-run KB (generate-book multi mode)
 └── runs/
-    └── {YYYYMMDD}-{run_slug}-{label}/
-        ├── progress.md                  # 唯一进度真相源
-        ├── context-summary.md           # 阶段间摘要，integrate-books 使用
-        ├── plan.md                      # 整合计划，integrate-books 使用
-        ├── findings/                    # 增量发现，review-tech-book 使用
-        │   ├── phase1.md
-        │   ├── phase2.md
-        │   └── phase3.md
-        └── report.md                    # 完成报告
+    └── {YYYYMMDD}-{slug}-{label}/
+        ├── progress.md              # single source of truth
+        ├── context-summary.md       # cross-phase summary (generate-book)
+        ├── plan.md                  # generation plan
+        ├── findings/                # review findings
+        └── report.md                # completion report
 ```
 
-各 skill 只创建自己需要的子结构。运行目录外的 `.book-doc/spec.md` 和 `.book-doc/knowledge_base/` 是跨轮次共享状态；分析、发现、计划、报告等本轮状态必须放在当前运行目录。
+## Run Slugs
 
-## 运行 slug
+| Skill | Slug |
+|-------|------|
+| generate-book | generate |
+| review-tech-book | review |
+| codebase-book | codebase |
 
-运行目录使用稳定短名，不使用完整 skill name：
+## Phase Completion Protocol
 
-| Skill name | run_slug |
-|------------|----------|
-| `translate-book` | translate: `translate` |
-| `integrate-books` | integrate: `integrate` |
-| `review-tech-book` | review: `review` |
-| `codebase-book` | codebase: `codebase` |
+**Every phase end** (mandatory, no skipping):
 
-## 启动与运行发现
+1. **Write outputs**: Confirm all files written to disk.
+2. **Update progress.md**: Mark phase ✅, write output paths.
+3. **Read back**: Verify progress.md actually says ✅.
+4. **Next phase**: Only after 1-3 pass.
 
-开始执行任意长流程前：
+## Reading Evidence Protocol
 
-1. 扫描 `.book-doc/runs/` 下匹配 `*-{run_slug}-*` 的目录，按日期前缀排序。
-2. 读取候选运行的 `progress.md`，区分 `active`、`interrupted`、`completed`。
-3. 只有一个 `active` 或 `interrupted` 运行时直接恢复；有多个时先让用户选择。
-4. 没有可恢复运行，或历史运行全部 `completed` 时，新建 `{今天日期}-{run_slug}-{用户标签或序号}`。
-5. 新建运行时创建所需子目录并写入初始 `progress.md`。
+> Prevent "claimed read but didn't".
 
-不得因为 `output/` 中存在文件就跳过运行发现；`progress.md` 与产物标记必须共同判断。
+**Every claimed read** must include ≥2 of:
+- **Structure**: paragraph count, code block count, total lines
+- **Content summary**: specific arguments (not title rewrite)
+- **Terms**: ≥3 actual technical terms from the file
 
-## 状态文件：progress.md
+**Red flags = unread**:
+- "No issues" without evidence
+- Content summary is title rewrite
+- Consecutive chapters have identical evidence format
+- "This chapter is simple" without structure data
 
-每个运行目录下的 `progress.md` 是唯一进度真相源。
+## Recovery
 
-```markdown
-# {Skill名称}进度
+1. Scan `.book-doc/runs/` for `*{slug}*`
+2. Read `progress.md` of candidate runs
+3. Single active/interrupted → resume directly
+4. Multiple → ask user
+5. None or all completed → create new run
 
-## 运行信息
-- 运行 ID：{运行目录名}
-- 状态：[active | interrupted | completed]
-- 输入：{源文件/主书/代码库/审阅对象}
-- 输出：{output/ 或用户指定目录}
-- 模式：{全量/补缺/快速/标准/深度等}
+## Cross-Skill Report Lookup
 
-## 步骤/阶段记录
+Find latest `completed` run by date prefix:
+- Generation: `*-generate-*/report.md`
+- Review: `*-review-*/report.md`
+- Codebase: `*-codebase-*/report.md`
 
-### 步骤 1：{名称}
-- 状态：✅ 已完成 | 🔄 进行中 | ⏳ 未开始
-- 完成时间：YYYY-MM-DD HH:MM
-- 产出：{文件或摘要}
-- 跳过依据：{如适用}
-- 已完成单元：{章节/模块/文件列表}
-```
-
-## 保存时机
-
-| 时机 | 保存内容 | 原因 |
-|------|----------|------|
-| 最小可恢复单元完成 | 更新该单元状态和产物路径 | 最小单元通常是单章、单模块、单次精读 |
-| 阶段完成 | 将阶段标记为 ✅ | 支持阶段级恢复 |
-| 跳过阶段 | 记录跳过依据、输入指纹和校验结果 | 避免无证据跳过 |
-| 错误或用户中断 | 状态改为 `interrupted`，记录当前位置 | 下次恢复精确定位 |
-| 全部完成 | 状态改为 `completed`，写入报告路径和验证摘要 | 供后续 skill 查找 |
-
-## ⚠️ 阶段完成协议（每个阶段结束时必须执行）
-
-这个协议是防止 LLM 跳步和伪造完成状态的核心机制。**每个阶段结束前必须按顺序执行以下四步，不能跳过任何一步：**
-
-1. **写入产物**：确认该阶段所有产出文件已写入磁盘。
-2. **更新进度**：将 progress.md 中该阶段标记为 ✅，写入产出文件路径。
-3. **回读验证**：读取刚写入的 progress.md，确认阶段状态确实是 ✅ 且产出路径存在。
-4. **下一阶段**：只有前三步全部通过后才进入下一阶段。
-
-为什么需要回读验证：LLM 容易声称"已更新 progress.md"但实际并未写入。回读是机械验证，不依赖自省。
-
-**单元完成协议**（单章/单模块/单次精读完成后）同样适用以上四步，只是粒度为单个可恢复单元而非整个阶段。
-
-## 幂等性保障
-
-恢复后执行任何步骤前，先做幂等性检查：
-
-1. 读取 `progress.md`，确认该单元是否标记为 ✅。
-2. 检查产物文件是否存在、非空，并带有该 skill 定义的完成标记。
-3. 检查输入是否变化（路径、大小、时间戳或缓存元数据）。
-4. 以上全部通过才跳过；任何一步失败则重做该单元。
-
-产物标记优先级：`complete` → 可跳过依据；`partial` → 必须重做；`unknown`（无标记）→ **不得自动跳过**，必须执行该单元并写入正确标记。
-
-## 恢复协议
-
-中断后恢复：
-
-1. 扫描 `.book-doc/runs/` 下 `*-{run_slug}-*` 目录，按日期前缀排序。
-2. 如有多个 `active` 或 `interrupted` 运行，提示用户选择。
-3. 读取选定运行的 `progress.md`。
-4. 找到最后一个 ✅ 或 🔄 单元。
-5. 对每个候选单元执行幂等性检查（四步），跳过可信完成项，重做 `partial` 或不可信 `unknown` 项。
-6. 从下一个未完成单元继续，每个可恢复单元后执行单元完成协议。
-
-无需重做已可信完成的单元；`progress.md`、产物标记和验证结果共同构成恢复依据。
-
-## 跨 skill 报告查找
-
-其他 skill 查找前置报告时，按目录名日期前缀排序，取最新 `completed` 运行：
-
-- 翻译报告：`*-translate-*` 目录下的 `report.md`
-- 整合报告：`*-integrate-*` 目录下的 `report.md`
-- 审阅报告：`*-review-*` 目录下的 `report.md`
-- 代码库书籍报告：`*-codebase-*` 目录下的 `report.md`
-
-找不到报告时不要伪造前置信息；记录缺失并降级执行，或在缺失会影响正确性时询问用户。
-
-## 阅读证据协议
-
-> 供所有需要"通读""精读""分析"内容的 skill 共享。防止模型声称已读但实际跳过。
-
-### 问题
-
-模型声称"已读，无问题"是不可验证的。一个没打开文件的模型和一个仔细读过文件的模型可以写出同样的"无红旗"记录。自报的"已读"不是证据。
-
-### 原则
-
-**只能要求从实际内容中提取的、不可编造的证据。**
-
-以下类型的证据是**不可伪造**的——不打开文件就无法提供：
-
-- 源文件中的具体段落数/代码块数
-- 特定段落的核心论点（必须与原文内容对应，不能泛泛而谈）
-- 文件中实际出现的术语列表
-- 代码块的首行或末行内容
-- 文件的总行数
-
-以下类型的证据是**可伪造**的——不打开文件也能编造，禁止作为唯一证据：
-
-- "内容简单，无红旗"
-- "已扫描，未发现异常"
-- "术语与全书面貌一致"
-- "格式正确"
-- "此文件不包含需要讲解的行为"
-
-### 要求
-
-每个被声明"已读"的内容单元（章节/文件/模块），progress.md 中必须包含以下至少两项：
-
-1. **结构证据**：段落数、代码块数、总行数、标题数量等可量化指标。
-2. **内容摘要**：该单元的核心论点或关键行为，必须具体到能区分"真正读过"和"凭标题猜测"。例如："第 3-5 段讲解生成器的暂停恢复机制，yield from 语法出现在行 120-135"可接受；"讲解生成器相关内容"不可接受。
-3. **术语/关键词列表**：该单元中实际出现的技术术语或关键词，列出至少 3 个。
-
-"无问题"或"无红旗"的结论只能出现在上述证据之后。**没有证据的"无问题"等于未读。**
-
-### 红旗清单——出现以下记录时应判定为未读
-
-- 只有"无红旗"/"无问题"/"已读"而没有具体证据
-- 内容摘要是标题的改写（如标题是"错误与异常"，摘要是"讲解错误与异常"）
-- 术语列表只有 1-2 个泛泛的词
-- 连续多章的证据格式完全相同（段落/代码块数不同但摘要措辞雷同）
-- 声称"此文件/章节内容简单"但没有提供任何结构数据
-
-### 对各 skill 的适用
-
-各 skill 的 SKILL.md 必须在自己的通读/精读/分析阶段引用本协议，并在具体格式中落实证据要求。
+Missing reports: record and ask user if it affects correctness.

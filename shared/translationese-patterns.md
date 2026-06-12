@@ -1,8 +1,8 @@
 # 翻译腔高频模式
 
-> 供 translate-book、review-tech-book 及验证脚本共享。定义翻译腔检测模式列表。
+> 供 generate-book、review-tech-book 及验证脚本共享。定义翻译腔检测模式列表。
 >
-> 验证脚本（validate_format.sh、validate_code.sh）从本文件动态读取正则模式。后备硬编码列表也需与此文件保持一致。
+> 验证脚本从本文件动态读取正则模式。后备硬编码列表也需与此文件保持一致。
 
 ---
 
@@ -30,7 +30,7 @@
 
 验证脚本从本文件动态读取模式（正则列）。新增模式时只需更新本文件，脚本会自动读取。后备硬编码列表位于：
 
-1. `translate-book/scripts/validate_format.sh` 第 12 项
+1. `generate-book/scripts/workflow.py` 翻译质量扫描段
 2. `review-tech-book/scripts/validate_code.sh` 翻译质量扫描段
 
 当动态读取失败时脚本使用后备列表，因此新增模式也应同步更新后备列表。
