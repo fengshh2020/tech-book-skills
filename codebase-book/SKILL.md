@@ -5,6 +5,25 @@ description: "Generate project mastery guide from codebase. Trigger: 生成项�
 
 # Codebase Book
 
+## ⛊ IRON LAW
+
+**NO COVERAGE CLAIM WITHOUT FILE:LINE EVIDENCE. NO GATE SKIP. NO LISTING WITHOUT EXPLAINING. NO CONTENT SHRINKAGE.**
+
+Violating the letter of this rule IS violating the spirit of this rule.
+
+### Anti-Rationalization Table
+
+| If you think... | The truth is... |
+|-----------------|-----------------|
+| "I remember this module" | You don't. Re-read the source. |
+| "The function name tells me enough" | It doesn't. Read the body. |
+| "Gate probably passes" | Run it. No probably. |
+| "This is ~20KB per chapter" | Shrinkage = lost understanding. Expand. |
+| "I'll add depth later" | Add depth now. Later never comes. |
+| "Just this once" | "Just this once" is how it starts. |
+| "The user wants speed" | The user wants mastery-level depth. |
+| "I already analyzed this" | Re-analyze. Fresh evidence only. |
+
 Generate a deep learning guide from a codebase. Focus: design decisions, code understanding, algorithms, knowledge points.
 
 ## What Success Looks Like
