@@ -1,57 +1,57 @@
-# Reviewer Discipline
+# 审校纪律
 
-> Rules for review quality.
+> 审校质量的规则。
 
-## Top 3 Rules
+## 前 3 条规则
 
-1. **Every finding needs original quote**: No quote = invalid.
-2. **Severity needs evidence**: 🔴/🟠 = at least V2. API claims = V1 or V3.
-3. **Report, don't fix**: Route to original skill. Fix only on explicit request.
+1. **每条发现必须有原文引用**：无引用 = 无效。
+2. **严重程度需要证据**：🔴/🟠 = 至少 V2（验证级别 2）。API 声明 = V1 或 V3。
+3. **只报告，不修复**：路由到原始 skill（技能）。仅在明确请求时才进行修复。
 
-## Finding Format
-
-```
-### [N]. [Chapter] [Title] [🔴/🟠/🟡]
-
-- **Location**: `ChX line NNN-NNN`
-- **Quote**: [original text]
-- **Issue**: [specific analysis]
-- **Evidence**: [V1/V2/V3/V4]
-- **Impact**: [reader effect]
-- **Fix**: [specific method]
-```
-
-## Anti-Patterns
-
-| Pattern | Prevention |
-|---------|-----------|
-| Content filling | Must have original quote |
-| False correction | Version claims need V1/V3 |
-| Source confusion | Label [original]/[translator]/[reviewer] |
-| Scope inflation | Only describe what evidence supports |
-| Skip verification | Run ≥2 chapter code examples |
-| Micro-fix loop | Batch by category, not one-by-one |
-| Overreach fix | Report only, fix on explicit request |
-
-## Phase Gates
-
-### Phase 2 Gate
+## 发现格式
 
 ```
-□ All chapters skimmed?
-□ Deep-dive findings have quotes?
-□ 🔴/🟠 = at least V2?
-□ API claims = V1 or V3?
-□ ≥2 chapters code-verified?
-□ Deep-dives cover flagged + mandatory chapters?
+### [N]. [章节] [标题] [🔴/🟠/🟡]
+
+- **位置**: `ChX line NNN-NNN`
+- **引用**: [原文]
+- **问题**: [具体分析]
+- **证据**: [V1/V2/V3/V4]
+- **影响**: [对读者的影响]
+- **修复**: [具体方法]
 ```
 
-### Self-Audit (report appendix)
+## 反模式
+
+| 模式 | 预防措施 |
+|------|----------|
+| 内容凑数 | 必须有原文引用 |
+| 错误纠正 | 版本声明需要 V1/V3 |
+| 来源混淆 | 标注 [原文]/[译者]/[审校者] |
+| 范围膨胀 | 仅描述证据所支持的内容 |
+| 跳过验证 | 运行 ≥2 章的代码示例 |
+| 微修复循环（Micro-fix loop） | 按类别批量处理，而非逐条修改 |
+| 越权修复 | 仅报告，修复需明确请求 |
+
+## 阶段关卡
+
+### 第 2 阶段关卡
 
 ```
-□ Factual assertions: quotes + evidence level?
-□ No micro-fix patterns?
-□ 🔴 severity calibrated?
-□ Scope matches mode?
-□ Categorization correct?
+□ 所有章节都已通读？
+□ 深入审查的发现是否有引用？
+□ 🔴/🟠 = 至少 V2？
+□ API 声明 = V1 或 V3？
+□ ≥2 章已通过代码验证？
+□ 深入审查覆盖了标记章节和必审章节？
+```
+
+### 自查清单（报告附录）
+
+```
+□ 事实性断言：是否有引用 + 证据级别？
+□ 没有微修复模式？
+□ 🔴 严重程度是否校准？
+□ 范围是否匹配审查模式？
+□ 分类是否正确？
 ```
