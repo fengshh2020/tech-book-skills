@@ -1,10 +1,10 @@
-# Book Assembly
+# 书籍组装（Book Assembly）
 
-This document defines page semantic structure, HTML templates, component contracts, and interaction mount points. `style.css` provides an adaptive design system — heading levels, component distribution, and visual weights adjust automatically based on the book's content structure. When generating pages, select the appropriate mode based on the book's actual heading depth.
+本文档定义页面语义结构、HTML 模板、组件契约和交互挂载点。`style.css` 提供自适应设计系统 —— 标题层级、组件分布和视觉权重会根据书籍的内容结构自动调整。生成页面时，请根据书籍的实际标题深度选择合适的模式。
 
-## HTML Scaffold Structure
+## HTML 脚手架结构
 
-The generic page skeleton shared by all content pages:
+所有内容页面共享的通用页面骨架：
 
 ```html
 <!DOCTYPE html>
@@ -44,14 +44,14 @@ The generic page skeleton shared by all content pages:
 </html>
 ```
 
-**Adjustable**: Navigation visual style, header area layout, body width, color system, cover composition, component decoration and animations.
+**可调整项**：导航视觉风格、头部区域布局、正文宽度、色彩体系、封面构图、组件装饰和动画。
 
-**Must not break**: `style.css` reference, TOC entry, body container, cross-chapter page navigation, script mount points, anchors, and semantic hierarchy.
+**不可破坏项**：`style.css` 引用、目录条目、正文容器、跨章翻页导航、脚本挂载点、锚点和语义层级。
 
-## File Numbering Convention
+## 文件编号约定
 
-| Number | File |
-|--------|------|
+| 编号 | 文件 |
+|------|------|
 | 00 | `00_cover.html` |
 | 01 | `01_toc.html` |
 | 02 | `02_front.html` |
@@ -59,11 +59,11 @@ The generic page skeleton shared by all content pages:
 | 04+ | `{NN}_chapter{M}.html` |
 | N+ | `{NN}_appendix_{x}.html` |
 
-Chapter numbers must map to the EPUB spine order. The numbering ensures correct sort order and navigation links between pages.
+章节编号必须与 EPUB spine 顺序一致。编号确保正确的排序和页面间导航链接。
 
-## Page Types
+## 页面类型
 
-### Cover Page
+### 封面页（Cover Page）
 
 ```html
 <div class="cover">
@@ -79,9 +79,9 @@ Chapter numbers must map to the EPUB spine order. The numbering ensures correct 
 </div>
 ```
 
-The cover should immediately convey the book name, author, and entry point to reading. Whether to use background images, illustrations, geometric decorations, two-column composition, or minimalist typography depends on the book's character. The cover typically has no navigation bar, no page-turn buttons, and no JS.
+封面应立即传达书名、作者和阅读入口。是否使用背景图片、插图、几何装饰、双栏构图或极简排版，取决于书籍的定位。封面通常没有导航栏、没有翻页按钮、没有 JS。
 
-### Table of Contents
+### 目录页（Table of Contents）
 
 ```html
 <main class="chapter">
@@ -93,19 +93,19 @@ The cover should immediately convey the book name, author, and entry point to re
 </main>
 ```
 
-The TOC page should allow quick scanning of chapter hierarchy. Lists, groupings, chapter summaries, or progress indicators can be used. Typically no `chapter-header`, no `chapter-content` wrapper, no page-turn buttons, and no dropdown TOC JS.
+目录页应允许快速扫描章节层级。可使用列表、分组、章节摘要或进度指示器。通常没有 `chapter-header`、没有 `chapter-content` 包裹、没有翻页按钮、没有下拉目录 JS。
 
-### Preface Page
+### 前言页（Preface Page）
 
-Recommended structure: one `chapter-header` (without `chapter-number` span) + multiple `h2` subsections inside `chapter-content`. Has navigation bar, page-turn, and JS. If the preface is very short, a lighter header area is acceptable as long as TOC, headings, and navigation remain consistent.
+推荐结构：一个 `chapter-header`（不带 `chapter-number` span）+ `chapter-content` 内的多个 `h2` 小节。有导航栏、翻页和 JS。如果前言非常简短，可以使用更轻量的头部区域，只要目录、标题和导航保持一致即可。
 
-### Chapter Page
+### 章节页（Chapter Page）
 
-Recommended structure: `nav` (with `toc-toggle` + `toc-dropdown`) → `chapter-header` → `chapter-content` → `page-nav` → `<script>` injection. You can adjust the header area visual and content component styles, but do not remove the body container, TOC mount point, or page-turn navigation.
+推荐结构：`nav`（带 `toc-toggle` + `toc-dropdown`）-> `chapter-header` -> `chapter-content` -> `page-nav` -> `<script>` 注入。可调整头部区域视觉和内容组件样式，但不要移除正文容器、目录挂载点或翻页导航。
 
-### Appendix Page
+### 附录页（Appendix Page）
 
-Same structure as chapter pages, but use "Appendix X" instead of "Chapter N" in the chapter-header:
+与章节页结构相同，但在 `chapter-header` 中使用"附录 X"代替"第 N 章"：
 
 ```html
 <div class="chapter-header">
@@ -114,11 +114,11 @@ Same structure as chapter pages, but use "Appendix X" instead of "Chapter N" in 
 </div>
 ```
 
-Appendix pages have navigation bar, page-turn, and JS. Content is typically reference material or cheat sheets.
+附录页有导航栏、翻页和 JS。内容通常是参考资料或速查表。
 
-### Glossary Page
+### 术语表页（Glossary Page）
 
-Full glossary page using the glossary-term component:
+使用术语组件的完整术语表页面：
 
 ```html
 <main class="chapter">
@@ -135,11 +135,11 @@ Full glossary page using the glossary-term component:
 </main>
 ```
 
-Has navigation bar, page-turn, and JS. No `chapter-number` span. Terms are sorted by pinyin or alphabetical order.
+有导航栏、翻页和 JS。没有 `chapter-number` span。术语按拼音或字母顺序排列。
 
-## Content Components
+## 内容组件
 
-### Code Blocks
+### 代码块（Code Blocks）
 
 ```html
 <pre data-lang="Python"><code>def hello():
@@ -147,21 +147,21 @@ Has navigation bar, page-turn, and JS. No `chapter-number` span. Terms are sorte
 </code></pre>
 ```
 
-- Use the `data-lang` attribute to label the language type, displayed in the code block's top toolbar
-- Code copy button is automatically injected by `script.js`, no manual addition needed
-- No nested `<code>` allowed
-- Code indented with 4 spaces
-- `<em>` and `<b>` inside code blocks are uniformly replaced with `<strong>`
+- 使用 `data-lang` 属性标注语言类型，显示在代码块顶部工具栏
+- 代码复制按钮由 `script.js` 自动注入，无需手动添加
+- 不允许嵌套 `<code>`
+- 代码缩进使用 4 个空格
+- 代码块内的 `<em>` 和 `<b>` 统一替换为 `<strong>`
 
-### Code Titles
+### 代码标题（Code Titles）
 
 ```html
 <p class="CodeListingCaption">Listing 7-1: Initializing a class</p>
 ```
 
-Can be placed above or below the code block, but must be consistent throughout the book. Visual weight should be lighter than body headings to avoid competing with the code block for attention.
+可放在代码块上方或下方，但全书必须保持一致。视觉权重应轻于正文标题，避免与代码块争夺注意力。
 
-### Sidebars/Tip Boxes
+### 侧边栏/提示框（Sidebars/Tip Boxes）
 
 ```html
 <div class="sidebar">
@@ -170,26 +170,26 @@ Can be placed above or below the code block, but must be consistent throughout t
 </div>
 ```
 
-GOTCHA ALERT uses `class="sidebar warning"`. Headings h2/h3/h4 inside sidebars are excluded from the dropdown TOC scan.
+GOTCHA ALERT 使用 `class="sidebar warning"`。侧边栏内的 h2/h3/h4 标题不参与下拉目录扫描。
 
-Available sidebar variants (distinguished by additional class for visual style):
+可用的侧边栏变体（通过额外 class 区分视觉风格）：
 
-| class | Purpose | Accent Color |
-|-------|---------|-------------|
-| `.sidebar` | General sidebar | Default |
-| `.sidebar.warning` | Warning/gotcha | Red |
-| `.learn` | Learning objectives | Blue |
-| `.check` | Checklist | Blue |
-| `.quick-start` | Quick start | Blue |
-| `.things-to-remember` | Key takeaways | Green |
-| `.author-advice` | Author advice | Green |
-| `.theory-note` | Theory note | Amber |
-| `.pedantic-note` | Pedantic note | Amber |
-| `.performance-tip` | Performance tip | Blue |
-| `.gotcha-alert` | Gotcha alert | Red |
-| `.error-cheatsheet` | Error cheat sheet | Red |
+| class | 用途 | 强调色 |
+|-------|------|--------|
+| `.sidebar` | 通用侧边栏 | 默认 |
+| `.sidebar.warning` | 警告/注意事项 | 红色 |
+| `.learn` | 学习目标 | 蓝色 |
+| `.check` | 检查清单 | 蓝色 |
+| `.quick-start` | 快速入门 | 蓝色 |
+| `.things-to-remember` | 要点回顾 | 绿色 |
+| `.author-advice` | 作者建议 | 绿色 |
+| `.theory-note` | 理论说明 | 琥珀色 |
+| `.pedantic-note` | 学究式注释 | 琥珀色 |
+| `.performance-tip` | 性能提示 | 蓝色 |
+| `.gotcha-alert` | 陷阱警告 | 红色 |
+| `.error-cheatsheet` | 错误速查 | 红色 |
 
-### Tables
+### 表格（Tables）
 
 ```html
 <div class="table-wrapper">
@@ -200,18 +200,18 @@ Available sidebar variants (distinguished by additional class for visual style):
 </div>
 ```
 
-### Glossary Terms
+### 术语条目（Glossary Terms）
 
 ```html
 <p class="glossary-term">Term Name (English Original)</p>
 <p>Definition content</p>
 ```
 
-### Adaptive Content Levels
+### 自适应内容层级（Adaptive Content Levels）
 
-The design system automatically adjusts visual weights based on the book's content structure. When generating pages, select the appropriate mode based on the book's actual heading depth:
+设计系统根据书籍的内容结构自动调整视觉权重。生成页面时，请根据书籍的实际标题深度选择合适的模式：
 
-**2-Level Structure** (h2 → h4) — Concise type, suitable for books with flat content:
+**2 级结构**（h2 -> h4）—— 简洁型，适用于内容扁平的书籍：
 
 ```html
 <div class="chapter-content">
@@ -223,11 +223,11 @@ The design system automatically adjusts visual weights based on the book's conte
 </div>
 ```
 
-- h2 uses gradient text with bottom separator line, serving as large block headings
-- h4 automatically displays as a pill tag (blue rounded small label)
-- When no h3 is present, h2 automatically gets a larger font size (driven by CSS `:not(:has(h4))` selector)
+- h2 使用渐变文字加底部分隔线，作为大块标题
+- h4 自动显示为药丸标签（Pill Tag，蓝色圆角小标签）
+- 当没有 h3 时，h2 自动获得更大字号（由 CSS `:not(:has(h4))` 选择器驱动）
 
-**3-Level Structure** (h2 → h3 → h4) — Standard type, most technical books:
+**3 级结构**（h2 -> h3 -> h4）—— 标准型，适用于大多数技术书籍：
 
 ```html
 <div class="chapter-content">
@@ -240,11 +240,11 @@ The design system automatically adjusts visual weights based on the book's conte
 </div>
 ```
 
-- h2 = gradient large section heading
-- h3 = card-style group heading (left blue border + subtle glow background)
-- h4 = inline sub-topic marker
+- h2 = 渐变大节标题
+- h3 = 卡片式分组标题（左侧蓝色边框 + 淡发光背景）
+- h4 = 行内子主题标记
 
-**4-Level Structure** (h2 → h3 → h4 → h5) — Deep type, suitable for complex architecture books:
+**4 级结构**（h2 -> h3 -> h4 -> h5）—— 深度型，适用于复杂架构书籍：
 
 ```html
 <div class="chapter-content">
@@ -258,31 +258,31 @@ The design system automatically adjusts visual weights based on the book's conte
 </div>
 ```
 
-- h5 automatically displays as an uppercase micro-label (small, muted color, uppercase)
-- TOC dropdown automatically adds indentation for h3/h4 (driven by `data-depth` attribute)
-- Sidebar navigation links also auto-indent based on depth
+- h5 自动显示为大写微标签（小字号、柔和色、大写字母）
+- 下拉目录自动为 h3/h4 添加缩进（由 `data-depth` 属性驱动）
+- 侧边栏导航链接也会根据深度自动缩进
 
-Anchors use `<h4 id="item-{N}">` or `<h3 id="item-{N}">`, with globally sequential numbering. Cross-file references: `<a href="chapter_file.html#item-N">`.
+锚点使用 `<h4 id="item-{N}">` 或 `<h3 id="item-{N}">`，全局顺序编号。跨文件引用：`<a href="chapter_file.html#item-N">`。
 
-### Component Distribution Guide
+### 组件分布指南
 
-Control component spacing based on content density:
+根据内容密度控制组件间距：
 
-| Content Density | Sidebar Frequency | Code Block Spacing | Max Consecutive Components |
-|----------------|-------------------|-------------------|---------------------------|
-| Low (concept/intro-heavy) | Every 6-8 paragraphs | Every 3-4 paragraphs | 1 sidebar + 1 code block |
-| Medium (concept + code mix) | Every 4-6 paragraphs | Every 2-3 paragraphs | 2 consecutive components |
-| High (code-dense) | Every 6-8 paragraphs | Every 1-2 paragraphs | No more than 3 consecutive code blocks |
+| 内容密度 | 侧边栏频率 | 代码块间距 | 最大连续组件数 |
+|---------|-----------|-----------|--------------|
+| 低（以概念/介绍为主） | 每 6-8 段 | 每 3-4 段 | 1 个侧边栏 + 1 个代码块 |
+| 中（概念 + 代码混合） | 每 4-6 段 | 每 2-3 段 | 2 个连续组件 |
+| 高（代码密集） | 每 6-8 段 | 每 1-2 段 | 不超过 3 个连续代码块 |
 
 ---
 
-## Advanced Components (v2.0)
+## 高级组件（v2.0）
 
-The following components are provided by `style.css` v2.0 and `script.js` v2.0. All interactions are automatically mounted by JS; HTML only needs correct class names.
+以下组件由 `style.css` v2.0 和 `script.js` v2.0 提供。所有交互由 JS 自动挂载；HTML 只需正确的 class 名称。
 
-### Collapsible Areas
+### 可折叠区域（Collapsible Areas）
 
-For optional content, deep discussions, or advanced topics — reduces page pressure:
+用于可选内容、深入讨论或进阶主题 —— 减少页面压力：
 
 ```html
 <div class="collapsible">
@@ -293,13 +293,13 @@ For optional content, deep discussions, or advanced topics — reduces page pres
 </div>
 ```
 
-- Click trigger toggles expand/collapse
-- JS automatically handles `aria-expanded` and animation
-- Default collapsed; add `.open` class to default expanded
+- 点击触发器切换展开/折叠
+- JS 自动处理 `aria-expanded` 和动画
+- 默认折叠；添加 `.open` class 可默认展开
 
-### Code Tabs
+### 代码标签页（Code Tabs）
 
-Multi-language code comparison (Python/Rust/Go etc.):
+多语言代码对比（Python/Rust/Go 等）：
 
 ```html
 <div class="code-tabs">
@@ -320,20 +320,20 @@ Multi-language code comparison (Python/Rust/Go etc.):
 </div>
 ```
 
-- JS automatically handles click switching and keyboard navigation
-- `data-index` matches tab to panel
+- JS 自动处理点击切换和键盘导航
+- `data-index` 匹配标签页到面板
 
-### Full-Text Search
+### 全文搜索（Full-Text Search）
 
-Search modal is automatically created by JS, no HTML needed. Trigger methods:
-- `Ctrl+K` or `Cmd+K` keyboard shortcut
-- JS automatically indexes all h2-h5 and code blocks on the page
+搜索模态框由 JS 自动创建，无需 HTML。触发方式：
+- `Ctrl+K` 或 `Cmd+K` 键盘快捷键
+- JS 自动索引页面上所有 h2-h5 和代码块
 
-### Page Outline Navigation
+### 页面大纲导航（Page Outline Navigation）
 
-Outline is automatically generated by JS and pinned to the right side of the page (>1200px viewport), no HTML needed. Automatically tracks current reading position.
+大纲由 JS 自动生成，固定在页面右侧（视口宽度 >1200px 时显示），无需 HTML。自动跟踪当前阅读位置。
 
-### Breadcrumbs
+### 面包屑导航（Breadcrumbs）
 
 ```html
 <nav class="breadcrumbs">
@@ -345,12 +345,12 @@ Outline is automatically generated by JS and pinned to the right side of the pag
 </nav>
 ```
 
-- Insert above `.chapter-header`
-- Last item is the current page, not clickable
+- 插入到 `.chapter-header` 上方
+- 最后一项是当前页面，不可点击
 
-### Diff View
+### 差异视图（Diff View）
 
-Before/after code comparison:
+代码前后对比：
 
 ```html
 <div class="diff-block">
@@ -360,10 +360,10 @@ Before/after code comparison:
 </div>
 ```
 
-- `.diff-del` = deleted line (red), `.diff-add` = added line (green)
-- Wide screens automatically switch to side-by-side comparison
+- `.diff-del` = 删除行（红色），`.diff-add` = 新增行（绿色）
+- 宽屏自动切换为并排对比
 
-### Quizzes
+### 测验（Quizzes）
 
 ```html
 <div class="quiz">
@@ -380,11 +380,11 @@ Before/after code comparison:
 </div>
 ```
 
-- `data-correct="true"` marks the correct answer
-- JS automatically validates, shows feedback, and reveals explanation
-- Automatically disabled after answering
+- `data-correct="true"` 标记正确答案
+- JS 自动验证、显示反馈并揭示解析
+- 回答后自动禁用
 
-### File Trees
+### 文件树（File Trees）
 
 ```html
 <div class="file-tree">
@@ -402,10 +402,10 @@ Before/after code comparison:
 </div>
 ```
 
-- Directories are clickable to expand/collapse
-- `.active` highlights the current file
+- 目录可点击展开/折叠
+- `.active` 高亮当前文件
 
-### Figure Numbering
+### 图编号（Figure Numbering）
 
 ```html
 <div class="svg-diagram">
@@ -414,10 +414,10 @@ Before/after code comparison:
 <p class="fig-caption" data-num>Architecture Layer Diagram</p>
 ```
 
-- `data-num` attribute triggers CSS counter auto-numbering: displays as "Figure 3-2: Architecture Layer Diagram"
-- Without `data-num`, no numbering is applied
+- `data-num` 属性触发 CSS 计数器自动编号：显示为"图 3-2：架构层图"
+- 不加 `data-num` 则不编号
 
-### Cross-References
+### 交叉引用（Cross-References）
 
 ```html
 <p>As shown in <a class="xref xref--fig" href="#fig-arch">Figure 3-2</a>,
@@ -425,7 +425,7 @@ see <a class="xref xref--listing" href="#lst-hello">Listing 4-1</a>,
 for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p>
 ```
 
-### Definition Lists
+### 定义列表（Definition Lists）
 
 ```html
 <div class="def-list">
@@ -436,7 +436,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-### API References
+### API 参考（API References）
 
 ```html
 <div class="api-ref">
@@ -459,7 +459,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-### Code Annotations
+### 代码标注（Code Annotations）
 
 ```html
 <pre data-lang="Python"><code>with zenoh.open(zenoh.Config()) as session:  <span class="code-annotation__marker" data-note="1"></span>
@@ -471,7 +471,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </ol>
 ```
 
-### Learning Objectives
+### 学习目标（Learning Objectives）
 
 ```html
 <div class="learning-objectives">
@@ -484,9 +484,9 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-- JS automatically persists check state to localStorage
+- JS 自动将勾选状态持久化到 localStorage
 
-### Video Embeds
+### 视频嵌入（Video Embeds）
 
 ```html
 <div class="video-wrap video-wrap--16x9">
@@ -495,7 +495,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 <p class="fig-caption" data-num>Zenoh Architecture Overview</p>
 ```
 
-### Math Formulas
+### 数学公式（Math Formulas）
 
 ```html
 <p>Time complexity is <span class="math-inline">O(n \log n)</span>.</p>
@@ -504,9 +504,9 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-- JS automatically detects and loads KaTeX rendering
+- JS 自动检测并加载 KaTeX 渲染
 
-### Terminal Output
+### 终端输出（Terminal Output）
 
 ```html
 <div class="terminal">
@@ -518,7 +518,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-### Interactive Exercises
+### 互动练习（Interactive Exercises）
 
 ```html
 <div class="exercise">
@@ -530,7 +530,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-### Reading Aids
+### 阅读辅助（Reading Aids）
 
 ```html
 <p class="reading-time"></p>  <!-- JS automatically calculates and inserts -->
@@ -539,7 +539,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 <span class="difficulty difficulty--advanced">Advanced</span>
 ```
 
-### Badge System
+### 徽章系统（Badge System）
 
 ```html
 <span class="badge badge--stable">Stable</span>
@@ -550,7 +550,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 <span class="badge badge--version">v1.8+</span>
 ```
 
-### Footnotes
+### 脚注（Footnotes）
 
 ```html
 <p>Zenoh's wire overhead is only 4-6 bytes<a class="footnote-ref" href="#fn-1">[1]</a>.</p>
@@ -562,7 +562,7 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 </div>
 ```
 
-### Accessibility Tools
+### 无障碍工具（Accessibility Tools）
 
 ```html
 <!-- At the very top of the page, start of body -->
@@ -571,11 +571,11 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 <main id="main-content" class="mn">...</main>
 ```
 
-- `.sr-only` for text visible only to screen readers
+- `.sr-only` 用于仅供屏幕阅读器（Screen Reader）可见的文本
 
-### DrawIO/SVG Diagrams
+### DrawIO/SVG 图表
 
-DrawIO files are converted to SVG at build time and embedded:
+DrawIO 文件在构建时转换为 SVG 并嵌入：
 
 ```html
 <div class="svg-diagram arch-diagram">
@@ -584,11 +584,11 @@ DrawIO files are converted to SVG at build time and embedded:
 <p class="fig-caption" data-num>System Architecture Diagram</p>
 ```
 
-- Use `currentColor` and CSS variables inside SVG for theme switching
-- Semantic class names: `.arch-diagram`, `.flow-diagram`, `.seq-diagram`
-- JS automatically syncs SVG colors on theme switch
+- 在 SVG 内部使用 `currentColor` 和 CSS 变量以支持主题切换
+- 语义化 class 名称：`.arch-diagram`、`.flow-diagram`、`.seq-diagram`
+- JS 在主题切换时自动同步 SVG 颜色
 
-### Theme and Font Size
+### 主题和字号（Theme and Font Size）
 
 ```html
 <!-- Theme toggle (existing) -->
@@ -599,66 +599,66 @@ DrawIO files are converted to SVG at build time and embedded:
 <!-- Supported: "default" (16px), "large" (18px), "xl" (20px) -->
 ```
 
-### Keyboard Shortcuts
+### 键盘快捷键（Keyboard Shortcuts）
 
-Press `?` key to display the shortcuts panel. Built-in shortcuts:
+按 `?` 键显示快捷键面板。内置快捷键：
 
-| Shortcut | Function |
-|----------|----------|
-| `Ctrl+K` | Full-text search |
-| `←` / `→` | Previous page / Next page |
-| `?` | Keyboard shortcuts help |
-| `Escape` | Close modal/search |
+| 快捷键 | 功能 |
+|--------|------|
+| `Ctrl+K` | 全文搜索 |
+| `←` / `→` | 上一页 / 下一页 |
+| `?` | 键盘快捷键帮助 |
+| `Escape` | 关闭模态框/搜索 |
 
-## CSS/JS Integration
+## CSS/JS 集成
 
-`style.css` provides a high-end adaptive design system with a "quiet luxury" design language — conveying quality through restraint rather than decoration. When generating pages, prioritize reading experience and structural consistency, while adjusting component distribution based on the book's content hierarchy and audience.
+`style.css` 提供高端自适应设计系统，采用"静奢"（Quiet Luxury）设计语言 —— 通过克制而非装饰来传达品质。生成页面时，优先保证阅读体验和结构一致性，同时根据书籍的内容层级和受众调整组件分布。
 
-### Design System Core Features
+### 设计系统核心特性
 
-- **Adaptive hierarchy**: Heading visual weights automatically adjust based on the page's actual h2/h3/h4/h5 depth. Flat structures (2-level) get auto-enlarged h2; deep structures (4-level) get auto-micro-labeled h5
-- **Dual theme + system preference**: Supports dark/light themes, detects `prefers-color-scheme`, persists setting to `localStorage`
-- **Glass-morphism interaction layer**: Navigation bar, copy buttons, and back-to-top all use `backdrop-filter` frosted glass effect
-- **Code blocks**: `data-lang` language label + auto copy button (shown on hover), auto-detected from hljs class when not set
-- **Reading experience**: `requestAnimationFrame` progress bar, elastic easing scroll reveal, keyboard page-turn, active section highlighting
+- **自适应层级（Adaptive Hierarchy）**：标题视觉权重根据页面实际的 h2/h3/h4/h5 深度自动调整。扁平结构（2 级）自动放大 h2；深层结构（4 级）自动为 h5 添加微标签
+- **双主题 + 系统偏好**：支持深色/浅色主题，检测 `prefers-color-scheme`，设置持久化到 `localStorage`
+- **玻璃拟态交互层（Glass-Morphism）**：导航栏、复制按钮和返回顶部均使用 `backdrop-filter` 毛玻璃效果
+- **代码块**：`data-lang` 语言标签 + 自动复制按钮（悬停时显示），未设置时从 hljs class 自动检测
+- **阅读体验**：`requestAnimationFrame` 进度条、弹性缓动滚动揭示（Scroll Reveal）、键盘翻页、当前节高亮
 
-### Required Experience Constraints
+### 必要体验约束
 
-- Body width, line height, font size, and paragraph spacing must be suitable for extended reading
-- Code blocks, tables, sidebars, and glossary must be clearly readable on both desktop and mobile
-- Top navigation, TOC, previous/next page, and keyboard page-turn must remain functional
-- Pages must not overflow horizontally on mobile; interactive controls are hidden when printing
-- Colors, contrast, and accent styles must serve the technical content, not overshadow the body text
+- 正文宽度、行高、字号和段间距必须适合长时间阅读
+- 代码块、表格、侧边栏和术语表在桌面端和移动端都必须清晰可读
+- 顶部导航、目录、上/下页和键盘翻页必须正常运作
+- 页面在移动端不得水平溢出；打印时隐藏交互控件
+- 颜色、对比度和强调风格必须服务于技术内容，不得喧宾夺主
 
-## Navigation Structure
+## 导航结构
 
-The interaction system is automatically provided by `script.js`:
+交互系统由 `script.js` 自动提供：
 
-- **Smart TOC**: Automatically detects page heading depth, builds a hierarchical dropdown TOC with indentation and active section highlighting
-- **Reading progress bar** (`.prog`): Gradient progress indicator, smoothly rendered with `requestAnimationFrame`
-- **Code copy**: Glass-morphism style copy button shown on hover, supports Clipboard API with fallback
-- **Scroll reveal**: Headings, code blocks, cards, and other elements fade in and slide up when entering the viewport, powered by IntersectionObserver
-- **Back to top** (`.btt`): Glass-morphism style, appears after scrolling past 500px
-- **Keyboard page-turn**: Left/right arrow keys trigger previous/next page (automatically skipped inside input fields)
-- **Theme toggle** (`.sb-toggle`): Dark/light switch, supports `prefers-color-scheme` detection + `localStorage` persistence
-- **Auto language detection**: Code blocks without `data-lang` set automatically detect language label from hljs class
+- **智能目录（Smart TOC）**：自动检测页面标题深度，构建带缩进和当前节高亮的层级下拉目录
+- **阅读进度条**（`.prog`）：渐变进度指示器，使用 `requestAnimationFrame` 平滑渲染
+- **代码复制**：悬停时显示的毛玻璃风格复制按钮，支持 Clipboard API 并带降级方案
+- **滚动揭示（Scroll Reveal）**：标题、代码块、卡片等元素进入视口时淡入上滑，由 IntersectionObserver 驱动
+- **返回顶部**（`.btt`）：毛玻璃风格，滚动超过 500px 后出现
+- **键盘翻页**：左右方向键触发上/下页（在输入框内自动跳过）
+- **主题切换**（`.sb-toggle`）：深色/浅色切换，支持 `prefers-color-scheme` 检测 + `localStorage` 持久化
+- **自动语言检测**：未设置 `data-lang` 的代码块从 hljs class 自动检测语言标签
 
-## CSS Class Naming Conventions
+## CSS Class 命名约定
 
-The following structural class names must be preserved — they are the contract between HTML templates and the CSS design system:
+以下结构性 class 名称必须保留 —— 它们是 HTML 模板与 CSS 设计系统之间的契约：
 
-- `.chapter` / `.art` — Chapter main container
-- `.chapter-header` / `.chapter-number` — Chapter heading area
-- `.chapter-content` — Body content container
-- `.sidebar` / `.sidebar.warning` — Sidebar boxes (multiple variant classes)
-- `.CodeListingCaption` — Code listing title
-- `.page-nav` / `.prev` / `.next` — Page-turn navigation
-- `.top-nav` / `.toc-toggle` / `.toc-dropdown` — Top navigation bar
-- `.table-wrapper` — Table scroll container
-- `.glossary-term` — Glossary entry
-- `.cover` / `.cover-content` — Cover page
-- `.prog` — Reading progress bar
-- `.btt` — Back to top button
-- `.sb-link[data-depth]` — Sidebar hierarchical navigation links
+- `.chapter` / `.art` —— 章节主容器
+- `.chapter-header` / `.chapter-number` —— 章节标题区域
+- `.chapter-content` —— 正文内容容器
+- `.sidebar` / `.sidebar.warning` —— 侧边栏框（多种变体 class）
+- `.CodeListingCaption` —— 代码清单标题
+- `.page-nav` / `.prev` / `.next` —— 翻页导航
+- `.top-nav` / `.toc-toggle` / `.toc-dropdown` —— 顶部导航栏
+- `.table-wrapper` —— 表格滚动容器
+- `.glossary-term` —— 术语条目
+- `.cover` / `.cover-content` —— 封面页
+- `.prog` —— 阅读进度条
+- `.btt` —— 返回顶部按钮
+- `.sb-link[data-depth]` —— 侧边栏层级导航链接
 
-Visual themes, layout details, cover presentation, component decoration, and animations are all adjustable. Prefer implementing styles in `style.css`; only add minimal local class names in HTML when a single page has specific semantic or asset needs, avoiding inline style proliferation.
+视觉主题、布局细节、封面呈现、组件装饰和动画均可调整。优先在 `style.css` 中实现样式；仅在单页有特定语义或资产需求时才在 HTML 中添加最少的局部 class，避免内联样式泛滥。

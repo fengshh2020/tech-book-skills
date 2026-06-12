@@ -1,45 +1,45 @@
-# Book Architecture Assessment Protocol
+# 书籍架构评估协议（Book Architecture Assessment Protocol）
 
-> For use by generate-book Phase 1. Based on the deep knowledge indexes from Phase 0, design the architecture of the integrated book.
-> Core principle: architecture design must be built on deep understanding — you cannot draw blueprints without first understanding the material.
+> 供 generate-book 阶段 1 使用。基于阶段 0 的深度知识索引，设计整合书籍的架构。
+> 核心原则：架构设计必须建立在深入理解之上 —— 不理解材料就无法绘制蓝图。
 
-## When to Use
+## 适用场景
 
-- Multiple source books are being integrated into a single new book, with no clear primary book.
-- The primary book's table of contents requires major restructuring rather than local supplementation.
-- The user emphasizes "optimal chapter design," "knowledge organization," or "skeleton matters most."
-- Early outputs consist only of outlines, short lecture notes, or sample chapters, which risk being misjudged as completed manuscripts.
+- 多本源书整合为一本新书，且没有明确的主干书籍。
+- 主干书籍的目录需要大幅重组而非局部补充。
+- 用户强调"最优章节设计"、"知识组织"或"骨架最重要"。
+- 早期输出仅由大纲、简短讲义或样章组成，存在被误判为已完成书稿的风险。
 
-## Prerequisites
+## 前置条件
 
-**All knowledge indexes from Phase 0 must have passed the gate check.** You cannot enter Phase 1 without passing the Phase 0 gate.
+**阶段 0 的所有知识索引必须已通过门控检查。** 未通过阶段 0 门控不得进入阶段 1。
 
-Before Phase 1 begins, you must:
-1. Read all knowledge indexes in full (not skim summaries)
-2. Record read confirmation in progress.md
-3. List core methodology differences across books (at least 3 points)
+阶段 1 开始前，必须：
+1. 完整阅读所有知识索引（不可只浏览摘要）
+2. 在 `progress.md` 中记录阅读确认
+3. 列出各书之间核心方法论差异（至少 3 点）
 
-## Core Principles
+## 核心原则
 
-**Architecture design is analytical work based on knowledge indexes, not TOC stitching.** Every chapter's existence, order, and depth must be supported by evidence from the knowledge indexes.
+**架构设计是基于知识索引的分析工作，而非目录拼接。** 每一章的存在、顺序和深度都必须有知识索引中的证据支撑。
 
-**The chapter skeleton is instructional design, not outline rearrangement.** Chapter order must serve the reader's cognitive dependencies: establish conceptual foundations first, then introduce tools, then organize projects, and finally advance to specialized topics.
+**章节骨架是教学设计（Instructional Design），而非大纲重排。** 章节顺序必须服务于读者的认知依赖：先建立概念基础，再引入工具，再组织项目，最后推进到专题。
 
-**Source book coverage must be checked bidirectionally.** Proving "the target chapter references a knowledge point" is not enough; you must also reverse-check each source book's chapters and topics: assigned to a target chapter, demoted to sidebar/appendix, or explicitly excluded — one of the three must apply.
+**源书覆盖度必须双向检查。** 仅证明"目标章节引用了某个知识点"不够；还必须反向检查每本源书的章节和主题：分配到目标章节、降级为侧边栏/附录、或明确排除 —— 三者必居其一。
 
-**Do not default to the largest or most authoritative book as the backbone.** Whether to adopt a particular book as the skeleton must be determined jointly by the target audience, learning path, modernity, engineering orientation, and chapter dependencies.
+**不要默认以最大或最权威的书为骨架。** 是否采用某本书作为骨架，必须由目标受众、学习路径、现代性、工程导向和章节依赖共同决定。
 
-**Each chapter bears only one primary cognitive load.** If a single chapter contains multiple core models (e.g., resource model, error model, concurrency model, performance model), it should be split.
+**每章仅承担一个主要认知负荷（Cognitive Load）。** 如果一章包含多个核心模型（例如资源模型、错误模型、并发模型、性能模型），应拆分。
 
-## Three Core Work Items of Phase 1
+## 阶段 1 的三项核心工作
 
-### Work Item 1: Cross-Book Deep Comparison [Sub-phase 1.2]
+### 工作项 1：跨书深度对比 [子阶段 1.2]
 
-Based on the knowledge indexes, complete the following comparative analyses (output to `cross-book-analysis.md`):
+基于知识索引，完成以下对比分析（输出到 `cross-book-analysis.md`）：
 
-#### Methodology Difference Analysis [Sub-phase 1.2.1]
+#### 方法论差异分析 [子阶段 1.2.1]
 
-For each major topic, analyze the teaching methodology differences across books:
+对每个主要主题，分析各书的教学方法论差异：
 
 ```markdown
 ### Topic: [Topic Name]
@@ -53,9 +53,9 @@ For each major topic, analyze the teaching methodology differences across books:
 | Teaching quality | [High/Med/Low] | [High/Med/Low] | [High/Med/Low] | — | — |
 ```
 
-#### Depth Alignment Analysis [Sub-phase 1.2.2]
+#### 深度对齐分析 [子阶段 1.2.2]
 
-Identify depth differences across books on the same topic:
+识别同一主题在不同书籍中的深度差异：
 
 ```markdown
 ### Depth Alignment Table
@@ -66,15 +66,15 @@ Identify depth differences across books on the same topic:
 | [Topic 2] | Intermediate | Introductory | Intermediate | Primarily A; B supplements introductory perspective |
 ```
 
-Alignment strategy options:
-- **Foundation + Deepening**: The shallower book provides the basic framework; the deeper book provides advanced content.
-- **Strength complement**: One book's strengths compensate for another's weaknesses.
-- **Independent perspective**: Preserve distinctive perspectives from different books as sidebars.
-- **Redesign**: Neither is satisfactory; design the teaching path for this topic from scratch.
+对齐策略选项：
+- **基础 + 深化（Foundation + Deepening）**：较浅的书提供基本框架；较深的书提供进阶内容。
+- **优势互补（Strength Complement）**：一本书的优势弥补另一本书的不足。
+- **独立视角（Independent Perspective）**：保留不同书籍的独特视角作为侧边栏。
+- **重新设计（Redesign）**：两者均不满意；从头设计该主题的教学路径。
 
-#### Boundary Complementarity Analysis [Sub-phase 1.2.3]
+#### 边界互补分析 [子阶段 1.2.3]
 
-Identify how the knowledge boundaries of each book complement one another:
+识别各书知识边界的互补关系：
 
 ```markdown
 ### Boundary Complementarity Table
@@ -85,9 +85,9 @@ Identify how the knowledge boundaries of each book complement one another:
 | [Topic 2] | No practical coverage | Practice-oriented | A for concepts + B for practice |
 ```
 
-#### Style Conflict Resolution [Sub-phase 1.2.4]
+#### 风格冲突解决 [子阶段 1.2.4]
 
-Identify style differences and formulate resolution strategies:
+识别风格差异并制定解决策略：
 
 ```markdown
 ### Style Resolution Table
@@ -100,18 +100,18 @@ Identify style differences and formulate resolution strategies:
 | Code block length | 5-10 lines | 15-30 lines | [Choice] | [How to unify] |
 ```
 
-### Work Item 2: Target TOC Design [Sub-phase 1.3]
+### 工作项 2：目标目录设计 [子阶段 1.3]
 
-Based on the cross-book comparative analysis, design the integrated table of contents structure.
+基于跨书对比分析，设计整合目录结构。
 
-**Design steps**:
-1. Determine the target audience and use cases
-2. Determine the primary skeleton source (not necessarily any single source book's original TOC)
-3. Order chapters by cognitive dependencies
-4. Assign one primary cognitive load per chapter
-5. Check coverage completeness
+**设计步骤**：
+1. 确定目标受众和使用场景
+2. 确定主干来源（不一定是某本源书的原始目录）
+3. 按认知依赖排序章节
+4. 每章分配一个主要认知负荷
+5. 检查覆盖完整性
 
-**Outputs**:
+**输出**：
 
 ```markdown
 ## Target TOC
@@ -129,11 +129,11 @@ Based on the cross-book comparative analysis, design the integrated table of con
 - **Depth target**: [Introductory / Intermediate / Advanced]
 ```
 
-### Work Item 3: Per-Chapter Integration Plans [Sub-phase 1.4]
+### 工作项 3：逐章整合计划 [子阶段 1.4]
 
-Write a detailed integration plan for each target chapter, output to `plan.md`. This is the execution guide for Phase 2.
+为目标章节的每一章编写详细整合计划，输出到 `plan.md`。这是阶段 2 的执行指南。
 
-**Each chapter's integration plan must be self-contained** — Phase 2 execution should not require re-reading other files (except to look up specific chapters in the knowledge indexes as needed).
+**每章的整合计划必须自包含（Self-Contained）** —— 阶段 2 执行时不应需要重新读取其他文件（除非按需查阅知识索引中的特定章节）。
 
 ```markdown
 ## Chapter N Integration Plan
@@ -196,33 +196,33 @@ Section by section:
 - Integration markers: [Estimated N `<!-- integrated -->` markers]
 ```
 
-## Outputs: source-architecture.md [Sub-phase 1.6]
+## 输出：source-architecture.md [子阶段 1.6]
 
-Must contain the following sections:
+必须包含以下章节：
 
-1. **Target audience and use cases**: Existing foundation, reading purpose, work application method, and explicitly stated out-of-scope areas.
-2. **Per-book portraits**: A portrait of each source book based on the knowledge indexes (role, strengths, limitations, recommended integration strategy).
-3. **Cross-book comparative analysis summary**: Core methodology differences, depth alignment scheme, boundary complementarity, style resolution.
-4. **Unified knowledge graph**: Topic nodes, prerequisite dependencies, downstream capabilities, difficulty levels, practical outputs.
-5. **Target TOC design**: Parts, chapters, capability objective per chapter, prerequisite concepts, source coverage.
-6. **Reverse coverage matrix** [Sub-phase 1.5]: Source book chapters/topics mapped to target chapters/sidebars/appendix/exclusion rationale.
-7. **Exclusion and demotion scope**: Content not entering the main narrative, reasons, and whether placed in appendix or future roadmap.
-8. **Skeleton self-check**: Coverage, dependencies, granularity, project thread, advanced thread, style unification risks.
+1. **目标受众和使用场景**：现有基础、阅读目的、工作应用方式，以及明确声明的超出范围的内容。
+2. **逐书画像（Per-Book Portraits）**：基于知识索引的每本源书画像（角色、优势、局限、推荐整合策略）。
+3. **跨书对比分析摘要**：核心方法论差异、深度对齐方案、边界互补性、风格解决方案。
+4. **统一知识图谱（Knowledge Graph）**：主题节点、前置依赖、下游能力、难度级别、实践产出。
+5. **目标目录设计**：部分、章节、每章能力目标、前置概念、源书覆盖。
+6. **反向覆盖矩阵（Reverse Coverage Matrix）** [子阶段 1.5]：源书章节/主题到目标章节/侧边栏/附录/排除理由的映射。
+7. **排除和降级范围**：不进入正文的内容、原因，以及是否放入附录或未来路线图。
+8. **骨架自检**：覆盖度、依赖关系、粒度、项目主线（Project Thread）、进阶主线（Advanced Thread）、风格统一风险。
 
-## Source Book Portrait Dimensions (Based on Knowledge Indexes)
+## 源书画像维度（基于知识索引）
 
-| Dimension | Check Source |
-|---|---|
-| Learning path | Knowledge index -> Overall teaching philosophy -> Cognitive progression strategy |
-| Conceptual depth | Knowledge index -> Per-chapter depth calibration -> Depth level |
-| Modernity | Knowledge index -> Meta-information -> Language/framework version |
-| Engineering orientation | Knowledge index -> Per-chapter content coverage -> Engineering practice coverage |
-| Code density | Knowledge index -> Per-chapter code example inventory |
-| Specialized value | Knowledge index -> Per-chapter unique insights |
-| Exclusion risk | Knowledge index -> Per-chapter depth calibration -> Boundaries |
-| Integration fitness | Knowledge index -> Integration readiness summary |
+| 维度 | 检查来源 |
+|------|---------|
+| 学习路径 | 知识索引 -> 整体教学理念 -> 认知递进策略 |
+| 概念深度 | 知识索引 -> 逐章深度校准 -> 深度级别 |
+| 现代性 | 知识索引 -> 元信息 -> 语言/框架版本 |
+| 工程导向 | 知识索引 -> 逐章内容覆盖 -> 工程实践覆盖 |
+| 代码密度 | 知识索引 -> 逐章代码示例盘点 |
+| 独特价值 | 知识索引 -> 逐章独到见解 |
+| 排除风险 | 知识索引 -> 逐章深度校准 -> 边界 |
+| 整合适配度 | 知识索引 -> 整合就绪摘要 |
 
-## Target TOC Self-Check [Sub-phase 1.3]
+## 目标目录自检 [子阶段 1.3]
 
 ```
 [ ] Does each chapter have only one primary cognitive load?
@@ -238,15 +238,15 @@ Must contain the following sections:
 [ ] Have all cross-book methodology differences been analyzed with integration choices made?
 ```
 
-## Common Failure Modes
+## 常见失败模式
 
-| Failure Mode | Symptom | Fix |
-|---|---|---|
-| Largest-book bias | Default to the largest/most authoritative source book as the skeleton | Conduct cross-book comparative analysis first; let the target audience match decide |
-| Coverage illusion | Only check that target knowledge points are mapped; fail to check whether source book chapters are missed | Add a reverse coverage matrix |
-| Coarse granularity | One chapter crams in multiple core models | Split chapters by cognitive load |
-| Missing project thread | Every chapter is concepts; readers do not know how to combine them | Design stage projects and capstone projects |
-| Premature completion | An outline or short lecture notes reported as a finished book | Explicitly mark as architecture draft; forbid "completed" |
-| Specialized topic pollution | Performance, concurrency, or framework details interrupt the foundational path too early | Separate into core path, support path, and advanced path |
-| Hollow integration plan | Plan only says "integrate X into Y" without methodology | Every integration decision must be supported by knowledge index evidence |
-| Missing style resolution | Style differences between source books are ignored | Style conflict resolution analysis must be completed |
+| 失败模式 | 症状 | 修复方式 |
+|---------|------|---------|
+| 最大书偏差（Largest-Book Bias） | 默认以最大/最权威的源书为骨架 | 先做跨书对比分析；由目标受众匹配度决定 |
+| 覆盖度幻觉（Coverage Illusion） | 只检查目标知识点是否被映射；未检查源书章节是否遗漏 | 增加反向覆盖矩阵 |
+| 粒度过粗 | 一章塞入多个核心模型 | 按认知负荷拆分章节 |
+| 缺少项目主线 | 每章都是纯概念；读者不知道如何综合运用 | 设计阶段项目和综合项目（Capstone Project） |
+| 过早完成 | 大纲或简短讲义被报告为已完成的书 | 明确标记为架构草稿；禁止标记为"已完成" |
+| 专题污染 | 性能、并发或框架细节过早打断基础路径 | 拆分为核心路径、支撑路径和进阶路径 |
+| 空洞整合计划 | 计划只说"将 X 整合到 Y"而无方法论 | 每个整合决策必须有知识索引证据支撑 |
+| 缺少风格解决 | 源书之间的风格差异被忽略 | 必须完成风格冲突解决分析 |
