@@ -1,28 +1,28 @@
-# Quality Ownership
+# 质量归属（Quality Ownership）
 
-> Shared by all book skills. Who fixes what, when.
+> 所有书籍 skill 共享。谁在什么时候负责修复什么。
 
-## Principles
+## 原则
 
-1. **First-time right**: Generation phase fixes what it can verify. Don't pass typos, format, links to review.
-2. **Systemic only**: Review reports cross-chapter patterns, not point-by-point issues.
-3. **Integration owns style**: generate-book adapts style and removes duplicates. Review only checks reader-visible seams.
-4. **Source traceable**: codebase-book provides file:line evidence. Review verifies coverage and learning path.
+1. **一次做对**：生成阶段修复其能验证的问题。不要将拼写错误、格式、链接问题留给审查阶段。
+2. **仅报告系统性问题**：审查报告关注跨章节的模式，而非逐条列出问题。
+3. **集成阶段负责风格**：generate-book 负责调整风格和去除重复内容。审查仅检查读者可见的衔接处（seams）。
+4. **来源可追溯**：codebase-book 提供 file:line（文件:行号）证据。审查负责验证覆盖度和学习路径。
 
-## Responsibility
+## 职责划分
 
-| Issue | Owner | Reviewer |
-|-------|-------|----------|
-| Typos, encoding, punctuation | generate-book | Report systemic patterns only |
-| Terminology, glossary | generate-book | Cross-chapter inconsistencies |
-| Code blocks, images, nav links | generate-book / codebase-book | Reference validation summary |
-| Content source, style, dedup | generate-book | Reader-visible seams |
-| Source coverage, excerpts | codebase-book | Coverage table, evidence chain |
-| Technical correctness, versions | review-tech-book | V1-V3 evidence |
-| Learning path, reader fit | review-tech-book | Core output |
+| 问题类型 | 负责方 | 审查方 |
+|----------|--------|--------|
+| 拼写错误、编码、标点 | generate-book | 仅报告系统性模式 |
+| 术语、词汇表 | generate-book | 跨章节不一致性 |
+| 代码块、图片、导航链接 | generate-book / codebase-book | 引用验证摘要 |
+| 内容来源、风格、去重 | generate-book | 读者可见的衔接处 |
+| 来源覆盖度、摘录 | codebase-book | 覆盖度表格、证据链 |
+| 技术正确性、版本 | review-tech-book | V1-V3 证据 |
+| 学习路径、读者适配 | review-tech-book | 核心输出 |
 
-## Report Deduplication
+## 报告去重
 
-- Same issue type >3 times → merge into systemic finding
-- Automation already listed → report summary only
-- Score table ≠ issue list: scores are judgments, details in findings
+- 同类问题出现 >3 次 → 合并为系统性发现
+- 自动化工具已列出的 → 报告中仅保留摘要
+- 评分表 ≠ 问题列表：评分是判断结论，详情见发现部分
