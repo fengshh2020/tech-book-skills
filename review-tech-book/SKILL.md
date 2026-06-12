@@ -36,7 +36,11 @@ Phase 1: Scan → Phase 2: Read → Phase 3: Score → Phase 4: Report → [Fix 
 
 ## Phase 1: Scan
 
-**Auto-load**: `references/spec.md`, `references/execution-guardrails.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/spec.md` completely (no skimming)
+- [ ] Read `references/execution-guardrails.md` completely (no skimming)
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Do**:
 1. Batch scan: structure, logic, code density, terminology, translation artifacts
@@ -45,6 +49,14 @@ Phase 1: Scan → Phase 2: Read → Phase 3: Score → Phase 4: Report → [Fix 
 4. Run: `scripts/validate_code.sh output/`
 
 **Output**: `findings/phase1.md`
+
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Any finding lacks a direct quote from the source
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
 
 **Gate** (auto-check):
 ```bash
@@ -58,12 +70,25 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 
 ## Phase 2: Read
 
-**Auto-load**: `references/reviewer-discipline.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/reviewer-discipline.md` completely (no skimming)
+- [ ] Record read confirmation in progress.md with structure evidence
+- [ ] Gate 1 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Pass 1: Skim all chapters** (no skipping)
 - Check: factual claims, terminology, teaching flow, formatting
 - Mark: 🔴 (needs deep dive) or minor issues
 - Evidence per chapter: paragraph count + core content + 3+ terms
+
+**Evidence required per chapter** (write to findings/phase2.md):
+```
+### [ChN] Skim Evidence
+- Paragraphs: [count]
+- Code blocks: [count]
+- Key terms: [≥3 specific terms from actual content, NOT from title]
+- Flags: [🔴 issues found or "clean"]
+```
 
 **Pass 2: Deep dive**
 - Flagged: 🔴 chapters from Pass 1
@@ -84,6 +109,14 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 
 **Output**: `findings/phase2.md`
 
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Any finding lacks a direct quote from the source
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 **Gate** (auto-check):
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
@@ -95,7 +128,10 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
 
 ## Phase 3: Score
 
-**Auto-load**: `references/excellence-dimensions.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `references/excellence-dimensions.md` completely (no skimming)
+- [ ] Gate 2 passed with evidence in progress.md
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Do**:
 1. Score risk dimensions (evidence-based only)
@@ -106,7 +142,10 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
 
 ## Phase 4: Report
 
-**Auto-load**: `../shared/report-templates.md`
+**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
+- [ ] Read `shared/report-templates.md` completely (no skimming)
+- [ ] Gate 3 complete with scored dimensions
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Do**: Write report with:
 - Executive summary
@@ -138,6 +177,14 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 
 **Output**: `report.md`
 
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Any finding lacks a direct quote from the source
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
+
 **Gate** (auto-check):
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
@@ -148,7 +195,11 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 
 ## Fix Mode (user requests)
 
-**Auto-load**: `references/apply-fixes.md`
+**⚠️ MANDATORY BEFORE STARTING FIX MODE:**
+- [ ] Read `references/apply-fixes.md` completely (no skimming)
+- [ ] Gate 4 passed (report completed)
+- [ ] User explicitly requested fix mode
+- [ ] If ANY unchecked: STOP. Do not proceed.
 
 **Do**:
 1. Load latest `report.md`
@@ -157,6 +208,14 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 4. Per batch: run `validate_code.sh`, check HTML, navigation, numbering
 
 **Output**: `fix-report.md`
+
+**STOP — Before running gate, verify NONE of these are true:**
+- [ ] Any reference file was not re-read this phase
+- [ ] Any "I read" claim lacks structure evidence
+- [ ] Any finding lacks a direct quote from the source
+- [ ] Gate check was not actually run (just claimed)
+
+**If ANY checked: Fix before running gate.**
 
 **Gate** (auto-check):
 ```bash
