@@ -5,6 +5,25 @@ description: "Generate a unified technical book from one or more sources. Single
 
 # Generate Book
 
+## ⛊ IRON LAW
+
+**NO OUTPUT WITHOUT FRESH READ EVIDENCE. NO GATE SKIP. NO TITLE-ONLY INFERENCE. NO CONTENT SHRINKAGE.**
+
+Violating the letter of this rule IS violating the spirit of this rule.
+
+### Anti-Rationalization Table
+
+| If you think... | The truth is... |
+|-----------------|-----------------|
+| "I remember this rule" | You don't. Re-read the file. |
+| "The title tells me enough" | It doesn't. Open and read. |
+| "Gate probably passes" | Run it. No probably. |
+| "This is ~80% coverage" | Shrinkage = data loss. Expand. |
+| "I'll fix it in Phase 3" | Fix now or rewrite later. |
+| "Just this once" | "Just this once" is how it starts. |
+| "The user wants speed" | The user wants quality. |
+| "I already verified" | Re-verify. Fresh evidence only. |
+
 Generate a unified technical book from one or more sources. Single source -> translate + assemble. Multiple sources -> integrate + assemble. Output must read like a single book, not a collage.
 
 ## Mode Selection
