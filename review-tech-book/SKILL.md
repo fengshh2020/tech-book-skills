@@ -5,6 +5,25 @@ description: "Review technical books for quality. Trigger: review book, 审阅�
 
 # Review Tech Book
 
+## ⛊ IRON LAW
+
+**NO FINDING WITHOUT DIRECT QUOTE. NO GATE SKIP. NO SKIM-ONLY REVIEW. NO SHALLOW SCORING.**
+
+Violating the letter of this rule IS violating the spirit of this rule.
+
+### Anti-Rationalization Table
+
+| If you think... | The truth is... |
+|-----------------|-----------------|
+| "I remember this rule" | You don't. Re-read the file. |
+| "The title tells me enough" | It doesn't. Open and read the chapter. |
+| "Gate probably passes" | Run it. No probably. |
+| "I'll score from memory" | Score from evidence. Memory is not evidence. |
+| "I'll fix it in the report" | Fix findings now. Report summarizes, doesn't create. |
+| "Just this once" | "Just this once" is how it starts. |
+| "The user wants speed" | The user wants thoroughness. |
+| "I already verified" | Re-verify. Fresh evidence only. |
+
 Structured quality review of technical books. Default: report only. Fix mode: only when user explicitly requests.
 
 ## Workflow
