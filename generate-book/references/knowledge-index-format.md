@@ -1,193 +1,193 @@
-# Deep Knowledge Index Format
+# 深度知识索引格式（Deep Knowledge Index Format）
 
-> For generate-book multi-mode Phase 0. Each source book generates a knowledge index of >=1000 lines.
-> Goal: Enable the LLM in subsequent phases to understand "how to integrate" — not just "what was covered," but "how it was taught," "why it was taught this way," and "where the boundaries lie."
+> 供 generate-book 多模态 Phase 0（第零阶段）使用。每本源书生成一份 >=1000 行的知识索引。
+> 目标：让后续阶段的 LLM（Large Language Model，大语言模型）理解"如何整合"——不仅是"讲了什么"，还包括"怎么讲的"、"为什么这样讲"以及"边界在哪里"。
 
-## Why This Depth Is Needed
+## 为什么需要这种深度
 
-The current "5-15 items/chapter, 200-word summary" extraction approach has three fatal flaws:
+当前"每章 5-15 个条目、200 字摘要"的提取方式有三个致命缺陷：
 
-1. **Information Loss**: Summaries compress away methodological differences. Both Book A and Book B cover "decorators," but A introduces them via the "function wrapping" metaphor while B uses the "middleware pattern." The summary only records "covers decorators," leaving the model unable to decide which introduction approach to use.
-2. **Context Break**: Summaries do not record inter-chapter cognitive progression relationships. The model sees isolated knowledge points and cannot reconstruct the original book's teaching path.
-3. **Depth Blind Spot**: Summaries do not calibrate depth boundaries. The model does not know how deeply a given book covers a particular topic before stopping, nor what the book assumes the reader already knows.
+1. **信息丢失**：摘要会压缩掉方法论的差异。书 A 和书 B 都讲"装饰器"，但 A 通过"函数包装"比喻引入，B 使用"中间件模式"引入。摘要只记录"讲了装饰器"，模型无法判断该用哪种引入方式。
+2. **上下文断裂**：摘要不记录章节间的认知递进关系。模型看到的是孤立的知识点，无法重建原书的教学路径。
+3. **深度盲区**：摘要不标定深度边界。模型不知道某本书对某个主题讲到多深才停下，也不知道该书假设读者已经掌握了什么。
 
-**Solution**: Generate a deep knowledge index for each book, covering 9 dimensions. The granularity of the index must be sufficient for the model to answer questions like "what are the methodological differences between these two books on the same topic?"
+**解决方案**：为每本书生成一份深度知识索引，覆盖 9 个维度。索引的粒度必须足以让模型回答"这两本书在同一主题上的方法论差异是什么？"这类问题。
 
-## Index File Structure
+## 索引文件结构
 
 ```
 .book-doc/knowledge_base/
 ├── {source-book-name}/
-│   └── index.md          # Deep knowledge index for this source book (>=1000 lines)
-├── cross-book-analysis.md # Phase 1 output: cross-book comparative analysis
+│   └── index.md          # 该源书的深度知识索引（>=1000 行）
+├── cross-book-analysis.md # Phase 1 输出：跨书比较分析
 └── INDEX/
-    └── source_coverage.md # Coverage statistics for each source book
+    └── source_coverage.md # 各源书的覆盖度统计
 ```
 
-## Index File Format
+## 索引文件格式
 
 ```markdown
-# [Source Book Name] Deep Knowledge Index
+# [源书名称] 深度知识索引
 
-## Metadata
-- Book Title:
-- Author:
-- Target Audience:
-- Prerequisite Knowledge Assumptions:
-- Primary Programming Language/Framework Version:
-- Total Chapter Count:
-- Total Code Examples (estimated):
-
----
-
-## Teaching Philosophy
-
-### Core Teaching Method
-[What is this book's teaching approach? Is it "problem-driven," "concept-first," "example-led," or "project-throughout"? Describe in 2-3 sentences.]
-
-### Cognitive Progression Strategy
-[How does this book organize the reader's learning path? Is it "simple to complex," "low-level to high-level," "practical to theoretical," or a mixed strategy?]
-
-### Narrative Style Baseline
-- Narrative Person:
-- Sentence Length:
-- Code Comment Language:
-- Terminology Introduction Style (English+Chinese / Chinese only):
-- Tone (formal / casual / conversational):
-- Average Code Block Length (lines):
-- Sidebar Density (one every N lines):
-
-### Overall Assessment (Integration Perspective)
-- What role should this book play in integration (main thread / reinforcement / specialized / reference)?
-- Core Strengths:
-- Core Limitations:
-- Complementary Points with Other Source Books:
+## 元数据（Metadata）
+- 书名：
+- 作者：
+- 目标读者：
+- 前置知识假设：
+- 主要编程语言/框架版本：
+- 总章节数：
+- 代码示例总数（估算）：
 
 ---
 
-## Per-Chapter Deep Analysis
+## 教学理念（Teaching Philosophy）
 
-### Chapter 1: [Chapter Title]
+### 核心教学方法
+[这本书的教学方式是什么？是"问题驱动"、"概念先行"、"示例引导"还是"贯穿项目"？用 2-3 句话描述。]
 
-#### Content Coverage
-- Core Topics: [What core concepts are covered in this section, listed in order of appearance]
-- Topic Weight: [Which are key topics, which are briefly mentioned]
-- Coverage Scope: [Which aspects of the topic are covered, which are not]
-- Paragraph Structure: [N paragraphs + M code blocks + K figures/sidebars]
+### 认知递进策略
+[这本书如何组织读者的学习路径？是"由简到繁"、"由底层到高层"、"由实践到理论"，还是混合策略？]
 
-#### Methodology Analysis
-- Introduction Approach: [How does this section introduce core concepts? Via problem / scenario / definition / analogy?]
-- Teaching Strategy: [Concept → Principle → Example → Exercise? Or another sequence?]
-- Cognitive Progression: [How do concepts progress from simple to complex within this section?]
-- Unique Methods: [Does this section use any distinctive teaching techniques? E.g., showing a wrong example first then correcting it?]
+### 叙事风格基线
+- 叙事人称：
+- 句子长度：
+- 代码注释语言：
+- 术语引入风格（英文+中文 / 仅中文）：
+- 语调（正式 / 随意 / 对话式）：
+- 平均代码块长度（行）：
+- Sidebar（侧边栏）密度（每 N 行一个）：
 
-#### Depth Calibration
-- Depth Level: [Introductory / Intermediate / Advanced / Expert]
-- Explanation Depth: [API usage only? Or principles, implementation details, boundary conditions?]
-- Assumes Reader Already Knows: [What does this section assume the reader has already mastered?]
-- Not Covered in This Section: [What does this section explicitly exclude? Left for later chapters?]
-- Depth Boundary: [At what point does it stop going deeper? Why?]
-
-#### Unique Insights
-- Insights Unique to This Section: [Observations unlikely to appear in other books]
-- Unique Analogies/Metaphors: [Distinctive analogies used in this section]
-- Unique Examples: [Example scenarios in this section not found in other books]
-- Common Misconception Corrections: [Common reader misunderstandings pointed out in this section]
-
-#### Code Example Inventory
-| Example | Lines | Scenario | Runnability | Teaching Purpose |
-|---------|-------|----------|-------------|------------------|
-| [Example 1 description] | [N] | [Real-world / Toy] | [Yes / No / Needs Modification] | [Introduce concept / Demonstrate usage / Show pitfall] |
-
-#### Cross-References
-- Depends on Prior Chapters: [Which earlier chapters does this section reference?]
-- Referenced by Later Chapters: [Which later chapters will use this section's content?]
-- External References: [What external resources does this section cite (docs, PEPs, papers)?]
-
-#### Style Characteristics
-- Narrative Density: [High (dense concepts) / Medium / Low (heavy on examples and explanations)]
-- Code Density: [High (code in every segment) / Medium / Low (primarily text explanations)]
-- Exercises: [Present / Absent, quantity]
-- Sidebars/Tip Boxes: [Present / Absent, content types]
-
-#### Integration Readiness
-- Recommended Integration Role: [Main content / Supplementary content / Sidebar content / Reference material]
-- Integration Considerations: [What needs special attention during integration? Style differences? Terminology conflicts?]
-- Direct Reusability: [High (can be quoted directly) / Medium (needs rewriting) / Low (needs reorganization)]
+### 总体评估（集成视角）
+- 这本书在集成中应扮演什么角色（主线 / 强化 / 专项 / 参考）？
+- 核心优势：
+- 核心局限：
+- 与其他源书的互补点：
 
 ---
 
-[Repeat the above structure for each chapter's deep analysis]
+## 逐章深度分析
+
+### 第 1 章：[章节标题]
+
+#### 内容覆盖
+- 核心主题：[本节涵盖哪些核心概念，按出现顺序列出]
+- 主题权重：[哪些是重点主题，哪些只是简略提及]
+- 覆盖范围：[主题的哪些方面被覆盖，哪些没有]
+- 段落结构：[N 段 + M 个代码块 + K 个图/侧边栏]
+
+#### 方法论分析
+- 引入方式：[本节如何引入核心概念？通过问题 / 场景 / 定义 / 类比？]
+- 教学策略：[概念 → 原理 → 示例 → 练习？还是其他顺序？]
+- 认知递进：[本节内概念如何从简单到复杂递进？]
+- 独特方法：[本节是否使用了独特的教学技巧？例如先展示错误示例再纠正？]
+
+#### 深度标定
+- 深度等级：[入门 / 中级 / 高级 / 专家]
+- 讲解深度：[仅 API 用法？还是包含原理、实现细节、边界条件？]
+- 假设读者已知：[本节假设读者已经掌握了什么？]
+- 本节未涉及：[本节明确排除了什么？留给了后续章节？]
+- 深度边界：[在什么点上停止深入？为什么？]
+
+#### 独特见解
+- 本节独有的见解：[不太可能出现在其他书中的观察]
+- 独特类比/隐喻：[本节使用的独特类比]
+- 独特示例：[本节中其他书中找不到的示例场景]
+- 常见误解纠正：[本节指出的读者常见误解]
+
+#### 代码示例清单
+| 示例 | 行数 | 场景 | 可运行性 | 教学目的 |
+|------|------|------|----------|----------|
+| [示例 1 描述] | [N] | [真实场景 / 玩具示例] | [是 / 否 / 需修改] | [引入概念 / 演示用法 / 展示陷阱] |
+
+#### 交叉引用
+- 依赖前置章节：[本节引用了哪些更早的章节？]
+- 被后续章节引用：[哪些后续章节会使用本节内容？]
+- 外部引用：[本节引用了哪些外部资源（文档、PEP、论文）？]
+
+#### 风格特征
+- 叙事密度：[高（概念密集）/ 中 / 低（示例和解释为主）]
+- 代码密度：[高（每段都有代码）/ 中 / 低（以文字解释为主）]
+- 练习：[有 / 无，数量]
+- Sidebar/提示框：[有 / 无，内容类型]
+
+#### 集成就绪度
+- 推荐集成角色：[主要内容 / 补充内容 / 侧边栏内容 / 参考资料]
+- 集成注意事项：[集成时需要特别注意什么？风格差异？术语冲突？]
+- 直接可用性：[高（可直接引用）/ 中（需改写）/ 低（需重组）]
 
 ---
 
-## Cross-Chapter Theme Mapping
+[对每章的深度分析重复上述结构]
 
-### Progression Path for Theme [A]
-- Chapter X: [Basic introduction]
-- Chapter Y: [In-depth expansion]
-- Chapter Z: [Advanced application / practical use]
-- Progression Pattern: [How concepts deepen from Chapter X to Y to Z]
+---
 
-### Progression Path for Theme [B]
+## 跨章主题映射
+
+### 主题 [A] 的递进路径
+- 第 X 章：[基础引入]
+- 第 Y 章：[深入展开]
+- 第 Z 章：[高级应用 / 实战使用]
+- 递进模式：[概念从第 X 章到 Y 章到 Z 章如何深化]
+
+### 主题 [B] 的递进路径
 ...
 
-### Running Project
-[If the book has a project that spans multiple chapters, describe its evolution path]
+### 贯穿项目
+[如果书中有一个跨多章的项目，描述其演进路径]
 
 ---
 
-## Knowledge Point Cross-Reference Matrix
+## 知识点交叉引用矩阵
 
-| Knowledge Point | Chapter | Depth | Prerequisites | Uniqueness Rating |
-|-----------------|---------|-------|---------------|-------------------|
-| [Concept 1] | Ch[1] | [Introductory / Intermediate / Advanced] | [None / Ch0] | [High / Medium / Low] |
-| [Concept 2] | Ch[3] | [Intermediate] | [Concept 1] | [Medium] |
+| 知识点 | 章节 | 深度 | 前置知识 | 独特性评级 |
+|--------|------|------|----------|------------|
+| [概念 1] | Ch[1] | [入门 / 中级 / 高级] | [无 / Ch0] | [高 / 中 / 低] |
+| [概念 2] | Ch[3] | [中级] | [概念 1] | [中] |
 ...
 
 ---
 
-## Integration Readiness Summary
+## 集成就绪度总结
 
-### What This Book Can Contribute to the Integration
-[3-5 sentences summarizing this book's core value in the integration]
+### 本书能为集成贡献什么
+[用 3-5 句话总结这本书在集成中的核心价值]
 
-### Style Adaptation Needs
-[If this book serves as the main thread, what style adaptations do other books need? If this book is in a supplementary role, what style adaptations does it need?]
+### 风格适配需求
+[如果本书作为主线，其他书需要做什么风格适配？如果本书作为补充角色，自身需要做什么风格适配？]
 
-### Known Risks
-[Potential problems during integration: terminology conflicts, depth mismatches, methodological conflicts, etc.]
+### 已知风险
+[集成期间可能出现的潜在问题：术语冲突、深度不匹配、方法论冲突等]
 
-### Recommended Integration Strategy
-[Suggested approach for using this book's content: which chapters to use as the main thread, which as supplements, which to skip]
+### 推荐集成策略
+[使用本书内容的建议方式：哪些章节作为主线、哪些作为补充、哪些跳过]
 ```
 
-## Line Count Estimation
+## 行数估算
 
-Per-chapter deep analysis is approximately 60-100 lines. A 15-chapter book = 900-1500 lines of chapter analysis + 100 lines of overall analysis + 50 lines of cross-chapter mapping + 50 lines of cross-reference matrix = **1100-1700 lines**. Meets the >=1000 line requirement.
+每章深度分析约 60-100 行。一本 15 章的书 = 900-1500 行章节分析 + 100 行总体分析 + 50 行跨章映射 + 50 行交叉引用矩阵 = **1100-1700 行**。满足 >=1000 行的要求。
 
-## Quality Standards
+## 质量标准
 
-How to verify whether the index is sufficiently deep:
+如何验证索引是否足够深入：
 
 ```
-□ Can it answer "What are the methodological differences between these two books on [topic]?"
-□ Can it answer "How deeply does this book cover [topic] before stopping?"
-□ Can it answer "What is the unique value of this book's treatment of [topic]?"
-□ Can it answer "How are [Concept A] and [Concept B] connected in this book?"
-□ Can it answer "What does this book assume the reader already knows before learning [topic]?"
+□ 能否回答"这两本书在 [主题] 上的方法论差异是什么？"
+□ 能否回答"这本书在 [主题] 上讲到多深才停下？"
+□ 能否回答"这本书对 [主题] 的处理的独特价值是什么？"
+□ 能否回答"[概念 A] 和 [概念 B] 在这本书中是如何关联的？"
+□ 能否回答"这本书假设读者在学习 [主题] 之前已经知道什么？"
 
-If any of the above questions cannot be answered from the index, the index is not deep enough.
+如果以上任一问题无法从索引中找到答案，说明索引不够深入。
 ```
 
-## Reading Evidence Requirements
+## 阅读证据要求
 
-The "Content Coverage" section of each chapter must include:
-- Exact paragraph count (not "approximately N paragraphs" but a precise count)
-- Exact code block count
-- At least 3 specific technical terms that appear in the chapter (not rewordings of the chapter title)
+每章的"内容覆盖"部分必须包含：
+- 精确的段落数（不是"大约 N 段"，而是精确计数）
+- 精确的代码块数
+- 至少 3 个在该章中出现的具体技术术语（不能是章节标题的改写）
 
-**Prohibited**:
-- Inferring content from titles alone
-- Having identical reading evidence formats for two consecutive chapters
-- "This chapter mainly covers X" style title rewording
+**禁止行为**：
+- 仅从标题推断内容
+- 连续两章的阅读证据格式完全相同
+- "本章主要讲 X"式样的标题改写

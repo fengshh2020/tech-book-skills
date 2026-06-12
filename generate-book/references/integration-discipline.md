@@ -1,188 +1,188 @@
-# Integration Discipline
+# 集成纪律（Integration Discipline）
 
-> Rules for correctness, completeness, style consistency.
+> 关于正确性、完整性、风格一致性的规则。
 
-## Correctness
+## 正确性
 
-### Verification Levels
+### 验证等级
 
-| Level | Meaning | Method | Tag |
-|-------|---------|--------|-----|
-| V1 | Runtime verified | Ran code, called `hasattr()` | `[V1]` |
-| V2 | Source confirmed | Read source file lines | `[V2]` |
-| V3 | Docs checked | Read PEP/What's New | `[V3]` |
-| V4 | Inferred | General knowledge, unverified | `[V4]` |
+| 等级 | 含义 | 方法 | 标签 |
+|------|------|------|------|
+| V1 | 运行时验证 | 运行代码，调用 `hasattr()` | `[V1]` |
+| V2 | 源码确认 | 阅读源文件代码行 | `[V2]` |
+| V3 | 文档核查 | 阅读 PEP/What's New | `[V3]` |
+| V4 | 推断 | 通用知识，未经验证 | `[V4]` |
 
-**Rules**:
-- Critical/High severity = at least V2
-- API existence/removal = V1 or V3
-- V4 = severity auto-downgraded, mark "unverified"
-- New code blocks in integration = V2 or V1, never V4
+**规则**：
+- 严重/高等级问题 = 至少 V2
+- API（Application Programming Interface，应用程序编程接口）存在/移除 = V1 或 V3
+- V4 = 严重等级自动降级，标记为"未经验证"
+- 集成阶段新增代码块 = V2 或 V1，不允许 V4
 
-### Code Verification (3 steps)
+### 代码验证（3 步）
 
-1. **Block review**: Check imports, API names, parameter signatures
-2. **Runtime**: Run code blocks with version-specific APIs
-3. **Version**: Confirm version-specific APIs match baseline
+1. **块审查**：检查 import（导入）、API 名称、参数签名
+2. **运行时**：用目标版本的 API 运行代码块
+3. **版本**：确认版本特定 API 与基线（baseline）一致
 
-### Common Traps
+### 常见陷阱
 
-| Trap | Prevention |
-|------|------------|
-| API hallucination | V1 runtime check |
-| Version timeline error | V3 check What's New |
-| Import path error | V1 runtime check |
-| Parameter drift | V1 or V3 verify |
+| 陷阱 | 预防方法 |
+|------|----------|
+| API 幻觉（hallucination） | V1 运行时检查 |
+| 版本时间线错误 | V3 检查 What's New |
+| Import 路径错误 | V1 运行时检查 |
+| 参数偏移（drift） | V1 或 V3 验证 |
 
-## Completeness
+## 完整性
 
-### Coverage Check (Phase 1)
+### 覆盖度检查（Phase 1，第一阶段）
 
-| Chapter | Keywords | Extracted | Status |
-|---------|----------|-----------|--------|
+| 章节 | 关键词 | 已提取 | 状态 |
+|------|--------|--------|------|
 | Ch1 | ... | N | Pass/Warning/Fail |
 
-**Standard**: >=80% per source, all core topics covered, proportional to length.
+**标准**：每个源 >=80%，所有核心主题均已覆盖，且比例与篇幅匹配。
 
-### Mapping Check (Phase 2)
+### 映射检查（Phase 2，第二阶段）
 
-- **Forward**: Every KB ID mapped to a chapter?
-- **Reverse**: Every chapter checked against all sources?
-- **Gaps**: Every gap has decision (add/exclude/deferred)?
+- **正向映射**：每个 KB（Knowledge Base，知识库）ID 是否已映射到章节？
+- **反向映射**：每个章节是否对照所有源书检查过？
+- **缺口**：每个缺口是否有决策（添加/排除/延后）？
 
-### Output Check (Phase 4)
+### 输出检查（Phase 4，第四阶段）
 
-- Every "insert" action executed?
-- Every sidebar added?
-- Every mapped KB item appears in output?
-- Conflicts resolved?
-- Gaps addressed?
+- 每个"插入"动作是否已执行？
+- 每个 sidebar（侧边栏）是否已添加？
+- 每个已映射的 KB 条目是否出现在输出中？
+- 冲突是否已解决？
+- 缺口是否已处理？
 
-## Style Consistency
+## 风格一致性
 
-### Baseline Extraction
+### 基线提取
 
-| Dimension | What to Extract |
-|-----------|----------------|
-| Person | "we" / "you" / none |
-| Sentence length | Average characters |
-| Code comment language | EN / mixed |
-| Term introduction | EN only / EN+CN |
-| Code block size | Average lines |
-| Sidebar density | Per 1000 lines |
-| Explanation depth | Concept -> principle -> example -> pitfall -> best practice |
-| Tone | Formal / casual / conversational |
+| 维度 | 提取内容 |
+|------|----------|
+| 人称 | "we" / "you" / 无 |
+| 句子长度 | 平均字符数 |
+| 代码注释语言 | EN（英文）/ 混合 |
+| 术语引入方式 | 仅英文 / 英文+中文 |
+| 代码块大小 | 平均行数 |
+| Sidebar 密度 | 每 1000 行中的数量 |
+| 讲解深度 | 概念 → 原理 → 示例 → 陷阱 → 最佳实践 |
+| 语调 | 正式 / 随意 / 对话式 |
 
-### Source Adaptation
+### 来源适配
 
-| Source Type | Typical Bias | Adaptation |
-|-------------|-------------|------------|
-| Deep textbook | Long, detailed | Keep depth, trim wording |
-| Advice book | Itemized, no context | Add motivation, merge related |
-| Beginner book | Shallow, simple | Deepen, upgrade examples |
-| Reference docs | Dry, authoritative | Add analogy, practice guidance |
+| 来源类型 | 典型偏向 | 适配方式 |
+|----------|----------|----------|
+| 深度教材 | 篇幅长、详尽 | 保留深度，精简措辞 |
+| 建议类书 | 条目化，缺乏上下文 | 添加动机说明，合并相关条目 |
+| 入门书 | 浅显简单 | 加深内容，升级示例 |
+| 参考文档 | 干燥、权威 | 添加类比、实践指导 |
 
-**Rule**: New content adapts to main book style. Main book doesn't adapt to new content.
+**规则**：新内容适配主书风格。主书不适配新内容。
 
-### Per-Paragraph Self-Check
+### 逐段落自检
 
-After writing each paragraph from non-main source:
-- [ ] Person matches baseline?
-- [ ] Sentence length within +/-30%?
-- [ ] Term introduction follows convention?
-- [ ] Code block size matches baseline?
-- [ ] Context transition added?
-- [ ] Tone matches baseline?
+从非主要来源写完每段后：
+- [ ] 人称是否与基线一致？
+- [ ] 句子长度是否在 +/-30% 以内？
+- [ ] 术语引入是否遵循约定？
+- [ ] 代码块大小是否与基线一致？
+- [ ] 是否添加了上下文过渡？
+- [ ] 语调是否与基线一致？
 
-Fix before writing next paragraph. Don't fix after.
+在下一段之前修正。不要事后修补。
 
-## Phase Gates
+## 阶段关卡（Phase Gates）
 
-### Phase 1 Gate
-
-```
-[ ] Coverage >=80% per source?
-[ ] Every chapter has >=1 item?
-[ ] All core topics covered?
-[ ] Item format uniform?
-[ ] Dependencies annotated?
-```
-
-### Phase 2 Gate
+### Phase 1 关卡
 
 ```
-[ ] Forward mapping >=95%?
-[ ] Reverse mapping complete?
-[ ] Unmapped items reviewed?
-[ ] All gaps have decision?
-[ ] Conflicts identified?
+[ ] 每个源的覆盖度 >=80%？
+[ ] 每个章节有 >=1 个条目？
+[ ] 所有核心主题已覆盖？
+[ ] 条目格式统一？
+[ ] 依赖关系已标注？
 ```
 
-### Phase 3 Gate
+### Phase 2 关卡
 
 ```
-[ ] Global constraints complete?
-[ ] Per-chapter instruction: state/source/content/terms/estimate?
-[ ] Estimate reasonable (15-35% increment)?
-[ ] No vague instructions?
+[ ] 正向映射 >=95%？
+[ ] 反向映射完成？
+[ ] 未映射条目已审查？
+[ ] 所有缺口有决策？
+[ ] 冲突已识别？
 ```
 
-### Phase 4 Gate (per chapter)
+### Phase 3 关卡
 
 ```
-[ ] Code blocks reviewed, >=2 run?
-[ ] Version APIs match baseline?
-[ ] Every plan action executed?
-[ ] All KB items in output?
-[ ] Markers present?
-[ ] Style adapted?
-[ ] Terms consistent?
-[ ] No duplicate explanations?
+[ ] 全局约束完成？
+[ ] 每章指令：状态/来源/内容/术语/估算？
+[ ] 估算合理（增量 15-35%）？
+[ ] 无模糊指令？
 ```
 
-### Full Book Gate
+### Phase 4 关卡（每章）
 
 ```
-[ ] Terms consistent (grep full book)?
-[ ] Cross-references valid?
-[ ] Code listings renumbered?
-[ ] No duplicate concepts?
-[ ] Learning objectives updated?
-[ ] All chapter gates passed?
+[ ] 代码块已审查，>=2 个已运行？
+[ ] 版本 API 与基线匹配？
+[ ] 每个计划动作已执行？
+[ ] 所有 KB 条目在输出中？
+[ ] 标记（Markers）已存在？
+[ ] 风格已适配？
+[ ] 术语一致？
+[ ] 无重复说明？
 ```
 
-## Coverage Guardian
+### 全书关卡
 
-### Per-Source Coverage Ratio
+```
+[ ] 术语一致（grep 全书）？
+[ ] 交叉引用有效？
+[ ] 代码清单已重新编号？
+[ ] 无重复概念？
+[ ] 学习目标已更新？
+[ ] 所有章节关卡已通过？
+```
 
-Per-chapter rule: If a source book is mapped as "primary" or "secondary" for a chapter, it MUST contribute >=3 integration markers in that chapter.
+## 覆盖度守护（Coverage Guardian）
 
-Per-book rule: Each source book's total markers >= (total_source_chapters * 0.5).
-- Example: Will has 30 chapters -> minimum 15 markers
-- Example: Mindset has 15 chapters -> minimum 8 markers
+### 每源覆盖比例
 
-Floor rule: No source book may have fewer than 10% of total markers across the integrated book.
-- If total markers = 700, minimum per source = 70.
+每章规则：如果某源书在某章被映射为"主要"或"次要"，它必须在该章贡献 >=3 个集成标记（integration marker）。
 
-### Patch-Style Detection
+每书规则：每本源书的总标记数 >= (该源被映射的总章数 * 0.5)。
+- 示例：Will 有 30 章 -> 最少 15 个标记
+- 示例：Mindset 有 15 章 -> 最少 8 个标记
 
-A source is "patch-style" if ANY of these is true:
-1. All its markers appear in <=2 chapters (concentrated, not integrated)
-2. Its markers never appear as the first marker in any section (always supplemental)
-3. Its content always appears after the primary source content within every section
+下限规则：任何源书的标记数不得少于全书总标记数的 10%。
+- 如果总标记数 = 700，则每源最少 = 70。
 
-Detection timing:
-- After each chapter gate (sub-phase 2.3)
-- After batch check (sub-phase 2.5)
-- During Phase 3 validation
+### 补丁式检测（Patch-Style Detection）
 
-Escalation:
-- First detection: WARNING logged to progress.md
-- Second detection for same source: REQUIRE REWRITE of affected chapters
+如果满足以下任一条件，该源即为"补丁式"：
+1. 其所有标记集中在 <=2 个章节中（集中而非整合）
+2. 其标记从未作为任何小节的第一个标记出现（始终是补充角色）
+3. 其内容在每个小节中始终出现在主要来源内容之后
 
-### Output Size Guard
+检测时机：
+- 每章关卡之后（子阶段 2.3）
+- 批次检查之后（子阶段 2.5）
+- Phase 3 验证期间
 
-Per-chapter rule: Output chapter size MUST be >= max(source_chapter_sizes_for_this_topic) * 0.8
+升级处理：
+- 首次检测：在 progress.md 中记录 WARNING（警告）
+- 同一源第二次被检测：要求重写受影响章节
 
-This prevents the "integrated book has less content than a single source book" problem.
-- Example: If Will Ch8 = 50KB and Stroustrup Ch7 = 40KB cover the same topic, the integrated chapter must be >= 40KB (50KB * 0.8).
+### 输出大小守卫
+
+每章规则：输出章节大小必须 >= max(该主题对应的各源章节大小) * 0.8
+
+这防止了"集成书内容比单本源书还少"的问题。
+- 示例：如果 Will 第 8 章 = 50KB，Stroustrup 第 7 章 = 40KB 覆盖同一主题，则集成章节必须 >= 40KB（50KB * 0.8）。

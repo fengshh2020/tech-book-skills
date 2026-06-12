@@ -1,100 +1,100 @@
-# Quality Gate
+# 质量关卡（Quality Gate）
 
-> Chapter-level quality gates. Each chapter must pass before the next one starts.
-> Core principle of Phase 2: resolve quality issues on the spot; do not accumulate them to the end.
+> 章节级别的质量关卡。每章必须通过后才能开始下一章。
+> Phase 2 的核心原则：当场解决质量问题；不要积累到最后。
 
-## Purpose
+## 目的
 
-Prevent "reviewed 30 rounds, still problems". Catch issues during generation, not after. Every chapter passes its gate BEFORE the next chapter starts.
+防止"审了 30 轮，还有问题"。在生成过程中发现问题，而不是事后。每章通过关卡后，才能开始下一章。
 
-## Phase 0 Gate: Knowledge Indexing
-
-```
-□ Every source book has an index.md file?
-□ Every index.md >= 1000 lines?
-□ Every index.md contains all required sections? (Teaching Philosophy, Per-Chapter Deep Analysis, Cross-Chapter Theme Mapping, Integration Readiness Summary)
-□ Every chapter has reading evidence? (paragraph count, code block count, specific terminology)
-□ No two consecutive chapters have identical reading evidence format?
-□ No content inferred from titles alone? (every topic has specific supporting evidence)
-```
-
-**Fail = re-read and supplement the index. Do not enter Phase 1.**
-
-## Phase 1 Gate: Architecture Design
+## Phase 0 关卡：知识索引
 
 ```
-□ source-architecture.md contains all required sections?
-□ Cross-book comparison analysis complete? (methodology differences, depth alignment, boundary complementarity, style harmonization)
-□ Each chapter in target TOC has only one primary cognitive load?
-□ Source book reverse coverage matrix is 100%?
-□ Each chapter in plan.md has a self-contained integration plan?
-□ Each integration plan has: source mapping, methodology selection (with evidence), depth alignment, content synthesis approach?
-□ No TBD / placeholders?
-□ Target TOC self-check all passed?
+□ 每本源书都有 index.md 文件？
+□ 每个 index.md >= 1000 行？
+□ 每个 index.md 包含所有必需章节？（教学理念、逐章深度分析、跨章主题映射、集成就绪度总结）
+□ 每章都有阅读证据？（段落数、代码块数、具体术语）
+□ 没有连续两章的阅读证据格式完全相同？
+□ 没有仅从标题推断的内容？（每个主题都有具体支撑证据）
 ```
 
-**Fail = redesign. Do not enter Phase 2.**
+**未通过 = 重新阅读并补充索引。不要进入 Phase 1。**
 
-## Phase 2 Gate: Chapter Generation (per chapter)
+## Phase 1 关卡：架构设计
 
-### Per Chapter (2a) — after each chapter
+```
+□ source-architecture.md 包含所有必需章节？
+□ 跨书比较分析已完成？（方法论差异、深度对齐、边界互补性、风格协调）
+□ 目标目录（TOC）中每章只有一个主要认知负荷？
+□ 源书反向覆盖矩阵达到 100%？
+□ plan.md 中每章都有自包含的集成计划？
+□ 每个集成计划都有：来源映射、方法论选择（附证据）、深度对齐、内容合成方式？
+□ 没有 TBD / 占位符？
+□ 目标 TOC 自检全部通过？
+```
 
-| ID | Check | Pass Criteria | Fail Action |
-|----|-------|--------------|-------------|
-| G1 | Coverage | All plan.md IDs have markers | Rewrite chapter |
-| G2 | Code quality | New code has V1-V3 tags | Add tags + verify |
-| G3 | Style match | No translationese, matches baseline | Rewrite sections |
-| G4 | No duplicates | No repeated explanations | Merge/cross-ref |
-| G5 | Narrative flow | Transitions natural, arc complete | Rewrite |
-| G6 | Depth match | Matches plan's depth target, sufficient length | Expand or trim |
-| G7 | Source ratio | Each mapped source has >=3 markers in this chapter | Expand source contribution |
-| G8 | Output size | Chapter size >= max(source_chapter_sizes) * 0.8 | Expand content |
+**未通过 = 重新设计。不要进入 Phase 2。**
 
-### Per Batch (2b) — every 5 chapters
+## Phase 2 关卡：章节生成（每章）
 
-| ID | Check | Pass Criteria | Fail Action |
-|----|-------|--------------|-------------|
-| G9 | Cross-chapter consistency | Terms consistent, style uniform | Fix batch |
-| G10 | Source unidentifiable | 3 random paragraphs, can't tell source | Rewrite |
+### 每章（2a）—— 每章完成后
 
-### Full Book (2c) — after all chapters
+| ID | 检查项 | 通过标准 | 未通过处理 |
+|----|--------|----------|------------|
+| G1 | 覆盖度 | plan.md 中所有 ID 都有标记 | 重写章节 |
+| G2 | 代码质量 | 新代码有 V1-V3 标签 | 添加标签 + 验证 |
+| G3 | 风格匹配 | 无翻译腔（translationese），与基线匹配 | 重写相关段落 |
+| G4 | 无重复 | 无重复说明 | 合并/交叉引用 |
+| G5 | 叙事流畅度 | 过渡自然，叙事弧完整 | 重写 |
+| G6 | 深度匹配 | 符合计划的深度目标，篇幅充足 | 扩展或精简 |
+| G7 | 来源比例 | 每个已映射来源在该章有 >=3 个标记 | 扩展来源贡献 |
+| G8 | 输出大小 | 章节大小 >= max(源章节大小) * 0.8 | 扩展内容 |
 
-| ID | Check | Pass Criteria | Fail Action |
-|----|-------|--------------|-------------|
-| G11 | Global consistency | Full book term/style/flow check | Fix |
-| G12 | Coverage complete | 100% source material accounted for | Add missing |
-| G13 | Resample check | Re-check 3 chapters against G1-G8 | Rewrite if fail |
+### 每批次（2b）—— 每 5 章
 
-## Record Format
+| ID | 检查项 | 通过标准 | 未通过处理 |
+|----|--------|----------|------------|
+| G9 | 跨章一致性 | 术语一致，风格统一 | 修复该批次 |
+| G10 | 来源不可辨识 | 随机抽 3 段，无法辨别来源 | 重写 |
+
+### 全书（2c）—— 所有章节完成后
+
+| ID | 检查项 | 通过标准 | 未通过处理 |
+|----|--------|----------|------------|
+| G11 | 全局一致性 | 全书术语/风格/流畅度检查 | 修复 |
+| G12 | 覆盖完整 | 100% 源材料已处理 | 补充缺失 |
+| G13 | 重采样检查 | 重新对照 G1-G8 检查 3 章 | 未通过则重写 |
+
+## 记录格式
 
 ```markdown
-### Ch[N] Gate
-- Time: YYYY-MM-DD HH:MM
-- G1: pass/fail — [markers count]
-- G2: pass/fail — [verified/total code blocks]
-- G3: pass/fail — [translationese hits]
-- G4: pass/fail — [duplicate count]
-- G5: pass/fail — [notes]
-- G6: pass/fail — [line count, depth assessment]
-- G7: pass/fail — [markers per source, lowest count]
-- G8: pass/fail — [chapter size vs max(source_chapter_sizes)]
-- Issues: [list]
-- Action: proceed/rewrite
+### Ch[N] 关卡
+- 时间：YYYY-MM-DD HH:MM
+- G1：通过/未通过 — [标记数量]
+- G2：通过/未通过 — [已验证/总代码块数]
+- G3：通过/未通过 — [翻译腔命中数]
+- G4：通过/未通过 — [重复数量]
+- G5：通过/未通过 — [备注]
+- G6：通过/未通过 — [行数，深度评估]
+- G7：通过/未通过 — [每源标记数，最低数量]
+- G8：通过/未通过 — [章节大小 vs max(源章节大小)]
+- 问题：[列表]
+- 动作：继续/重写
 ```
 
-## Phase 3 Gate: Validation
+## Phase 3 关卡：验证
 
 ```
-□ Coverage >= 95%?
-□ All terms consistent across full book?
-□ All code blocks runnable?
-□ All cross-references valid?
-□ No style jumps between chapters?
-□ Reverse coverage 100%?
+□ 覆盖度 >= 95%？
+□ 全书术语一致？
+□ 所有代码块可运行？
+□ 所有交叉引用有效？
+□ 章节之间无风格跳跃？
+□ 反向覆盖 100%？
 ```
 
-## Core Rule
+## 核心规则
 
-**Fail = rewrite. Do not proceed to next chapter. Do not accumulate.**
+**未通过 = 重写。不要进入下一章。不要积累。**
 
-If 2 consecutive chapters fail the same gate item, stop and check whether plan.md has a problem.
+如果连续 2 章在同一关卡项上未通过，停下来检查 plan.md 是否存在问题。
