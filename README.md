@@ -86,14 +86,6 @@ generate-book → review-tech-book → generate-book (fix mode)
 - **Robustness**: Pre-flight checks, gate degradation, error recovery, output validation
 - **Evidence-based**: Every finding needs a direct quote (review), every claim needs file:line (codebase)
 
-## Validation
-
-```bash
-python3 evals/validate_skill_pack.py
-```
-
-Checks skill metadata, resource links, script syntax, and cross-skill contracts.
-
 ## License
 
 MIT
