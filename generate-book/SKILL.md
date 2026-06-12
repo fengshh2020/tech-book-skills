@@ -611,6 +611,39 @@ See `references/agent-orchestration.md` for full rules. Key constraints:
 - 1:1 paragraph mapping preserved (single-source mode)
 - Terms, numbering, navigation, images, code comments correct on first pass
 
+## What Failure Looks Like
+
+### Failure 1: Re-read skip
+- **Model says**: "I already loaded the translation rules earlier" / "I remember the integration plan"
+- **Reality**: Context was summarized, rules are now fuzzy, plan details forgotten
+- **Detection**: Read confirmation missing from progress.md for this phase
+- **Fix**: Re-read file, record confirmation with structure evidence (line count, key rules)
+
+### Failure 2: Title-only inference
+- **Model says**: "Chapter 5 covers functions, so it includes parameters, return types, overloading"
+- **Reality**: Chapter 5 is about function objects and lambdas, not basic functions
+- **Detection**: Evidence uses generic terms applicable to any chapter on "functions"
+- **Fix**: Open file, read full content, re-record evidence with specific terms from actual text
+
+### Failure 3: Gate bypass
+- **Model says**: "Gate passes — all checks look good" / "Coverage is sufficient"
+- **Reality**: Gate script was never actually run; coverage was estimated, not measured
+- **Detection**: No script output pasted in progress.md; no marker counts
+- **Fix**: Run gate command, paste full output, verify pass with evidence
+
+### Failure 4: Content shrinkage
+- **Model says**: "Chapter generated successfully"
+- **Reality**: Source chapter had 40 paragraphs, output has 15 (37% coverage) — content was summarized, not translated/integrated
+- **Detection**: Output file < 80% of source chapter size; paragraph count mismatch
+- **Fix**: Expand output to match source depth. Add missing sections. Re-run gate.
+
+### Failure 5: Patch-style integration (multi-mode only)
+- **Model says**: "All sources integrated"
+- **Reality**: One source contributes 80% of markers, others only appear in 1-2 chapters
+- **Detection**: Coverage Guardian shows floor rule violation; per-chapter minimum not met
+- **Fix**: Expand contributions from underrepresented sources in affected chapters
+
+
 ## Reference Files
 
 | File | Purpose | Mode |

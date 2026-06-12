@@ -224,6 +224,32 @@ python ../shared/workflow.py review-tech-book <run_dir> check_gate fix
 - All 4 batches completed
 - Each batch validated
 
+## What Failure Looks Like
+
+### Failure 1: Re-read skip
+- **Model says**: "I already loaded the spec earlier" / "I know the reviewer discipline rules"
+- **Reality**: Context was summarized, specific scoring criteria forgotten
+- **Detection**: Read confirmation missing from progress.md for this phase
+- **Fix**: Re-read reference file, record confirmation with structure evidence
+
+### Failure 2: Skim-only review (title inference variant)
+- **Model says**: "I reviewed all chapters" but findings use generic descriptions
+- **Reality**: Chapters were scanned for structure only, not read for content
+- **Detection**: Findings lack direct quotes; evidence level V1 for 🔴/🟠 issues
+- **Fix**: Re-read flagged chapters, add direct quotes with line references
+
+### Failure 3: Gate bypass
+- **Model says**: "Gate passes — all chapters reviewed"
+- **Reality**: Chapters were listed, not actually read; findings are fabricated summaries
+- **Detection**: No chapter evidence in findings/phase2.md; no quotes for deep-dives
+- **Fix**: Re-read chapters, document with paragraph counts + terms + quotes
+
+### Failure 4: Shallow scoring
+- **Model says**: "All dimensions scored"
+- **Reality**: Scores are rounded estimates without evidence, or all dimensions scored 7/10
+- **Detection**: No quotes supporting scores; uniform scoring across all dimensions
+- **Fix**: Re-score each dimension with specific evidence: quote + issue + impact
+
 ## Quality Standards
 
 - Conclusions based on evidence, not intuition
