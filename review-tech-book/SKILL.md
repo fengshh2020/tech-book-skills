@@ -3,255 +3,256 @@ name: review-tech-book
 description: "Review technical books for quality. Trigger: review book, 审阅这本书, optimize issues, 修复这些问题. Default: report only, do not fix."
 ---
 
-# Review Tech Book
+# 审阅技术书籍
 
-## ⛊ IRON LAW
+## ⛊ IRON LAW（铁律）
 
 **NO FINDING WITHOUT DIRECT QUOTE. NO GATE SKIP. NO SKIM-ONLY REVIEW. NO SHALLOW SCORING.**
+（没有直接引用就没有发现。不跳过关卡。不只扫不读。不浅层打分。）
 
-Violating the letter of this rule IS violating the spirit of this rule.
+违反此规则的字面含义，就是违反此规则的精神。
 
-### Anti-Rationalization Table
+### Anti-Rationalization Table（反合理化对照表）
 
-| If you think... | The truth is... |
-|-----------------|-----------------|
-| "I remember this rule" | You don't. Re-read the file. |
-| "The title tells me enough" | It doesn't. Open and read the chapter. |
-| "Gate probably passes" | Run it. No probably. |
-| "I'll score from memory" | Score from evidence. Memory is not evidence. |
-| "I'll fix it in the report" | Fix findings now. Report summarizes, doesn't create. |
-| "Just this once" | "Just this once" is how it starts. |
-| "The user wants speed" | The user wants thoroughness. |
-| "I already verified" | Re-verify. Fresh evidence only. |
+| 如果你这么想…… | 事实是…… |
+|----------------|----------|
+| "我记得这条规则" | 你不记得。重新读文件。 |
+| "标题已经告诉够了" | 不够。打开章节逐字读。 |
+| "关卡应该能通过" | 跑一下。没有"应该"。 |
+| "我凭记忆打分就行" | 凭证据打分。记忆不是证据。 |
+| "报告里再补问题" | 现在就记录发现。报告只汇总，不创造。 |
+| "就这一次" | "就这一次"就是滑坡的起点。 |
+| "用户想要速度" | 用户想要的是彻底。 |
+| "我已经验证过了" | 重新验证。只接受新鲜证据。 |
 
-Structured quality review of technical books. Default: report only. Fix mode: only when user explicitly requests.
+技术书籍的结构化质量审阅。默认模式：仅出报告。修复模式：仅在用户明确请求时启用。
 
-## Workflow
+## 工作流
 
 ```
-Phase 1: Scan → Phase 2: Read → Phase 3: Score → Phase 4: Report → [Fix Mode]
+Phase 1: Scan（扫描） → Phase 2: Read（精读） → Phase 3: Score（打分） → Phase 4: Report（报告） → [Fix Mode（修复模式）]
 ```
 
-**Phase lock**: Run `python ../shared/workflow.py review-tech-book <run_dir> check_gate <phase>` before entering any phase. If gate fails, fix and retry.
+**阶段锁（Phase Lock）**：进入任何阶段前，运行 `python ../shared/workflow.py review-tech-book <run_dir> check_gate <phase>`。如果关卡未通过，先修复再重试。
 
-## Phase 1: Scan
+## Phase 1: Scan（扫描阶段）
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `references/spec.md` completely (no skimming)
-- [ ] Read `references/execution-guardrails.md` completely (no skimming)
-- [ ] Record read confirmation in progress.md with structure evidence
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整读取 `references/spec.md`（不允许略读）
+- [ ] 完整读取 `references/execution-guardrails.md`（不允许略读）
+- [ ] 在 progress.md 中记录读取确认，附结构证据
+- [ ] 如有任意一项未勾选：停止，不得继续。
 
-**Do**:
-1. Batch scan: structure, logic, code density, terminology, translation artifacts
-2. Define target reader
-3. Draw learning path map
-4. Run: `scripts/validate_code.sh output/`
+**执行事项**：
+1. 批量扫描：结构、逻辑、代码密度、术语、翻译痕迹（translation artifacts）
+2. 定义目标读者
+3. 绘制学习路径图
+4. 运行：`scripts/validate_code.sh output/`
 
-**Output**: `findings/phase1.md`
+**输出**：`findings/phase1.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I read" claim lacks structure evidence
-- [ ] Any finding lacks a direct quote from the source
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重新读取
+- [ ] 任何"我已读取"的声明缺少结构证据
+- [ ] 任何发现缺少来自原文的直接引用
+- [ ] 关卡检查未实际运行（仅声称已运行）
 
-**If ANY checked: Fix before running gate.**
+**如有任意一项勾选：先修复再运行关卡。**
 
-**Gate** (auto-check):
+**关卡（Gate）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 1
 ```
-- Target reader defined
-- Learning path drawn
-- Anomalies listed with types
-- Validation summary recorded
-- Issues categorized
+- 目标读者已定义
+- 学习路径已绘制
+- 异常项已列出并标注类型
+- 验证摘要已记录
+- 问题已分类
 
-## Phase 2: Read
+## Phase 2: Read（精读阶段）
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `references/reviewer-discipline.md` completely (no skimming)
-- [ ] Record read confirmation in progress.md with structure evidence
-- [ ] Gate 1 passed with evidence in progress.md
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整读取 `references/reviewer-discipline.md`（不允许略读）
+- [ ] 在 progress.md 中记录读取确认，附结构证据
+- [ ] 关卡 1 已通过，且有 progress.md 中的证据
+- [ ] 如有任意一项未勾选：停止，不得继续。
 
-**Pass 1: Skim all chapters** (no skipping)
-- Check: factual claims, terminology, teaching flow, formatting
-- Mark: 🔴 (needs deep dive) or minor issues
-- Evidence per chapter: paragraph count + core content + 3+ terms
+**第一轮：略读所有章节**（不允许跳过）
+- 检查：事实性声明、术语、教学流程、格式
+- 标记：🔴（需要深读）或轻微问题
+- 每章证据：段落数 + 核心内容 + 3 个以上术语
 
-**Evidence required per chapter** (write to findings/phase2.md):
+**每章必须提供的证据**（写入 findings/phase2.md）：
 ```
-### [ChN] Skim Evidence
+### [ChN] 略读证据
 - Paragraphs: [count]
 - Code blocks: [count]
-- Key terms: [≥3 specific terms from actual content, NOT from title]
-- Flags: [🔴 issues found or "clean"]
+- Key terms: [≥3 个来自实际内容的具体术语，而非标题]
+- Flags: [🔴 发现问题 或 "clean"]
 ```
 
-**Pass 2: Deep dive**
-- Flagged: 🔴 chapters from Pass 1
-- Mandatory: first, last, code-heavy, core concept chapters
+**第二轮：深读**
+- 标记对象：第一轮中标记为 🔴 的章节
+- 必须深读：首章、末章、代码密集章节、核心概念章节
 
-**Finding format** (strict):
+**发现格式（严格遵循）**：
 ```
 ### [N]. [Chapter] [Title] [🔴/🟠/🟡]
 - **Location**: `ChX line NNN-NNN`
 - **Quote**: [original text]
-- **Issue**: [specific analysis]
+- **Issue**: [具体分析]
 - **Evidence**: [V1/V2/V3/V4]
-- **Impact**: [reader effect]
-- **Fix**: [specific method]
+- **Impact**: [对读者的影响]
+- **Fix**: [具体修复方法]
 ```
 
-**No quote = invalid. Do not write.**
+**没有直接引用 = 无效发现。不要写。**
 
-**Output**: `findings/phase2.md`
+**输出**：`findings/phase2.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I read" claim lacks structure evidence
-- [ ] Any finding lacks a direct quote from the source
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重新读取
+- [ ] 任何"我已读取"的声明缺少结构证据
+- [ ] 任何发现缺少来自原文的直接引用
+- [ ] 关卡检查未实际运行（仅声称已运行）
 
-**If ANY checked: Fix before running gate.**
+**如有任意一项勾选：先修复再运行关卡。**
 
-**Gate** (auto-check):
+**关卡（Gate）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 2
 ```
-- All chapters skimmed
-- Deep-dives have quotes
-- 🔴/🟠 = at least V2
-- >=2 chapters code-verified
+- 所有章节已略读
+- 深读章节包含直接引用
+- 🔴/🟠 问题至少达到 V2 证据等级
+- 至少 2 个章节已进行代码验证
 
-## Phase 3: Score
+## Phase 3: Score（打分阶段）
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `references/excellence-dimensions.md` completely (no skimming)
-- [ ] Gate 2 passed with evidence in progress.md
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整读取 `references/excellence-dimensions.md`（不允许略读）
+- [ ] 关卡 2 已通过，且有 progress.md 中的证据
+- [ ] 如有任意一项未勾选：停止，不得继续。
 
-**Do**:
-1. Score risk dimensions (evidence-based only)
-2. Score five conversion dimensions
-3. Mark cross-chapter anti-patterns
+**执行事项**：
+1. 对风险维度进行打分（仅基于证据）
+2. 对五大转化维度进行打分
+3. 标记跨章节反模式（anti-patterns）
 
-**Output**: `findings/phase3.md`
+**输出**：`findings/phase3.md`
 
-## Phase 4: Report
+## Phase 4: Report（报告阶段）
 
-**⚠️ MANDATORY BEFORE STARTING THIS PHASE:**
-- [ ] Read `shared/report-templates.md` completely (no skimming)
-- [ ] Gate 3 complete with scored dimensions
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整读取 `shared/report-templates.md`（不允许略读）
+- [ ] 关卡 3 已完成，各维度已打分
+- [ ] 如有任意一项未勾选：停止，不得继续。
 
-**Do**: Write report with:
-- Executive summary
-- Score overview
-- Top 3 strengths, top 3 issues
-- Learning path + breakpoints
-- Issue categorization
-- Systemic issues
-- Fix batches: P0 (errors), P1 (structure), P2 (style), P3 (references)
+**执行事项**：撰写报告，包含：
+- 执行摘要（Executive Summary）
+- 评分总览
+- 前 3 优势、前 3 问题
+- 学习路径 + 断点（breakpoints）
+- 问题分类
+- 系统性问题
+- 修复批次：P0（错误）、P1（结构）、P2（风格）、P3（参考）
 
-**Auto-check scripts**:
+**自动检查脚本**：
 ```bash
-# Technical accuracy validation
+# 技术准确性验证
 python ../shared/validate_tech.py output/
 
-# Terminology consistency validation
+# 术语一致性验证
 python ../shared/validate_terms.py output/
 
-# Workflow gate
+# 工作流关卡
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 ```
 
-**Self-audit** (appendix):
-- [ ] Factual assertions: quotes + evidence level
-- [ ] No micro-fix patterns
-- [ ] 🔴 severity calibrated
-- [ ] Scope matches mode
-- [ ] Categorization correct
+**自我审计（Self-audit）**（附录）：
+- [ ] 事实性声明：引用 + 证据等级
+- [ ] 无微小修复模式（micro-fix patterns）
+- [ ] 🔴 严重程度已校准
+- [ ] 范围与模式匹配
+- [ ] 分类正确
 
-**Output**: `report.md`
+**输出**：`report.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I read" claim lacks structure evidence
-- [ ] Any finding lacks a direct quote from the source
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重新读取
+- [ ] 任何"我已读取"的声明缺少结构证据
+- [ ] 任何发现缺少来自原文的直接引用
+- [ ] 关卡检查未实际运行（仅声称已运行）
 
-**If ANY checked: Fix before running gate.**
+**如有任意一项勾选：先修复再运行关卡。**
 
-**Gate** (auto-check):
+**关卡（Gate）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate 4
 ```
-- All required sections present
-- Findings have quotes
-- Scores have evidence
+- 所有必需章节已呈现
+- 发现项包含直接引用
+- 评分有证据支撑
 
-## Fix Mode (user requests)
+## Fix Mode（修复模式，用户请求时启用）
 
-**⚠️ MANDATORY BEFORE STARTING FIX MODE:**
-- [ ] Read `references/apply-fixes.md` completely (no skimming)
-- [ ] Gate 4 passed (report completed)
-- [ ] User explicitly requested fix mode
-- [ ] If ANY unchecked: STOP. Do not proceed.
+**⚠️ 本阶段启动前必须完成：**
+- [ ] 完整读取 `references/apply-fixes.md`（不允许略读）
+- [ ] 关卡 4 已通过（报告已完成）
+- [ ] 用户已明确请求修复模式
+- [ ] 如有任意一项未勾选：停止，不得继续。
 
-**Do**:
-1. Load latest `report.md`
-2. Extract P0→P3 batches
-3. Apply P0 → validate → P1 → validate → P2 → validate → P3 → validate
-4. Per batch: run `validate_code.sh`, check HTML, navigation, numbering
+**执行事项**：
+1. 加载最新的 `report.md`
+2. 提取 P0→P3 各批次
+3. 执行 P0 → 验证 → P1 → 验证 → P2 → 验证 → P3 → 验证
+4. 每批次后：运行 `validate_code.sh`，检查 HTML、导航、编号
 
-**Output**: `fix-report.md`
+**输出**：`fix-report.md`
 
-**STOP — Before running gate, verify NONE of these are true:**
-- [ ] Any reference file was not re-read this phase
-- [ ] Any "I read" claim lacks structure evidence
-- [ ] Any finding lacks a direct quote from the source
-- [ ] Gate check was not actually run (just claimed)
+**⛔ 运行关卡前，确认以下均不为真：**
+- [ ] 任何参考文件在本阶段未被重新读取
+- [ ] 任何"我已读取"的声明缺少结构证据
+- [ ] 任何发现缺少来自原文的直接引用
+- [ ] 关卡检查未实际运行（仅声称已运行）
 
-**If ANY checked: Fix before running gate.**
+**如有任意一项勾选：先修复再运行关卡。**
 
-**Gate** (auto-check):
+**关卡（Gate）**（自动检查）：
 ```bash
 python ../shared/workflow.py review-tech-book <run_dir> check_gate fix
 ```
-- All 4 batches completed
-- Each batch validated
+- 全部 4 个批次已完成
+- 每个批次已通过验证
 
-## What Failure Looks Like
+## 失败模式识别
 
-### Failure 1: Re-read skip
-- **Model says**: "I already loaded the spec earlier" / "I know the reviewer discipline rules"
-- **Reality**: Context was summarized, specific scoring criteria forgotten
-- **Detection**: Read confirmation missing from progress.md for this phase
-- **Fix**: Re-read reference file, record confirmation with structure evidence
+### 失败模式 1：跳过重新读取
+- **模型说**："我之前已经加载过 spec 了" / "我知道审阅纪律规则"
+- **实际情况**：上下文被压缩摘要，具体评分标准已遗忘
+- **检测方法**：progress.md 中缺少本阶段的读取确认
+- **修复方法**：重新读取参考文件，记录确认并附结构证据
 
-### Failure 2: Skim-only review (title inference variant)
-- **Model says**: "I reviewed all chapters" but findings use generic descriptions
-- **Reality**: Chapters were scanned for structure only, not read for content
-- **Detection**: Findings lack direct quotes; evidence level V1 for 🔴/🟠 issues
-- **Fix**: Re-read flagged chapters, add direct quotes with line references
+### 失败模式 2：仅略读（标题推断变体）
+- **模型说**："我审阅了所有章节"，但发现项使用泛泛描述
+- **实际情况**：章节只扫描了结构，内容并未真正阅读
+- **检测方法**：发现项缺少直接引用；🔴/🟠 问题的证据等级仅为 V1
+- **修复方法**：重新阅读标记章节，添加带行号引用的直接引用
 
-### Failure 3: Gate bypass
-- **Model says**: "Gate passes — all chapters reviewed"
-- **Reality**: Chapters were listed, not actually read; findings are fabricated summaries
-- **Detection**: No chapter evidence in findings/phase2.md; no quotes for deep-dives
-- **Fix**: Re-read chapters, document with paragraph counts + terms + quotes
+### 失败模式 3：关卡绕过
+- **模型说**："关卡通过——所有章节已审阅"
+- **实际情况**：章节只是被列出了，并未真正阅读；发现项是捏造的摘要
+- **检测方法**：findings/phase2.md 中无章节证据；深读章节无直接引用
+- **修复方法**：重新阅读章节，记录段落数 + 术语 + 直接引用
 
-### Failure 4: Shallow scoring
-- **Model says**: "All dimensions scored"
-- **Reality**: Scores are rounded estimates without evidence, or all dimensions scored 7/10
-- **Detection**: No quotes supporting scores; uniform scoring across all dimensions
-- **Fix**: Re-score each dimension with specific evidence: quote + issue + impact
+### 失败模式 4：浅层打分
+- **模型说**："所有维度已打分"
+- **实际情况**：分数是粗略估算，无证据支撑；或所有维度都打 7/10
+- **检测方法**：评分无直接引用支撑；各维度分数均匀一致
+- **修复方法**：用具体证据重新打分：直接引用 + 问题 + 影响
 
-## Quality Standards
+## 质量标准
 
-- Conclusions based on evidence, not intuition
-- Systemic issues, not scattershot lists
-- Fix mode: validate HTML, nav, numbering, code after each batch
+- 结论基于证据，而非直觉
+- 聚焦系统性问题，而非零散罗列
+- 修复模式：每个批次后验证 HTML、导航、编号、代码
