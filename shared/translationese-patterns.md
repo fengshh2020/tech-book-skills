@@ -28,9 +28,4 @@
 
 ## 脚本同步说明
 
-验证脚本从本文件动态读取模式（正则列）。新增模式时只需更新本文件，脚本会自动读取。后备硬编码列表位于：
-
-1. `generate-book/scripts/workflow.py` 翻译质量扫描段
-2. `review-tech-book/scripts/validate_code.sh` 翻译质量扫描段
-
-当动态读取失败时脚本使用后备列表，因此新增模式也应同步更新后备列表。
+`review-tech-book/scripts/validate_code.sh` 从本文件动态读取正则列（动态读取失败时回落到脚本内的硬编码后备列表）。新增模式只需更新本文件；若希望后备列表同步，也更新 `validate_code.sh` 的硬编码段。
