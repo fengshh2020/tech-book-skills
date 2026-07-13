@@ -1,6 +1,6 @@
 ---
 name: take-note
-description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", or otherwise explicitly requests writing the current session's content into the Obsidian knowledge base at /mnt/d/知识库. Also use it proactively when the conversation has distilled reusable long-form content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Produces a structured note following the library's project-based conventions and writes it to the right project folder. Trigger this skill BEFORE composing the note so it lands in the correct place with the correct format.
+description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", or otherwise explicitly requests writing the current session's content into the Obsidian knowledge base at /mnt/d/知识库. Also use it proactively when the conversation has distilled reusable long-form content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Produces a structured note following the library's project-based conventions and writes it to the right project folder. Trigger this skill BEFORE composing the note so it lands in the correct place with the correct format. Do NOT trigger for: writing a full multi-page book or long document (use generate-book), code/API review (use review-tech-book), or generating brand-new technical content from scratch rather than capturing this session's content.
 allowed-tools: Read, Write
 ---
 
@@ -224,6 +224,8 @@ To find candidates, recall the session's topics and the library's known hubs: `[
 - **Don't commit.** 用户用 github-sync 插件（`Ctrl+Shift+S`）自己同步，只写文件即可。
 
 ## 写书/文档的单独规则
+
+> **适用范围**：本节仅适用于 session 中自然成型的**短篇**书式文档（几页精读 / 教程 / 长方案）。从零生成一整本多章技术书 → 不要用 take-note，用 `generate-book`（它有预检、Gate、Coverage Guardian、双格式 builder，take-note 给不了）。
 
 写一本书或长篇文档时，笔记的原子化原则（结论前置/去水分/一篇一结论）**不适用**——书就该厚，靠多页 + 结构展开一个主题。规则：
 
