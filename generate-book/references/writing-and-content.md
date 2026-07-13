@@ -98,37 +98,15 @@
 
 ### 图表类型与使用场景
 
-平台默认支持 draw.io 可编辑图。复杂项目图必须先生成结构化 JSON spec，再由 `scripts/render_drawio_diagrams.py` 输出 `.drawio` 文件。HTML 中使用 `figure.editable-diagram` 展示预览并链接到 `diagrams/*.drawio`。
+**用 Mermaid 文本写图**（[ADR-0004](../../../docs/adr/0004-diagrams-mermaid-to-png.md)）。在 MD 中直接写 ` ```mermaid ` 围栏，下一行写图注（以"图"开头触发自动编号）。builder 构建期用 mermaid-cli 渲染为 `diagrams/*.png` 嵌入 MD 版与 HTML 版；渲染器不可用时降级（HTML 运行时渲染 / GitHub MD 原生渲染）。**证据（file:line）写在图注里。**
 
-最低 spec 示例：
-
-```json
-{
-  "id": "02-main-flow",
-  "title": "主流程",
-  "kind": "flow",
-  "layout": "left-right",
-  "nodes": [
-    {"id": "client", "label": "Client", "type": "component"},
-    {"id": "service", "label": "Service", "type": "service"}
-  ],
-  "edges": [{"from": "client", "to": "service", "label": "POST", "evidence": ["client.py:42"]}]
-}
+```mermaid
+flowchart LR
+  Client -->|POST| Service
 ```
+图：请求链路（client.py:42）
 
-旧书可能仍包含 Mermaid 图表，在 HTML 中用 `<pre class="mermaid">` 包裹：
-
-```html
-<pre class="mermaid">
-graph LR
-    A[用户请求] --> B[Navigator]
-    B --> C[PathPlanner]
-    C --> D[Controller]
-    D --> E[执行]
-</pre>
-```
-
-需要在 `script.js` 中加载 Mermaid 渲染（或生成时将 Mermaid 转为静态 SVG）。
+Mermaid 图类型选择：`flowchart`（流程/架构）、`sequenceDiagram`（时序/调用链）、`stateDiagram-v2`（状态机）、`classDiagram`（类型关系）、`gitGraph`（演进）。下表"图表类型"对应到 Mermaid 类型即可。
 
 | 图表类型 | 适用场景 | 认知收益 |
 |----------|---------|----------|

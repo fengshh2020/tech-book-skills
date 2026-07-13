@@ -2,6 +2,8 @@
 
 **目录**：[铁律](#铁律-iron-law) | [预检清单](#预检清单-pre-flight-check) | [关卡自检](#标准关卡自检清单) | [反合理化表](#反合理化表) | [反偷工减料](#反偷工减料规则) | [Gate 降级](#gate-检查降级方案) | [错误恢复](#错误恢复协议) | [进度追踪](#进度追踪鲁棒性) | [失败模式](#失败模式识别) | [Coverage Guardian](#coverage-guardian覆盖守护者) | [质量标准](#质量标准) | [Agent 编排](#子-agent-编排)
 
+**共享纪律**：Gate 降级、错误恢复、进度追踪、反合理化通用条目、反偷工减料通用规则——见 `shared/discipline-framework.md`，本文件不重复，仅列 generate-book 特定内容。
+
 ## 铁律 (IRON LAW)
 
 **NO OUTPUT WITHOUT FRESH READ EVIDENCE. NO GATE SKIP. NO TITLE-ONLY INFERENCE. NO CONTENT SHRINKAGE.**

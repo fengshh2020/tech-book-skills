@@ -77,18 +77,23 @@ python scripts/workflow.py generate-book <run_dir> record_progress --phase <N> -
 
 ## 输出结构
 
+**MD 是信息主源**（[ADR-0001](../../docs/adr/0001-markdown-as-source-html-built.md)）。agent 在 `{RUN}/src/` 写 MD 章节 + `book.yml`，再运行 builder 渲染双格式：
+
 ```
-output/
-├── 00_cover.html
-├── 01_toc.html
-├── 02_front.html
-├── 03_intro.html
-├── 04+ {NN}_chapter{M}.html
-├── N+ {NN}_appendix_{x}.html
-├── style.css
-├── script.js
-└── diagrams/ (代码库模式)
+{RUN}/
+├── src/                         # ← agent 写这里（MD 主源）
+│   ├── book.yml                 # 元数据（title/author/lang…）
+│   ├── README.md                # （可选）MD 版目录
+│   └── NN_*.md                  # 章节，NN >= 02（00/01 留给封面/目录）
+├── output/                      # ← builder 产出（HTML 版）
+│   ├── 00_cover.html  01_toc.html  NN_*.html
+│   ├── style.css  script.js
+│   └── diagrams/*.png           # mermaid → PNG
+└── output-md/                   # ← builder 产出（可移植 MD 版，mermaid → png 嵌入）
 ```
+
+运行：`python scripts/build_html.py {RUN}/src {RUN}/output`
+作者约定见 `references/md-authoring.md`；HTML 组件契约见 `references/book-assembly.md`。
 
 ## 参考文件
 
@@ -107,7 +112,8 @@ output/
 | `references/quality-gate.md` | 质量关卡规范 | 多源 |
 | `references/context-passing.md` | Agent 之间的上下文传递 | 单源/多源 |
 | `references/translation-rules.md` | 翻译规则和指南 | 单源 |
-| `references/book-assembly.md` | HTML 组装和脚手架指南 | 单源/多源/代码库 |
+| `references/md-authoring.md` | **MD 作者约定（务实子集）+ 组件映射** | 全部 |
+| `references/book-assembly.md` | builder 产出的 HTML 组件契约（渲染目标，非手写） | 单源/多源/代码库 |
 | `references/analysis-guide.md` | 模块分析方法指南 | 代码库 |
 | `references/writing-and-content.md` | 写作与内容深度指南 | 代码库 |
 | `references/writing-guide.md` | 写作风格指南 | 代码库 |

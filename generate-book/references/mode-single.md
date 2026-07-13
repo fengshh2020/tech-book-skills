@@ -52,25 +52,24 @@
 - 段落数匹配（源 = 目标）
 - 术语一致，翻译腔 0 次命中
 
-## Phase 2：组装（4 个子阶段）
+## Phase 2：组装（MD 主源 + builder，ADR-0001）
 
-**⚠️ 启动前**：阅读 `references/book-assembly.md`，在 progress.md 中记录确认。Gate 1 已通过。
+**⚠️ 启动前**：阅读 `references/md-authoring.md`（作者约定），在 progress.md 中记录确认。Gate 1 已通过。
 
-### 2.1 HTML 脚手架
-- 按照 `references/book-assembly.md` 创建输出目录结构
-- 文件编号：00_cover → 01_toc → 02_front → 03_intro → 04+ chapters → N+ appendix
+### 2.1 写 MD 章节
+- 在 `{RUN}/src/` 下按 `references/md-authoring.md` 写 `book.yml` + 编号章节 MD（`02_*.md` 起）
+- 每章 `# 标题` + 正文；callout 用 `> **[标签]**`；图表用 ` ```mermaid `
+- 翻译规则（术语、代码注释中文化）见 `references/translation-rules.md`，套用到 MD 围栏/强调
 
-### 2.2 CSS/JS 集成
-- 复制 `assets/style.css` 和 `assets/script.js` 到输出目录
-- 验证 CSS/JS 在 HTML 文件中正确加载
+### 2.2 运行 builder
+```bash
+python scripts/build_html.py {RUN}/src {RUN}/output
+```
+- builder 自动：封面/目录/翻页导航、CSS/JS 复制、组件升级、mermaid → PNG
 
-### 2.3 导航与交叉引用
-- 构建目录，添加上一章/下一章导航
-- 验证所有内部链接正确解析
-
-### 2.4 关卡（Gate 2）
-- 所有 HTML 文件存在，CSS/JS 已链接
-- 目录完整，所有交叉引用有效
+### 2.3 关卡（Gate 2）
+- `{RUN}/output/*.html` 与 `{RUN}/output-md/*.md` 均已生成、非空
+- 目录完整，内部链接有效
 
 ## Phase 3：验证（Gate 3）
 

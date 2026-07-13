@@ -1,6 +1,11 @@
 # 书籍组装（Book Assembly）
 
-本文档定义页面语义结构、HTML 模板、组件契约和交互挂载点。`style.css` 提供自适应设计系统 —— 标题层级、组件分布和视觉权重会根据书籍的内容结构自动调整。生成页面时，请根据书籍的实际标题深度选择合适的模式。
+本文档定义 **builder（`scripts/build_html.py`）渲染产出的 HTML** 的页面语义结构、组件契约和交互挂载点。
+
+> **架构（[ADR-0001](../../../docs/adr/0001-markdown-as-source-html-built.md)）**：MD 是信息主源，
+> agent 按 `references/md-authoring.md` 写 MD；下面这些 HTML/class 是**渲染目标**，不是 agent 手写的内容。
+> `style.css` 提供自适应设计系统（[light-only，ADR-0003](../../../docs/adr/0003-light-only-no-dark-mode.md)）——
+> 标题层级、组件分布和视觉权重随内容结构自动调整。
 
 ## HTML 脚手架结构
 
@@ -573,31 +578,24 @@ for details see <a class="xref xref--chapter" href="ch05.html">Chapter 5</a>.</p
 
 - `.sr-only` 用于仅供屏幕阅读器（Screen Reader）可见的文本
 
-### DrawIO/SVG 图表
+### Mermaid 图表（→ PNG，ADR-0004）
 
-DrawIO 文件在构建时转换为 SVG 并嵌入：
+agent 在 MD 源中写 ` ```mermaid ` 文本（见 `md-authoring.md`），builder 用 mermaid-cli 渲染为 `diagrams/*.png` 嵌入：
 
 ```html
-<div class="svg-diagram arch-diagram">
-  <svg><!-- Theme-aware SVG --></svg>
+<div class="svg-diagram">
+  <img src="diagrams/mmd-{hash}.png" alt="...">
 </div>
-<p class="fig-caption" data-num>System Architecture Diagram</p>
+<p class="fig-caption" data-num>图：系统架构</p>
 ```
 
-- 在 SVG 内部使用 `currentColor` 和 CSS 变量以支持主题切换
-- 语义化 class 名称：`.arch-diagram`、`.flow-diagram`、`.seq-diagram`
-- JS 在主题切换时自动同步 SVG 颜色
+- 渲染器不可用时：builder 降级为 `<pre class="mermaid">`，由 `script.js` 从 CDN 加载 mermaid 运行时渲染
+- `data-num` 触发 CSS 计数器自动编号（"图 3-2：…"）
+- 已废弃：`.drawio` 路线、`render_drawio_diagrams.py`、JSON spec（见 ADR-0004）
 
-### 主题和字号（Theme and Font Size）
+### 字号（Font Size）
 
-```html
-<!-- Theme toggle (existing) -->
-<button class="sb-toggle">☀️</button>
-
-<!-- Font size adjustment (new) -->
-<!-- JS can switch via html[data-font-scale] -->
-<!-- Supported: "default" (16px), "large" (18px), "xl" (20px) -->
-```
+CSS 支持 `html[data-font-scale="large"|"xl"]` 字号档位（default 16px / large 18px / xl 20px），JS 可经此属性切换。主题为单一浅色（light-only，ADR-0003），无主题切换按钮。
 
 ### 键盘快捷键（Keyboard Shortcuts）
 
@@ -617,7 +615,7 @@ DrawIO 文件在构建时转换为 SVG 并嵌入：
 ### 设计系统核心特性
 
 - **自适应层级（Adaptive Hierarchy）**：标题视觉权重根据页面实际的 h2/h3/h4/h5 深度自动调整。扁平结构（2 级）自动放大 h2；深层结构（4 级）自动为 h5 添加微标签
-- **双主题 + 系统偏好**：支持深色/浅色主题，检测 `prefers-color-scheme`，设置持久化到 `localStorage`
+- **light-only 浅色主题**（ADR-0003）：单一浅色配色，无暗色切换
 - **玻璃拟态交互层（Glass-Morphism）**：导航栏、复制按钮和返回顶部均使用 `backdrop-filter` 毛玻璃效果
 - **代码块**：`data-lang` 语言标签 + 自动复制按钮（悬停时显示），未设置时从 hljs class 自动检测
 - **阅读体验**：`requestAnimationFrame` 进度条、弹性缓动滚动揭示（Scroll Reveal）、键盘翻页、当前节高亮
@@ -640,7 +638,6 @@ DrawIO 文件在构建时转换为 SVG 并嵌入：
 - **滚动揭示（Scroll Reveal）**：标题、代码块、卡片等元素进入视口时淡入上滑，由 IntersectionObserver 驱动
 - **返回顶部**（`.btt`）：毛玻璃风格，滚动超过 500px 后出现
 - **键盘翻页**：左右方向键触发上/下页（在输入框内自动跳过）
-- **主题切换**（`.sb-toggle`）：深色/浅色切换，支持 `prefers-color-scheme` 检测 + `localStorage` 持久化
 - **自动语言检测**：未设置 `data-lang` 的代码块从 hljs class 自动检测语言标签
 
 ## CSS Class 命名约定

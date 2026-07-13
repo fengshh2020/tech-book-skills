@@ -211,8 +211,6 @@
   --shadow-glow: 0 0 16px var(--glow-blue);
 }
 
-[data-theme="dark"] { color-scheme: dark; }
-
 /* Light theme: keep blue selection for readability */
 [data-theme="light"] ::selection { background: var(--blue); color: #fff; }
 
@@ -3034,43 +3032,7 @@ body {
   border: 0;
 }
 
-/* ─── 44. HIGH CONTRAST THEME ────────────────────────────────── */
-
-[data-theme="high-contrast"] {
-  --bg-0: #000000;
-  --bg-1: #0a0a0a;
-  --bg-2: #141414;
-  --bg-3: #1e1e1e;
-  --bg-4: #282828;
-  --ink-1: #ffffff;
-  --ink-2: #f0f0f0;
-  --ink-3: #c0c0c0;
-  --ink-4: #909090;
-  --ink-5: #606060;
-  --line: rgba(255, 255, 255, .2);
-  --line-hover: rgba(255, 255, 255, .35);
-  --line-accent: rgba(255, 255, 255, .45);
-  --blue: #4dabff;
-  --violet: #b38aff;
-  --teal: #38ffc6;
-  --amber: #ffd43b;
-  --rose: #ff6b8a;
-  --red: #ff5555;
-  --emerald: #50fa7b;
-  --cyan: #55ffff;
-  --sky: #55bbff;
-  --fuchsia: #ff66ff;
-  --code-bg: #050510;
-  --glow-blue: rgba(77, 171, 255, .12);
-  --glow-violet: rgba(179, 138, 255, .1);
-  --glow-teal: rgba(56, 255, 198, .1);
-  --glow-amber: rgba(255, 212, 59, .1);
-  --glow-rose: rgba(255, 107, 138, .1);
-  --glass: rgba(0, 0, 0, .85);
-  --glass-border: rgba(255, 255, 255, .15);
-}
-
-/* ─── 45. FONT SCALE ─────────────────────────────────────────── */
+/* ─── FONT SCALE ─────────────────────────────────────────────── */
 
 html[data-font-scale="large"] {
   font-size: 18px;

@@ -2,6 +2,9 @@
 
 Language and formatting rules for translating technical books. Complements the project SPEC.md: this file provides universal rules; the project SPEC.md provides book-specific rules.
 
+> **MD 主源（[ADR-0001](../../../docs/adr/0001-markdown-as-source-html-built.md)）**：翻译产物是 MD 章节（见 `md-authoring.md`），由 builder 渲染成 HTML。
+> 下文术语 / 代码注释 / 标点 / 结构对应规则直接套用到 MD；涉及 HTML 结构（`<em>`→`<strong>`、`<p class="CodeListingCaption">`、`<pre><code>` 等）的部分由 builder 从 MD 围栏 / 强调自动处理——**agent 只写 MD**。
+
 ## Translation Principles
 
 1. **Faithfulness and clarity first**: Do not pursue word-for-word correspondence; pursue the reader understanding the original meaning.
@@ -58,14 +61,13 @@ Use the common Chinese translation, with the English original in parentheses on 
 
 ## Code Block Handling
 
-1. Copy code from the source file verbatim (variable names, function names, output strings remain in English).
-2. **Translate code comments to Chinese** (`# This is a comment` becomes `# 这是注释`), but program output and exception text remain in English.
-3. Replace `<em>` and `<b>` inside `<pre>` with `<strong>`.
-4. No nested `<code>` (write text directly inside `<pre>`).
-5. Code indentation: 4 spaces.
-6. Do not add decorative elements inside `<pre><code>`; if code language labels or copy buttons are needed, use separate elements placed outside the code block, and keep them consistent across the book.
-7. Code listing captions use `<p class="CodeListingCaption">` below the code block.
-8. **Code listing numbers must be sequential** — if the original book has gaps or insertions, renumber them consecutively.
+1. 逐字复制源代码（变量名、函数名、输出字符串保留英文）。
+2. **代码注释译为中文**（`# This is a comment` → `# 这是注释`），程序输出与异常文本保持英文。
+3. 用 MD 围栏 ` ```lang ` 标注代码块，语言写在围栏开头（如 ` ```python `）——builder 渲染为 `<pre data-lang>`。
+4. 围栏内是字面文本：不放内联标记（`**`、`<em>`、`<strong>` 等会被原样显示为文本）。
+5. 代码缩进 4 空格。
+6. 代码清单标题：在围栏信息串里写 `caption="Listing N: …"`（builder 渲染为 `.CodeListingCaption`），**不要手写 HTML**。
+7. **代码清单编号全书连续**——原书有跳号或插入时，重新连续编号。
 
 ## Formatting Standards
 

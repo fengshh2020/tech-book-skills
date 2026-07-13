@@ -70,22 +70,24 @@
 
 **⚠️ 启动前**：重新阅读 `references/writing-and-content.md` 和 `references/writing-guide.md`。Gate 2 已通过。
 
-将 `assets/style.css` 和 `assets/script.js` 复制到 `output/`。
+**MD 主源 + builder（ADR-0001）**：在 `{RUN}/src/` 写 MD 章节 + `book.yml`，CSS/JS/封面/目录由 builder 注入（无需手动复制）。
 
 **每章**：
-1. 第一行：`<!-- generated: complete -->`
+1. 文件：`{RUN}/src/NN_*.md`，首行 `# 标题`
 2. 代码摘录：从源码复制，标注文件路径 + 行范围
 3. **叙事驱动**：沿执行路径或设计线索展开
-4. **图表优先**：复杂流程 -> `{RUN}/diagram-specs/*.json` -> `output/diagrams/*.drawio`
+4. **图表优先**：复杂流程写 ` ```mermaid `（见 `references/md-authoring.md`、ADR-0004），证据 file:line 写图注
 5. 核心函数：展示代码 + 解释逻辑 + 分析设计
 6. 设计决策：是什么、为什么、替代方案、权衡取舍
 7. 核心算法：核心思想、数据结构、参数影响
-8. 知识扩展：侧边栏（不在代码走读中穿插）
-9. 最终 HTML 中不得有 `[待确认]`
+8. 知识扩展：侧边栏用 `> **[标签]**`（不在代码走读中穿插）
+9. MD 中不得有 `[待确认]`
+
+全部章节写完后运行：`python scripts/build_html.py {RUN}/src {RUN}/output`（产出 HTML 版 + 可移植 MD 版 + diagrams/*.png）。
 
 **内容深度**：核心章节 >= 20KB，概览 >= 10KB，代码:解释比例 >= 1:1，核心路径每个函数/参数都有说明，错误路径已覆盖。
 
-**并行写作**（章节数 > 5 时）：每批 2-3 章，封面/目录/CSS/JS 由主代理在并行之前完成。
+**并行写作**（章节数 > 5 时）：每批 2-3 章并行写 MD；最后由主代理统一运行 builder。
 
 **关卡（Gate 3）**：所有章节有 `<!-- generated: complete -->` 标记，核心章节 >= 20KB，概览 >= 10KB，代码:解释 >= 1:1。
 

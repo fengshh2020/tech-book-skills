@@ -21,7 +21,8 @@ tech_book_skills/
 │   │   ├── mode-multi.md             # Multi-source mode: deep-read → architect → integrate
 │   │   ├── mode-codebase.md          # Codebase mode: discover → analyze → plan → generate
 │   │   ├── agent-orchestration.md    # Sub-agent rules and constraints
-│   │   ├── book-assembly.md          # HTML scaffold and assembly
+│   │   ├── md-authoring.md           # MD authoring conventions (pragmatic subset)
+│   │   ├── book-assembly.md          # HTML component contract (builder output)
 │   │   ├── translation-rules.md      # Translation guidelines (single-source)
 │   │   ├── book-architecture.md      # Architecture design (multi-source)
 │   │   ├── full-integration.md       # Integration levels (multi-source)
@@ -31,8 +32,8 @@ tech_book_skills/
 │   │   └── ...                       # Other reference files
 │   ├── scripts/
 │   │   ├── workflow.py               # Gate checks and progress recording
+│   │   ├── build_html.py             # MD → HTML builder (ADR-0001, dual-format)
 │   │   ├── validate_output.sh        # HTML output validation
-│   │   ├── render_drawio_diagrams.py # Diagram rendering
 │   │   └── check_coverage.sh         # Coverage checking
 │   └── assets/
 │       ├── style.css                 # Book stylesheet
@@ -63,6 +64,17 @@ tech_book_skills/
     └── workflow.py                   # Shared workflow engine
 ```
 
+## 输出格式（双格式，ADR-0001）
+
+**MD 是信息主源**：agent 在 `{RUN}/src/` 写 MD 章节 + `book.yml`，运行 `scripts/build_html.py {RUN}/src {RUN}/output` 渲染：
+
+- `output/` —— HTML 版（"静奢"设计系统，light-only，含封面/目录/翻页/mermaid→PNG）
+- `output-md/` —— 可移植 MD 版（mermaid→PNG 嵌入，GitHub/VS Code 直读）
+
+作者约定见 `generate-book/references/md-authoring.md`；架构决策见 `docs/adr/`：
+- **ADR-0001** MD 为源·builder 渲染 ｜ **ADR-0002** 富组件务实子集映射
+- **ADR-0003** light-only（去暗色）｜ **ADR-0004** Mermaid→PNG
+
 ## Skill Workflow
 
 ```
@@ -82,7 +94,8 @@ generate-book → review-tech-book → generate-book (fix mode)
 ## Design Principles
 
 - **Progressive disclosure**: SKILL.md under 150 lines, details in reference files
-- **Shared discipline**: Common gate/error/progress patterns in `shared/discipline-framework.md`
+- **MD as source (ADR-0001)**: agent writes portable MD; `build_html.py` renders the "Quiet Luxury" HTML edition + a portable MD edition; light-only (ADR-0003), Mermaid→PNG (ADR-0004)
+- **Shared discipline**: Common gate/error/progress patterns canonical in `shared/discipline-framework.md`, referenced (not duplicated) by each skill's shared-rules
 - **Robustness**: Pre-flight checks, gate degradation, error recovery, output validation
 - **Evidence-based**: Every finding needs a direct quote (review), every claim needs file:line (codebase)
 

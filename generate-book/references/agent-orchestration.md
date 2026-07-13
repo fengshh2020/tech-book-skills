@@ -239,11 +239,11 @@ You are a section generation agent. Task: generate Chapter [N], Section [M].
 2. All content must have `<!-- integrated: [source]Ch[N]-[id] -->` markers
 3. New code must have V1-V3 verification tags
 4. Match the narrative style of the style baseline
-5. Output in HTML format
+5. Output in MD format（作者约定见 references/md-authoring.md，ADR-0001）
 6. Timeout limit: 10 minutes
 
 **Output**:
-- Return: section HTML content + marker list
+- Return: section MD content + marker list
 ```
 
 ### 阶段 3：验证（Validation）

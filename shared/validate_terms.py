@@ -179,22 +179,22 @@ class TerminologyManager:
         if not output_path.exists():
             return {"passed": False, "reason": f"Output directory {output_dir} not found"}
 
-        html_files = list(output_path.glob("*.html"))
+        chapter_files = list(output_path.glob("*.md")) + list(output_path.glob("*.html"))
 
-        if not html_files:
-            return {"passed": False, "reason": "No HTML files found"}
+        if not chapter_files:
+            return {"passed": False, "reason": "未找到 .md 或 .html 文件"}
 
         total_issues = 0
         all_issues = []
 
-        for html_file in html_files:
-            result = self.validate_chapter(html_file)
+        for chapter_file in chapter_files:
+            result = self.validate_chapter(chapter_file)
             total_issues += len(result.get("issues", []))
             all_issues.extend(result.get("issues", []))
 
         return {
             "passed": total_issues == 0,
-            "reason": f"{total_issues} terminology issues across {len(html_files)} chapters",
+            "reason": f"{total_issues} terminology issues across {len(chapter_files)} chapters",
             "total_issues": total_issues,
             "issues": all_issues
         }

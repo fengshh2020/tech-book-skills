@@ -5,6 +5,7 @@
 """
 
 import ast
+import html
 import json
 import os
 import re
@@ -22,18 +23,42 @@ class TechValidator:
         self.results = []
         self.errors = []
 
-    def extract_code_blocks(self, html_content: str) -> List[Dict]:
-        """从 HTML 内容中提取代码块。"""
-        # 匹配 <pre><code> 块
-        pattern = r'<pre><code(?:\s+class="([^"]*)")?>(.*?)</code></pre>'
-        matches = re.findall(pattern, html_content, re.DOTALL)
-
+    def extract_code_blocks(self, content: str) -> List[Dict]:
+        """从 MD 或 HTML 内容中提取代码块（格式无关，ADR-0001 MD 主源）。"""
         blocks = []
-        for lang, code in matches:
+
+        # 1. Markdown 围栏: ```lang caption="..." \n code ```（lang 为首个 token）
+        for m in re.finditer(r"```([^\n`]*)\n(.*?)```", content, re.DOTALL):
+            info = m.group(1).strip()
+            code = m.group(2)
+            lang = (info.split()[0] if info else "").lower()
+            if lang == "mermaid":
+                continue  # 图表源，非可运行代码
             blocks.append({
                 "language": lang or "unknown",
                 "code": code,
-                "line_count": code.count("\n") + 1
+                "line_count": code.count("\n") + 1,
+            })
+
+        # 2. builder HTML: <pre data-lang="Lang"><code>…</code></pre>
+        for m in re.finditer(r'<pre[^>]*data-lang="([^"]*)"[^>]*><code>(.*?)</code></pre>', content, re.DOTALL):
+            lang = m.group(1).strip().lower()
+            code = html.unescape(m.group(2))
+            blocks.append({
+                "language": lang or "unknown",
+                "code": code,
+                "line_count": code.count("\n") + 1,
+            })
+
+        # 3. 旧式 HTML: <pre><code class="language-x">…</code></pre>
+        for m in re.finditer(r'<pre><code(?:\s+class="([^"]*)")?>(.*?)</code></pre>', content, re.DOTALL):
+            cls = (m.group(1) or "").strip().lower()
+            lang = cls.replace("language-", "") if cls else ""
+            code = html.unescape(m.group(2))
+            blocks.append({
+                "language": lang or "unknown",
+                "code": code,
+                "line_count": code.count("\n") + 1,
             })
 
         return blocks
@@ -194,18 +219,18 @@ class TechValidator:
         if not output_path.exists():
             return {"passed": False, "reason": f"输出目录 {output_dir} 未找到"}
 
-        # 查找所有 HTML 文件
-        html_files = list(output_path.glob("*.html"))
+        # 查找所有章节文件（MD 主源 或 HTML 输出，ADR-0001）
+        chapter_files = list(output_path.glob("*.md")) + list(output_path.glob("*.html"))
 
-        if not html_files:
-            return {"passed": False, "reason": "未找到 HTML 文件"}
+        if not chapter_files:
+            return {"passed": False, "reason": "未找到 .md 或 .html 文件"}
 
         total_blocks = 0
         total_runnable = 0
         total_unrunnable = 0
 
-        for html_file in html_files:
-            result = self.validate_chapter(html_file)
+        for chapter_file in chapter_files:
+            result = self.validate_chapter(chapter_file)
             total_blocks += result["code_blocks"]
             total_runnable += result["runnable"]
             total_unrunnable += result["unrunnable"]

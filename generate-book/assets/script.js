@@ -170,7 +170,7 @@
       if (window.mermaid) {
         mermaid.initialize({
           startOnLoad: false,
-          theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'dark',
+          theme: 'default',
           securityLevel: 'loose'
         });
         mermaidBlocks.forEach(function (el, i) {
@@ -311,34 +311,6 @@
     // Close on navigation link click (mobile)
     sidebar.querySelectorAll('.sb-link').forEach(function (link) {
       link.addEventListener('click', closeSidebar);
-    });
-  }
-
-  /* ── Theme Toggle ─────────────────────────────────────────── */
-
-  var themeBtn = document.querySelector('.sb-toggle');
-  if (themeBtn) {
-    function getPreferred() {
-      try { return localStorage.getItem('theme'); } catch (e) { return null; }
-    }
-
-    function setTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      themeBtn.textContent = theme === 'light' ? '🌙' : '☀️';
-      themeBtn.setAttribute('aria-label', theme === 'light' ? '切换到暗色主题' : '切换到亮色主题');
-      try { localStorage.setItem('theme', theme); } catch (e) { /* silent */ }
-    }
-
-    var saved = getPreferred();
-    if (saved) {
-      setTheme(saved);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      setTheme('light');
-    }
-
-    themeBtn.addEventListener('click', function () {
-      var current = document.documentElement.getAttribute('data-theme') || 'dark';
-      setTheme(current === 'light' ? 'dark' : 'light');
     });
   }
 
@@ -1045,60 +1017,7 @@
     loadKaTeX();
   })();
 
-  /* ── 13. Mermaid Theme Sync ───────────────────────────────── */
-
-  (function () {
-    // Patch the existing theme toggle to re-render mermaid on theme change
-    var themeToggleBtn = document.querySelector('.sb-toggle');
-    if (!themeToggleBtn) return;
-
-    // We observe data-theme attribute changes on <html>
-    if (!('MutationObserver' in window)) return;
-
-    var observerTarget = document.documentElement;
-    var themeObserver = new MutationObserver(function (mutations) {
-      mutations.forEach(function (m) {
-        if (m.attributeName === 'data-theme') {
-          rerenderMermaid();
-        }
-      });
-    });
-
-    themeObserver.observe(observerTarget, { attributes: true });
-
-    function rerenderMermaid() {
-      if (!window.mermaid) return;
-
-      var theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'default' : 'dark';
-      var mermaidDiagrams = document.querySelectorAll('pre.mermaid');
-
-      if (mermaidDiagrams.length === 0) return;
-
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: theme,
-        securityLevel: 'loose'
-      });
-
-      mermaidDiagrams.forEach(function (el, i) {
-        var id = 'mermaid-sync-' + i + '-' + Date.now();
-        var code = el.getAttribute('data-mermaid-source') || el.textContent;
-
-        // Store original source if not already stored
-        if (!el.getAttribute('data-mermaid-source')) {
-          el.setAttribute('data-mermaid-source', code);
-        }
-
-        mermaid.render(id, code).then(function (result) {
-          el.innerHTML = result.svg;
-        }).catch(function () {
-          // Keep current content on error
-        });
-      });
-    }
-  })();
-
-  /* ── 14. Learning Objectives Toggle ───────────────────────── */
+  /* ── 13. Learning Objectives Toggle ───────────────────────── */
 
   (function () {
     var objectiveItems = document.querySelectorAll('.learning-objectives__item');

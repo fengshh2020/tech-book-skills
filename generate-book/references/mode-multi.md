@@ -90,8 +90,9 @@
 
 **子 Agent 策略**：一次一个章节，单章内最多 3 个小节 Agent 并行。Gate 失败 = 重写章节，不累积修复。
 
-### 2.6 组装
-- 创建 HTML 脚手架、集成 CSS/JS、构建导航和交叉引用
+### 2.6 组装（MD 主源 + builder，ADR-0001）
+- 在 `{RUN}/src/` 写 `book.yml` + 整合后的编号章节 MD（约定见 `references/md-authoring.md`）
+- 运行 `python scripts/build_html.py {RUN}/src {RUN}/output`：封面/目录/导航/CSS/JS/组件升级/mermaid→PNG 均由 builder 完成
 
 ## Phase 3：验证
 

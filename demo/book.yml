@@ -1,0 +1,7 @@
+# book.yml — 演示书元数据（扁平 key: value, build_html.py 直接解析）
+title: Zenoh 入门
+subtitle: A Minimal Introduction
+subtitle_cn: 极简入门
+author: 示例作者
+edition: 中文版
+lang: zh-CN
