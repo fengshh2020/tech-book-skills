@@ -51,7 +51,7 @@
 
 ## Phase 2：规划
 
-**⚠️ 启动前**：阅读 `references/writing-and-content.md` 和 `references/writing-guide.md`。Gate 1 已通过。
+**⚠️ 启动前**：阅读 `references/writing-and-content.md`。Gate 1 已通过。
 
 **要做什么**：
 1. 定义目标读者和前置知识要求
@@ -68,9 +68,11 @@
 
 ## Phase 3：生成
 
-**⚠️ 启动前**：重新阅读 `references/writing-and-content.md` 和 `references/writing-guide.md`。Gate 2 已通过。
+**⚠️ 启动前**：重新阅读 `references/writing-and-content.md`。Gate 2 已通过。
 
-**MD 主源 + builder（ADR-0001）**：在 `{RUN}/src/` 写 MD 章节 + `book.yml`，CSS/JS/封面/目录由 builder 注入（无需手动复制）。
+> **doc 形态**（见 `references/product-shapes.md`，如 `pi3_trt/book.md` 这种项目学习文档）：不走 builder、不写 `book.yml`、不强制多章。流程压缩为——分析完核心模块后，直接写就地 `book.md`：顶部一句话说明项目用途 + 可选目录 → 沿主执行路径叙事讲解核心模块（每论断 file:line）→ 收尾给"修改影响/常见失败"。用同一套"叙事驱动/设计决策/代码摘录"规则，只是输出单文件、用轻量 gate（无 20KB 下限、无 builder 验证；**但 file:line 证据、无占位符、叙事连贯仍不可妥协**）。book 形态才走下面的多章 + builder 流程。
+
+**MD 主源 + builder（ADR-0001，book 形态）**：在 `{RUN}/src/` 写 MD 章节 + `book.yml`，CSS/JS/封面/目录由 builder 注入（无需手动复制）。
 
 **每章**：
 1. 文件：`{RUN}/src/NN_*.md`，首行 `# 标题`

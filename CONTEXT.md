@@ -21,8 +21,12 @@ _Avoid_: Obsidian 版（明确不选）。
 _Avoid_: 渲染器、generator。
 
 **Source（源）/ Mode（模式）**:
-输入材料及其决定的工作流。单源 = 一本书（翻译+组装）；多源 = 多本书（深度整合）；代码库 = 源码路径（发现+分析+生成）。
+输入材料及其决定的内容智能（读什么、怎么理解）。单源 = 一本书（翻译）；多源 = 多本书（深度整合）；代码库 = 源码路径（发现+分析）。
 _Avoid_: input（太泛）。
+
+**Product Shape（产品形态）**:
+与源类型**正交**的产出维度（产什么、走多重的流水线）。`book` = 全书，走 builder 双格式（HTML+MD）+ 封面/目录 + 重型 gate；`doc` = 轻文档，就地便携 MD（如 `proj/book.md`），无 builder、轻量 gate。任一源类型可配任一形态：代码库 × doc = 项目学习文档。详见 `generate-book/references/product-shapes.md`。
+_Avoid_: 把"源类型"和"产品形态"焊死（如假定代码库只能产 HTML 全书）。
 
 **Diagram（图表）**:
 agent 在 MD 中写 ` ```mermaid ` 文本，构建期 mermaid-cli (mmdc) 渲染为**仅 PNG**（ADR-0004）。MD 版 `![x](diagrams/x.png)`，HTML 版同嵌 PNG。证据（file:line）写在图注里。

@@ -1,107 +1,71 @@
 # 多源模式 (Multi-Source Mode)
 
-当提供两个或更多源书籍时使用。工作流：深度阅读、架构设计、章节生成、验证、报告。
+当提供两个或更多源书籍时使用。工作流：深度阅读（Phase 0）→ 架构设计（Phase 1）→ 章节生成（Phase 2）→ 验证（Phase 3）→ 报告（Phase 4）。
 
-**启动前**：运行预检（见 `shared-rules.md`「预检清单」），确认每个源文件可读取且数量 >= 2。初始化 progress.md（见「进度追踪鲁棒性」）。
+**启动前**：运行预检（见 `shared-rules.md`「预检清单」），确认每个源文件可读取且数量 >= 2。初始化 progress.md（见 `shared/discipline-framework.md`「进度追踪」）。
+
+## 两个状态文件（context-passing 核心）
+
+LLM 在长工作流跨阶段会丢上下文。用两个文件互补：
+
+| 文件 | 职责 | 回答 |
+|---|---|---|
+| `progress.md` | 进度跟踪：哪些阶段/章节已完成、从哪里恢复 | "我们到了哪里" |
+| `context-summary.md` | 知识传递：跨阶段的关键发现和决策 | "我们知道了什么" |
+
+**规则**：每个子阶段结束时向 `context-summary.md` 追加一个 <=150 行的章节；下一子阶段开始时**只读摘要 + 本子阶段的参考文件**，不重新读先前子阶段的原始输出。所有文件在运行目录 `.book-doc/runs/{id}/` 下。
+
+**context-summary 摘要骨架**（各阶段追加自己的章节）：
+- Phase 0：源书概览（章数/索引行数/角色）、逐书核心方法论、关键发现、风格基线要点、潜在整合挑战
+- Phase 1：目标读者、逐书角色、最终骨架（核心/支撑/进阶路径）、关键方法论决策（附证据）、排除范围、整合计划统计
+- Phase 2（逐章）：Ch[N] 完成记录（门控结果 G1-G8、整合标记数、代码块数、长度）+ Ch[N] Context（源映射、方法论、关键决策、跨章回引）
+- Phase 3：覆盖率%、术语一致性、代码可运行性、风格一致性、已知限制
 
 ## Phase 0：深度阅读（5 个子阶段）
 
-**⚠️ 启动前**：阅读 `references/knowledge-index-format.md` 和 `references/agent-orchestration.md`，在 progress.md 中记录确认。
+**⚠️ 启动前**：阅读 `references/multi-read-architect.md`（知识索引格式）和 `references/agent-orchestration.md`，progress.md 记录确认。
 
-### 0.1 书籍清点
-- 列出所有源书籍及其章节结构
-- 记录：书名、章节数、总页数、文件路径
+- **0.1 书籍清点**：列出所有源书（书名、章节数、页数、路径）
+- **0.2 逐书阅读**：顺序读每章（不跳过、不凭标题推断）；每本书一个 Agent，最多 3 本并行；网页源先读当前章所有链接再进下一页
+- **0.3 索引生成**：按 `multi-read-architect.md` 为每本书生成知识索引（>= 1000 行）
+- **0.4 覆盖率对比**：跨书对比索引——重叠、空白、独特贡献、深度差异
+- **0.5 关卡（Gate 0）**：见 `multi-synthesis.md`「Phase 0 关卡」
 
-### 0.2 逐书阅读
-- 按顺序阅读每个章节（不跳过，不只凭标题推断）
-- 每本书分配一个 Agent，最多 3 本书并行
-- 网页源：先阅读当前章节内所有链接再进入下一页
-
-### 0.3 索引生成
-- 按照 `references/knowledge-index-format.md` 为每本书生成知识索引
-- 每个索引 >= 1000 行，覆盖：每章内容分析、方法论、深度校准、边界映射、独特见解、代码示例清点、交叉引用图、风格特征、整合就绪度
-
-### 0.4 覆盖率对比
-- 跨书籍对比索引：重叠部分、空白区域、独特贡献、深度差异
-
-### 0.5 关卡（Gate 0）
-- 每个源书籍在 `.book-doc/knowledge_base/` 中都有索引文件（>= 1000 行）
-- 每个章节都有阅读证据（段落数、代码块数、核心概念、独特贡献）
-
-**本阶段是整个流程的基础。在每个索引都被验证之前，不得继续。**
+本阶段是整个流程的基础，索引未验证前不得继续。
 
 ## Phase 1：架构设计（6 个子阶段）
 
-**⚠️ 启动前**：阅读 `references/book-architecture.md`，重新阅读 Phase 0 的所有知识索引。Gate 0 已通过。
+**⚠️ 启动前**：阅读 `references/multi-read-architect.md`（架构评估），重新读 Phase 0 所有知识索引。Gate 0 已通过。
 
-### 1.1 加载索引
-- 完整阅读所有知识索引（不可略读）
+- **1.1 加载索引**：完整读所有知识索引（不可略读）
+- **1.2 跨书分析**：方法论对比、深度对齐、边界互补、风格调和（输出 `cross-book-analysis.md`，模板见 multi-read-architect.md）
+- **1.3 目标目录**：设计目录，每章有明确目的和源材料映射（模板见 multi-read-architect.md）
+- **1.4 逐章计划**：为每章写自包含整合计划（源材料贡献图、方法论选择+理由、深度目标、合成策略、概念桥接、术语约定、风格基线样例）。**Phase 2 执行时不应需要重读其他文件**
+- **1.5 反向覆盖**：构建反向覆盖矩阵——每个源章节 → 目标章节/侧边栏/附录/明确排除
+- **1.6 关卡（Gate 1）**：见 `multi-synthesis.md`「Phase 1 关卡」
 
-### 1.2 跨书籍分析
-- 方法论对比、深度对齐、边界互补性、风格调和
-
-### 1.3 目标目录
-- 设计目标目录结构，每个章节有明确目的和源材料映射
-
-### 1.4 逐章计划
-为每个章节编写整合计划：源材料贡献图（主要/次要/参考）、方法论选择及理由、深度目标、合成策略、空白填补需求、依赖链、预期产出
-
-### 1.5 反向覆盖
-- 构建反向覆盖矩阵：每个源章节 -> 目标章节 / 侧边栏 / 附录 / 明确排除
-
-### 1.6 关卡（Gate 1）
-- `source-architecture.md` 和 `plan.md` 存在且完整
-- 反向覆盖矩阵覆盖 100% 源章节，无"TBD"占位符
+输出：`source-architecture.md` + `plan.md`。
 
 ## Phase 2：章节生成（每章 6 个子阶段）
 
-**⚠️ 启动前**：阅读 `references/full-integration.md` 和 `references/agent-orchestration.md`，重新阅读 plan.md 中该章节的整合计划。Gate 1 已通过。
+**⚠️ 启动前**：阅读 `references/multi-synthesis.md`（合成方法论 + 整合级别 + 门控）和 `references/agent-orchestration.md`，重读 plan.md 中该章的整合计划。Gate 1 已通过。
 
-### 2.1 加载计划与源材料
-- 加载 plan.md 中该章节的整合计划、相关知识索引、风格基线
+- **2.1 加载计划与源材料**：加载该章整合计划、相关知识索引、风格基线
+- **2.2 解构与重写（5 步）**：解构所有源材料 → 设计新结构（不照搬任何源结构）→ 分配主/次源 → 统一风格重写 → 加标记 `<!-- integrated: [source]Ch[N]-[id] -->`。整合必须达 L3（重组）或 L4（完全融合），见 multi-synthesis.md
+- **2.3 质量门控（G1-G8）**：见 `multi-synthesis.md`「Phase 2 关卡」。未通过 = 重写本章，不累积修复
+- **2.4 进度记录**：门控结果写 progress.md，通过后才进下一章
+- **2.5 批量检查（每 5 章）**：跨章术语一致、源不可辨识测试、叙事弧连贯
+- **2.6 组装**：在 `{RUN}/src/` 写 `book.yml` + 编号章节 MD（约定见 `md-authoring.md`）；运行 `python scripts/build_html.py {RUN}/src {RUN}/output`（封面/目录/导航/CSS/JS/组件升级/mermaid→PNG 均由 builder 完成）
 
-### 2.2 解构与重写（5 步）
-1. 解构所有源材料的相关内容
-2. 设计新章节结构（不照搬任何源材料的原始结构）
-3. 为每个小节分配主要/次要源材料
-4. 以统一风格重写
-5. 添加标记：`<!-- integrated: [source]Ch[N]-[id] -->`
+> **doc 形态**（见 `references/product-shapes.md`）：不走 builder、不写 `book.yml`，整合完直接写就地 MD；轻量 gate（无 Coverage Guardian、无大小下限），但整合仍须达 L3/L4（不可辨识来源）、无翻译腔。
 
-**输出验证**：章节文件存在且非空；包含 `<!-- integrated: ... -->` 标记；无 `[待确认]` 占位符；大小 >= 最大源章节的 80%。
+**输出验证（2.2 后）**：章节文件存在且非空、含 `<!-- integrated -->` 标记、无 `[待确认]`、大小 >= 最大源章节的 80%。
 
-### 2.3 质量关卡（G1-G8）
-
-| 检查项 | 通过标准 | 失败处理 |
-|--------|----------|----------|
-| G1：覆盖率 | 所有 plan.md 中的 ID 都有标记 | 重写章节 |
-| G2：代码质量 | 新代码有 V1-V3 标签 | 添加标签 + 验证 |
-| G3：风格匹配 | 无翻译腔，匹配基线 | 重写相关小节 |
-| G4：无重复 | 无重复解释 | 合并/交叉引用 |
-| G5：叙事流畅 | 过渡自然，叙事弧完整 | 重写 |
-| G6：深度匹配 | 符合计划的深度目标 | 扩展或裁剪 |
-| G7：源材料比例 | 每个映射的源材料在本章有 >=3 个标记 | 扩展源材料贡献 |
-| G8：输出大小 | >= 最大源章节大小的 80% | 扩展内容 |
-
-### 2.4 进度记录
-- Gate 结果写入 progress.md，仅当 Gate 通过后才可进入下一章
-
-### 2.5 批量检查（每 5 章）
-- 跨章节术语一致、源不可辨识测试、叙事弧连贯
-
-**子 Agent 策略**：一次一个章节，单章内最多 3 个小节 Agent 并行。Gate 失败 = 重写章节，不累积修复。
-
-### 2.6 组装（MD 主源 + builder，ADR-0001）
-- 在 `{RUN}/src/` 写 `book.yml` + 整合后的编号章节 MD（约定见 `references/md-authoring.md`）
-- 运行 `python scripts/build_html.py {RUN}/src {RUN}/output`：封面/目录/导航/CSS/JS/组件升级/mermaid→PNG 均由 builder 完成
+**子 Agent 策略**：一次一章，单章内最多 3 个小节 Agent 并行。
 
 ## Phase 3：验证
 
-1. 覆盖率验证（所有章节）
-2. 术语一致性检查（全书检索）
-3. 代码可运行性检查
-4. 风格一致性（连续 3 章）
-5. 交叉引用完整性
-6. 反向覆盖：100% 源材料已处理
+覆盖率验证（所有章节）→ 术语一致性（全书检索）→ 代码可运行性 → 风格一致性（连续 3 章）→ 交叉引用完整性 → 反向覆盖 100%。
 
 ```bash
 scripts/validate_output.sh output/
@@ -111,17 +75,9 @@ python ../shared/validate_tech.py output/
 python ../shared/validate_terms.py output/
 ```
 
-**关卡**：覆盖率 >= 95%，术语一致，代码可运行，交叉引用有效，无风格跳跃。Coverage Guardian：无章节低于底线（总标记数的 10%），无章节低于单章最低要求（3 个标记）。
+**关卡（Gate 3）**：见 `multi-synthesis.md`「Phase 3 关卡」。Coverage Guardian 无底线违规。
 
-**Gate 降级检查**（当 workflow.py 不可用时）：
-```bash
-# 逐章检查大小和标记
-for f in output/*.html; do
-  size=$(wc -c < "$f")
-  markers=$(grep -c 'integrated:' "$f")
-  echo "$f: size=${size}B, integration_markers=${markers}"
-done
-```
+**Gate 降级**（workflow.py 不可用）：逐章 `grep -c 'integrated:' output/*.html` 查标记数，`wc -c` 查大小。
 
 ## Phase 4：报告
 

@@ -61,11 +61,9 @@ Gate 编号是模式特定的（例如 Gate 3 在单源/多源模式中 = 验证
 
 ## 反偷工减料规则
 
-遵循 `shared/anti-slacking.md`。核心要点：
-- 每个阶段开始时重新阅读参考文件，附带结构证据（段落数、代码块数、具体术语）
-- 不跳过子阶段，不凭标题推断，Gate 没有"大概"
-- 单源模式额外要求：验证 1:1 段落映射
-- 代码库模式额外要求：每个论断需要 file:line 证据
+遵循 `shared/discipline-framework.md`「防懈怠机制」与「防跳步检查」。generate-book 领域特定补充：
+- 单源模式：验证 1:1 段落映射
+- 代码库模式：每个论断需要 file:line 证据
 
 ## Gate 检查降级方案
 
@@ -178,23 +176,7 @@ grep -l '\[待确认\]\|TBD\|TODO' <output_file> && echo "FAIL: contains placeho
 
 ## Coverage Guardian（覆盖守护者）
 
-**适用范围**：仅多源模式。单源和代码库模式不使用。
-
-**用途**：检测并防止覆盖缺口、偷工减料和表面化整合。
-
-**规则**：
-1. **底线规则**：任何源书籍的标记数不得少于总标记数的 10%
-2. **单章最低要求**：被映射为"主要"或"次要"来源的章节必须有 >=3 个整合标记
-3. **补丁式检测**：标记全部出现在 <=2 个章节中 = 补丁式整合
-4. **输出大小守护**：章节输出 >= 整合的最大源章节大小的 80%
-
-**命令**：
-```bash
-python scripts/workflow.py generate-book <run_dir> coverage_report
-python scripts/workflow.py generate-book <run_dir> coverage_guard
-```
-
-**运行时机**：Phase 2 完成后、Phase 3 验证中、Phase 4 报告中。
+**适用范围**：仅多源模式（单源/代码库不用）。完整规则、底线阈值、补丁式检测、升级处理见 `references/multi-synthesis.md`「Coverage Guardian」。运行时机：Phase 2 每章/批次后、Phase 3 验证中。
 
 ## 质量标准
 

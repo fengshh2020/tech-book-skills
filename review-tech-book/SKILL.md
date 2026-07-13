@@ -21,7 +21,7 @@ description: "Structured quality review of technical books. Default: report only
 
 ## 🔴 反模式（等于失败，不要做）
 
-命中即视为产出不合格。下面只列各阶段特有的高危信号；更多偷工模式见 `references/review-shared-rules.md`「发现质量控制」「失败模式识别」与 `shared/anti-slacking.md`。
+命中即视为产出不合格。下面只列各阶段特有的高危信号；更多偷工模式见 `references/review-shared-rules.md`「发现质量控制」「失败模式识别」与 `shared/discipline-framework.md`「防懈怠机制/防跳步检查」。
 
 - **无引用发现 / 证据不配级**（全阶段）：没有原文逐字引用 + 行号就写发现；或 🔴/🟠 问题却只有 V1 证据、V4 推断不降级且不标「未经验证」。
 - **只扫不读**（P1–P2）：扫描结构后声称「已审阅」，发现项用泛泛描述而非具体段落 / 代码行。
@@ -153,6 +153,6 @@ python ../shared/validate_terms.py output/
 | `references/quality-reference.md` | 质量参考基准 | 阶段 3 |
 | `references/teaching-reference.md` | 教学参考基准 | 阶段 2 |
 | `shared/report-templates.md` | 报告格式模板 | 阶段 4 |
-| `shared/anti-slacking.md` | 反偷工减料规则 | 全部 |
+| `shared/discipline-framework.md` | 防懈怠/防跳步、Gate 降级、错误恢复、进度追踪 | 全部 |
 | `shared/validate_tech.py` | 技术准确性验证脚本 | 阶段 4 |
 | `shared/validate_terms.py` | 术语一致性验证脚本 | 阶段 4 |

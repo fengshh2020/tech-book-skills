@@ -54,6 +54,8 @@
 
 ## Phase 2：组装（MD 主源 + builder，ADR-0001）
 
+> **doc 形态**（见 `references/product-shapes.md`）：不走 builder，翻译完直接写就地 MD（如 `proj/book.md`），用轻量 gate（无 builder 产物验证；1:1 段落映射放宽为"语义对应但仍禁缩减"）。book 形态才走下面的 2.1-2.3。
+
 **⚠️ 启动前**：阅读 `references/md-authoring.md`（作者约定），在 progress.md 中记录确认。Gate 1 已通过。
 
 ### 2.1 写 MD 章节

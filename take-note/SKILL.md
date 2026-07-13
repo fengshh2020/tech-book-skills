@@ -225,7 +225,7 @@ To find candidates, recall the session's topics and the library's known hubs: `[
 
 ## 写书/文档的单独规则
 
-> **适用范围**：本节仅适用于 session 中自然成型的**短篇**书式文档（几页精读 / 教程 / 长方案）。从零生成一整本多章技术书 → 不要用 take-note，用 `generate-book`（它有预检、Gate、Coverage Guardian、双格式 builder，take-note 给不了）。
+> **适用范围**：本节仅适用于 session 中自然成型的**短篇**书式文档（几页精读 / 教程 / 长方案）。从零生成一整本多章技术书 → 不要用 take-note，用 `generate-book` 的 **book 形态**（预检、Gate、Coverage Guardian、双格式 builder，take-note 给不了）。**从零给一个项目/代码库生成学习文档**（如 `proj/book.md`）→ 也不要用 take-note，用 `generate-book` 的 **doc 形态**（就地 MD、轻量 gate、不走 builder，见 generate-book `references/product-shapes.md`）。本节只管 session 里自然成型的短篇。
 
 写一本书或长篇文档时，笔记的原子化原则（结论前置/去水分/一篇一结论）**不适用**——书就该厚，靠多页 + 结构展开一个主题。规则：
 

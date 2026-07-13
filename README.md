@@ -6,7 +6,7 @@ AI agent skills for processing technical books — generate, review, and create 
 
 | Skill | Purpose |
 |-------|---------|
-| **generate-book** | Generate a unified book from sources or codebase (single-source: translate+assemble, multi-source: integrate+assemble, codebase: discover+analyze+generate) |
+| **generate-book** | Generate a unified book from sources or codebase. Source type (single/multi/codebase) × product shape (book: full HTML+MD pipeline / doc: lightweight in-place MD like `proj/book.md`) |
 | **review-tech-book** | Structured quality review with evidence-based findings and fix mode |
 
 ## Architecture
@@ -16,20 +16,18 @@ tech_book_skills/
 ├── generate-book/                    # Book generation (3 modes)
 │   ├── SKILL.md                      # Hub: mode selection, core rules, reference index
 │   ├── references/
-│   │   ├── shared-rules.md           # Iron law, pre-flight, failure modes, coverage guardian, agent orchestration
-│   │   ├── mode-single.md            # Single-source mode: extract → translate → assemble
-│   │   ├── mode-multi.md             # Multi-source mode: deep-read → architect → integrate
-│   │   ├── mode-codebase.md          # Codebase mode: discover → analyze → plan → generate
-│   │   ├── agent-orchestration.md    # Sub-agent rules and constraints
-│   │   ├── md-authoring.md           # MD authoring conventions (pragmatic subset)
-│   │   ├── book-assembly.md          # HTML component contract (builder output)
+│   │   ├── product-shapes.md         # book vs doc product shape + doc lightweight gate
+│   │   ├── shared-rules.md           # Iron law, pre-flight, failure modes, agent orchestration
+│   │   ├── mode-single.md            # Single-source: extract → translate → assemble
+│   │   ├── mode-multi.md             # Multi-source: deep-read → architect → integrate (+ context-passing)
+│   │   ├── mode-codebase.md          # Codebase: discover → analyze → plan → generate
+│   │   ├── multi-read-architect.md   # Multi Phase 0-1: knowledge index format + architecture
+│   │   ├── multi-synthesis.md        # Multi Phase 2-3: synthesis + L1-L4 + gates G1-G13 + coverage
+│   │   ├── agent-orchestration.md    # Sub-agent orchestration strategy
+│   │   ├── md-authoring.md           # MD authoring conventions + component map (pragmatic subset)
 │   │   ├── translation-rules.md      # Translation guidelines (single-source)
-│   │   ├── book-architecture.md      # Architecture design (multi-source)
-│   │   ├── full-integration.md       # Integration levels (multi-source)
 │   │   ├── analysis-guide.md         # Module analysis (codebase)
-│   │   ├── writing-and-content.md    # Content depth (codebase)
-│   │   ├── writing-guide.md          # Writing style (codebase)
-│   │   └── ...                       # Other reference files
+│   │   └── writing-and-content.md    # Writing & content depth (codebase)
 │   ├── scripts/
 │   │   ├── workflow.py               # Gate checks and progress recording
 │   │   ├── build_html.py             # MD → HTML builder (ADR-0001, dual-format)
@@ -55,10 +53,10 @@ tech_book_skills/
 │       ├── style.css
 │       └── script.js
 └── shared/                           # Cross-skill resources
-    ├── discipline-framework.md       # Shared discipline: gate degradation, error recovery, progress tracking
-    ├── anti-slacking.md              # Anti-slacking rules
+    ├── discipline-framework.md       # Anti-slacking, gate degradation, error recovery, progress (merged anti-slacking)
+    ├── progress-protocol.md          # Run structure, reading-evidence protocol, recovery
     ├── report-templates.md           # Report templates
-    ├── translationese-patterns.md    # Anti-pattern list
+    ├── translationese-patterns.md    # Anti-pattern list (regex source)
     ├── validate_tech.py              # Technical accuracy validation
     ├── validate_terms.py             # Terminology consistency validation
     └── workflow.py                   # Shared workflow engine
@@ -93,9 +91,10 @@ generate-book → review-tech-book → generate-book (fix mode)
 
 ## Design Principles
 
+- **Source type × product shape (orthogonal)**: any source (single/multi/codebase) can produce either a `book` (full HTML+MD pipeline via builder) or a `doc` (lightweight in-place MD like `proj/book.md`, no builder, trimmed gates). See `generate-book/references/product-shapes.md`
 - **Progressive disclosure**: SKILL.md under 150 lines, details in reference files
 - **MD as source (ADR-0001)**: agent writes portable MD; `build_html.py` renders the "Quiet Luxury" HTML edition + a portable MD edition; light-only (ADR-0003), Mermaid→PNG (ADR-0004)
-- **Shared discipline**: Common gate/error/progress patterns canonical in `shared/discipline-framework.md`, referenced (not duplicated) by each skill's shared-rules
+- **Shared discipline**: Common anti-slacking/gate/error/progress patterns canonical in `shared/discipline-framework.md` (anti-slacking merged in), referenced (not duplicated) by each skill's shared-rules
 - **Robustness**: Pre-flight checks, gate degradation, error recovery, output validation
 - **Evidence-based**: Every finding needs a direct quote (review), every claim needs file:line (codebase)
 
