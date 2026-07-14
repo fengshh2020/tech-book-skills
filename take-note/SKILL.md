@@ -1,22 +1,33 @@
 ---
 name: take-note
-description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", or otherwise explicitly requests writing the current session's content into the Obsidian knowledge base at /mnt/d/知识库. Also use it proactively when the conversation has distilled reusable long-form content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Produces a structured note following the library's project-based conventions and writes it to the right project folder. Trigger this skill BEFORE composing the note so it lands in the correct place with the correct format. Do NOT trigger for: writing a full multi-page book or long document from scratch (use generate-book), code/API review (use review-tech-book), or generating brand-new technical content rather than capturing this session's content.
+description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", or otherwise explicitly requests writing the current session's content into an Obsidian-style knowledge base (root auto-detected, see 「定位知识库根」) — or ingesting an external source (URL/paper/pasted text) into the compounding wiki/ knowledge base. Also use it proactively when the conversation has distilled reusable long-form content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: writing a full multi-page book or long document from scratch (use generate-book), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
 allowed-tools: Read, Write
 ---
 
-把当前 session 的内容写成一篇符合库约定的结构化笔记，落到正确的位置。库根 `/mnt/d/知识库`，用用户当前语言写（默认中文）。
+把当前 session 的内容写成一篇符合库约定的结构化笔记，落到正确的位置。库根 `$KB_ROOT` **动态解析**（见下「定位知识库根」），用用户当前语言写（默认中文）。
 
 **写作原则（结论前置 / 原子性 / 标题即论点 / 面向检索 / 上下文自足 / 抽象成原则 / 事实与推断分离）见 `shared/writing-core.md`**——本文件只讲 Obsidian 库特有的：归位、frontmatter、callout 语义、面包屑与双链。库有强归位/命名约定，**下笔前缺信息（哪个项目、文件名、范围、是否拆篇）一律问用户，别默写——猜错会返工**。
 
-## 库结构（按项目组织）
+## 定位知识库根（`$KB_ROOT`，portable）
+
+本 skill 不假设库在哪——**从 cwd 向上发现根**，在任何地方都能用：
+
+1. **标记发现**：从当前目录向上逐级找 KB 标记——`.kb-root` 文件（显式）**或** `00_首页.md`（约定，零配置覆盖现有 Obsidian 库）。命中任一 → 该目录即 `$KB_ROOT`。
+2. **找不到 → 问用户**（三选一，别猜）：① 指定一个已有 KB 的绝对路径；② 在 cwd **初始化新 KB**（建 `00_首页.md` + `文档库/` + `系统配置/` + `wiki/` 骨架）；③ 就地生成单篇（不建 KB，写到 cwd）。
+3. **覆盖**：环境变量 `KB_ROOT` 设了即用（CI / 固定库场景）。
+
+定下 `$KB_ROOT` 后所有结构在它之下生成。**项目与 MOC 运行时发现**——扫 `$KB_ROOT/项目-*/` 列出现有项目（不硬编码项目名）；每个项目夹的 `{项目名}.md` 或 `00_MOC.md` 是其 MOC。
+
+## 库结构（在 `$KB_ROOT` 下，按项目组织）
 
 ```
-/mnt/d/知识库/
+$KB_ROOT/
 ├── 00_首页.md                 ← 全库入口/仪表盘
 ├── 文档库/                    ← 书籍/长文档（多页系统学习，每本一文件夹 + 00_MOC）
 ├── 项目-{名}/                 ← 每项目自包含：{项目名}.md 作 MOC + 调试/方案/设计 子目录
-│   （现有：DDPM模型转换、机器狗语音控制、Jetson部署）
-└── 系统配置/                  ← 跨项目复用的工具链/环境配置（扁平，type: config）
+│   （每项目自包含；现有项目运行时扫 `$KB_ROOT/项目-*` 得，别硬编码）
+├── 系统配置/                  ← 跨项目复用的工具链/环境配置（扁平，type: config）
+└── wiki/                      ← 可复利知识库（LLM 维护：raw/ 不可变源 → 编译 concept/entity 页 + index + log，见 `references/llm-wiki.md`）
 ```
 
 每个项目夹有一篇 MOC（`{项目名}.md` 或 `00_MOC.md`）串联其下笔记；`文档库/` 每本书有自己的 `00_MOC`。任何笔记都链回所属 MOC + `00_首页`，不孤立。
@@ -31,7 +42,7 @@ allowed-tools: Read, Write
 | 规则 | writing-core 六原则（结论前置/原子/去水分） | **不套笔记的"精简"标准**——书就该厚，多页+MOC+教学 callout+三级证据 |
 | 导航 | 面包屑链回项目 MOC | `prev`/`next` 串章 + 面包屑链回书 MOC |
 
-一个可复用独立结论 → 笔记；要系统讲清、需多页展开 → 书/文档（且从零生成时用 generate-book）。拿不准问用户。下文默认讲**笔记**写法。
+一个可复用独立结论 → 笔记；要系统讲清、需多页展开 → 书/文档（且从零生成时用 generate-book）；跨项目/跨书的可迁移 concept/entity → `wiki/` 编译页（见下「维护可复利知识库」）。拿不准问用户。下文默认讲**笔记**写法。
 
 ## 🔴 下笔前停下问用户（会造成返工的自主决策点）
 
@@ -65,7 +76,7 @@ allowed-tools: Read, Write
 ---
 title: "{标题，与文件名、H1 一致}"
 type: {moc | design | debug | plan | config | read}
-project: {DDPM模型转换 | 机器狗语音控制 | Jetson部署 | 系统配置 | {新项目名}}
+project: {扫 $KB_ROOT/项目-* 得的现有项目名 | 系统配置 | 知识库 | {新项目名}}
 date: YYYY-MM-DD
 status: {active | draft | archived}
 tags:
@@ -126,7 +137,7 @@ tags:
 ## Step 6 — 双链（笔记是网络节点）
 
 1. **结构回链**：面包屑页脚指向项目 MOC + `00_首页`。
-2. **主题互链**：`## 关联笔记` 区用 `- [[note]] — {关系}` 链 1-2 条相关笔记并注明关系（因果/对比/前置/同主题）；`[[待创建]]（待创建）` 留给应存在但还没的笔记。已知 hub：`[[DDPM模型转换]]`、`[[机器狗语音控制]]`、`[[Jetson部署]]`（`[[00_MOC]]` 是 `文档库/` 里 DDPM 那本书的总目录，不是项目 MOC——别链错）。新笔记也要回头更新它引用到的项目 MOC（笔记地图加一行），让双链闭环。
+2. **主题互链**：`## 关联笔记` 区用 `- [[note]] — {关系}` 链 1-2 条相关笔记并注明关系（因果/对比/前置/同主题）；`[[待创建]]（待创建）` 留给应存在但还没的笔记。**项目 hub 运行时发现**：扫 `$KB_ROOT/项目-*/` 得现有项目名作 hub（别硬编码——换库即失效）；`文档库/` 下每本书的 `00_MOC` 是书总目录、与项目 MOC 不同（别链错）。新笔记也要回头更新它引用到的项目 MOC（笔记地图加一行），让双链闭环。
 
 ## 规则
 
@@ -137,10 +148,16 @@ tags:
 
 **从零生成一整本多章技术书 / 给项目或代码库生成学习文档 → 不要用 take-note，用 generate-book**（book 形态 = 全书双格式 builder；doc 形态 = 就地 MD，轻量 gate）。本节仅适用于 **session 里自然成型的短篇**书式文档（几页精读/教程/长方案）：归位 `文档库/{书名}/`，`00_MOC.md`（`type: moc` + `book: "{书名}"`，写"给谁看+目标+阅读路径+目录表+怎么用"）+ `数字_标题.md` 章节（`type: book` + `prev`/`next`）；附录用 `A0_`/`A1_` 前缀，图放书根 `assets/`。**书不套笔记的精简标准**——多页+教学 callout+三级证据都是教学需要，长度不是水分。
 
+## 维护可复利知识库（`wiki/`）
+
+跨项目/跨书、值得反复回查的可迁移 concept/entity → `$KB_ROOT/wiki/`（与 `项目-{名}/` · `文档库/` 并列）。**你不手写 wiki，LLM 写——你只策展源、问好问题**；单 session 的项目结论仍走笔记，不进 wiki。触发：ingest 外部源（URL / 论文 / 粘贴文本）或"维护知识库 / ingest"。
+
+ingest → compile → 维护 index → 答查询并回写（复利）→ 定期 lint（Read 驱动自检，take-note 无 Bash）。**完整 `wiki/` 结构、五操作细节、与项目结构的交叉引用约定**见 **`references/llm-wiki.md`**（按需读，不常驻）。
+
 ## 完成时
 
 只打印一行：写入文件的绝对路径 + 一句话内容摘要。
 
 ```
-/mnt/d/知识库/项目-{项目名}/{子目录}/{filename}.md — {一句话内容摘要}
+$KB_ROOT/项目-{项目名}/{子目录}/{filename}.md — {一句话内容摘要}
 ```

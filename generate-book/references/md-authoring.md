@@ -1,9 +1,8 @@
 # Markdown 作者约定（务实子集）
 
-> 自 [ADR-0001](../../../docs/adr/0001-markdown-as-source-html-built.md) 起，**MD 是信息主源**，
-> HTML 由 `scripts/build_html.py` 渲染。本文件规定 agent 写 MD 时的约定——
-> 通用/GitHub 方言，GitHub 上可直接阅读，builder 识别后升级为"静奢"HTML 富组件
-> （[ADR-0002](../../../docs/adr/0002-pragmatic-component-subset.md) 务实子集）。
+> **MD 是信息主源**，HTML 由 `scripts/build_html.py` 渲染。
+> 本文件规定 agent 写 MD 时的约定——通用/GitHub 方言，GitHub 上可直接阅读，
+> builder 识别后升级为"静奢"HTML 富组件（务实子集）。
 
 ## 源目录结构
 
@@ -80,7 +79,7 @@ session = Zenoh.open({})
 session.put("demo/key", "Hello")
 ```
 
-### 图表（Mermaid）—— 见 [ADR-0004](../../../docs/adr/0004-diagrams-mermaid-to-png.md)
+### 图表（Mermaid）
 写 ` ```mermaid ` 文本，**下一行**写图注（以"图"开头触发自动编号）：
 
 ```mermaid

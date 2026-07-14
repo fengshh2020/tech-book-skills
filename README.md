@@ -1,6 +1,6 @@
 # Tech Book Skills
 
-三个 AI 技能把**任意技术栈**的源材料 / 代码库 / 当前 session 变成结构化文档（note / doc / book），并审阅它。为强模型设计——纪律收敛到一处，不堆防御性脚手架（见 [ADR-0005](docs/adr/0005-trim-scaffolding-for-capable-models.md)、[ADR-0006](docs/adr/0006-generalize-and-consolidate.md)）。
+三个 AI 技能把**任意技术栈**的源材料 / 代码库 / 当前 session 变成结构化文档（note / doc / book），并审阅它。为强模型设计——纪律收敛到一处，不堆防御性脚手架（见 [ADR-0005](docs/adr/0005-trim-scaffolding-for-capable-models.md)、[ADR-0006](docs/adr/0006-generalize-and-consolidate.md)、[ADR-0007](docs/adr/0007-2026-research-driven-description-routing-and-anti-slop.md)）。2026-07 进一步以**上下文工程**为脊柱、演进 take-note 维护可复利 **wiki/**、反 slop 精确化（[ADR-0008](docs/adr/0008-context-engineering-spine-and-landmine-reframe.md) / [0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md) / [0010](docs/adr/0010-anti-slop-precision-info-gain-and-structural-tells.md)）。
 
 ## 能力轴：输入 × 形态（系统级泛化）
 
@@ -14,7 +14,7 @@ session 内容  ─────────  take-note       take-note        ta
 代码库        ─────────      —          generate-book    generate-book
 ```
 
-- **take-note**：session → note/doc（Obsidian 库适配层）。
+- **take-note**：session → note/doc（Obsidian 库适配层），并维护顶层 `wiki/` 可复利知识库（ingest/query/lint，[ADR-0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md)）。
 - **generate-book**：源书 / 代码库 → doc/book。任意技术栈（Python / Rust / Go / 嵌入式 C/C++ / shell …）。
 - 三个 skill 共用 [`shared/writing-core.md`](shared/writing-core.md)（铁律、写作原则、证据 V1-V4、失败模式），各保留自己的目标约定（take-note = Obsidian 库；generate-book = 工作区）。
 
@@ -48,6 +48,8 @@ tech_book_skills/
 │   └── scripts/  validate_code.sh
 ├── take-note/                        # Obsidian 笔记/短文档适配层
 │   ├── SKILL.md                      # 归位/frontmatter/callout/双链（引用 writing-core）
+│   ├── references/
+│   │   └── llm-wiki.md               # 可复利 wiki/ 范式：结构 + 五操作 + 交叉引用（按需读）
 │   └── test-prompts.json
 └── shared/                           # 跨 skill 复用
     ├── writing-core.md               # ★ 唯一纪律源：铁律/原则/V1-V4/失败模式/剪枝/校验工具
@@ -66,6 +68,11 @@ tech_book_skills/
 - **ADR-0001** MD 为源·builder 渲染 ｜ **ADR-0002** 富组件务实子集映射
 - **ADR-0003** light-only ｜ **ADR-0004** Mermaid→PNG
 - **ADR-0005** 为强模型裁剪脚手架 ｜ **ADR-0006** 泛化任意技术栈 + 合并 reference + 修正 MD 源修复
+- **ADR-0007** 2026 研究驱动重构：description 路由化 + 反 AI 腔（slop）
+- **ADR-0008** 上下文工程脊柱 + ETH「地雷」重定位（writing-core 收成地雷文件）
+- **ADR-0009** LLM-wiki 范式：演进 take-note 维护顶层 `wiki/` 可复利知识库
+- **ADR-0010** 反 slop 精确化：信息增量框架 + 结构 tell 细化
+- **ADR-0011** KB 根解析与 portable：`$KB_ROOT` 动态发现（标记/问/init）+ 实例数据运行时发现，去硬编码
 
 ## 工作流
 
@@ -80,10 +87,16 @@ generate-book → review-tech-book → generate-book (按报告修复：改源 M
 ## 设计原则
 
 - **纪律收敛一处**：铁律、原则、证据等级、失败模式只在 `shared/writing-core.md` 定义一次，各 skill 引用不重述（ADR-0005）。
+- **正文纯粹、出处归档**：skill 正文只留规则、不夹出处（论文 / 人名 / arXiv / 书名标杆）——借来的方法直接用；同一概念（slop 清单、密度公式）只在 writing-core 定义一次、他处指回；决策出处归 `docs/adr/`，不进 skill 正文做徽章。
 - **输入 × 形态正交 + 任意技术栈**：任一输入配任一形态；note/doc/book 覆盖从原子结论到全书的谱系；不假设特定语言（ADR-0006）。
 - **MD 为源（ADR-0001）**：agent 写可移植 MD；`build_html.py` 渲染 HTML + MD；light-only、Mermaid→PNG。修复改源 MD 再重建，不手改 HTML（ADR-0006）。
 - **保留客观校验**：`build_html.py` + `validate_*.{sh,py}` + `check_coverage.sh` 是真 builder / 真校验，提供机械兜底——与"是否信任模型自检"无关。
 - **渐进披露 + 共享主干**：SKILL.md 是 hub（流程主干一次定义），细节按输入轴加载单个深度参考（ADR-0006）。
+- **上下文工程脊柱（ADR-0008）**：长程生成 = 分阶段策展上下文，总律「最小高信号 token 集」；既有 `progress.md` / `context-summary.md` / 并行子 Agent 即 Compaction / Structured Notes / Sub-agent Isolation。writing-core 收成「地雷文件」（只放 agent 自发现不了的）。
+- **可复利 wiki（ADR-0009）**：take-note 维护顶层 `wiki/`（raw/ 不可变源 → 编译 concept/entity 页 + index + log + lint），与项目结构并行、交叉引用。
+- **portable（ADR-0011）**：take-note 不焊死库路径——`$KB_ROOT` 从 cwd 向上发现（`.kb-root` / `00_首页.md`），找不到问 / init；项目名运行时扫 `项目-*`、不硬编码。结构逻辑 portable、实例数据 discover。
+- **description 即路由规则**：每个 SKILL.md 的 description 是"何时触发"的路由（`Use when…` + 触发短语 + 负路由），不述"做什么"（那是正文）——对齐 2026 Anthropic Agent Skills 规范（ADR-0007）。
+- **反 AI 腔（slop）**：生成内容不得回归通用腔——第六类失败模式 + `translationese-patterns` 的 AI 腔节 + review 反模式三处守住；**密度 = 抵抗被摘要的信息增量**，词汇警告 + 结构 tell 直接判，模型自检为主、脚本计数为辅（ADR-0007）。
 
 ## 安装
 

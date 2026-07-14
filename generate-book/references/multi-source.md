@@ -63,7 +63,7 @@ scripts/check_coverage.sh {RUN}/knowledge_base/ output/ summary   # 覆盖率 �
 python ../shared/validate_tech.py output/; python ../shared/validate_terms.py output/
 ```
 
-**每章自检**：非空、含 `<!-- integrated -->` 标记、无 `[待确认]`、大小 ≥ 最大源章 ×0.8、节间有"但是"桥接、随机 3 段无法辨识来源、术语一致。
+**每章自检**：非空、含 `<!-- integrated -->` 标记、无 `[待确认]`、大小 ≥ 最大源章 ×0.8、节间有"但是"桥接、随机 3 段无法辨识来源、术语一致、无 AI 腔（多源改写最易回归通用腔——刻意保留具体名词与确切动词）。
 **全书自检**：覆盖率 ≥95%、反向覆盖 100%、Coverage Guardian 无底线违规、连续 3 章风格一致、交叉引用完整。
 
 连续 2 章在同一项未通过 → 停下检查 `plan.md` 是否有问题，不累积修复。

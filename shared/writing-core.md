@@ -2,6 +2,12 @@
 
 三个 skill（generate-book / review-tech-book / take-note）共用的**唯一**写作纪律源。每个 skill 只引用本文件，不重述。
 
+## 上下文工程总律：最小高信号 token 集
+
+这套 skill 本质是**上下文工程**——策展长程生成时模型该看到什么。总律：**任一阶段只加载该阶段需要的高信号 token，找到能达成目标的最小集合**。推论：① 按需读参考（Select），不顺手全读；② 摘要从**全文**压缩、不二次压缩已压缩内容（Compaction，先 recall 后 precision）；③ 长程状态写窗口外（`progress.md` / `context-summary.md`），子任务开新上下文只回传结果（Isolation）。
+
+**地雷原则**：本文件只放 agent 自发现不了的——铁律、V1-V4、失败模式、库约定、脚本入口。**不要在 skill / 笔记里复述 agent 能自发现的结构**（目录罗列、通用编程概念）。规则留下、论证散文删掉。
+
 ## 铁律（Iron Law）
 
 **没有新鲜证据就不产出。不伪造。不缩减。推断必须标注。**
@@ -36,24 +42,27 @@
 - **review-tech-book**：每个发现带原文逐字引用 + 行号（`ChX line NNN-NNN`），引用不可改写。
 - **take-note**：引用"为什么"时指向源码行或源链接；shell / dockerfile / python 块下加 `# 预期输出: ...` 让读者一眼判断是否跑通。
 
-## 失败模式（5 行——真实风险，强模型也会犯）
+## 失败模式（真实风险，强模型也会犯）
 
 1. **假读**：声称读过却只凭标题 / 目录推断 → 打开文件完整读，记录段落数 / 代码块首行 / 术语位置。
 2. **缩水**：源 40 段输出只剩 15 段 / 核心章 < 20KB → 扩展到匹配源深度。
 3. **伪造 Gate / 校验**：没跑 `validate_*.{sh,py}` 就标"通过" → 真跑，粘输出。
 4. **缝补式整合**（多源）：一个源占 80% 标记 → 反向覆盖矩阵 + Coverage Guardian，读者须无法辨识来源。
 5. **推断当结论**：把 V4 假设写成实测发现 → 降级标 `[!caution] 推断/待验证`。
+6. **AI 腔 / slop**：产出回归均值的通用腔——模板化措辞、空洞大词、无具体观点的"安全"句。本质是**回归最可能的下一个 token、不敢给具体立场**。**治法：写不可被摘要压缩的信息**——让每句贡献摘要砍不掉的信息增量（密度 = 抵抗被摘要的信息量）。落地 = 具体名词、确切动词、删套话、敢给观点。**词汇命中是警告、结构命中直接判**：单次词弱、反复才判 slop；结构 tell 命中即扣分——三联排比 / "首先…其次…最后"万能骨架与万能开头 / 每节"intro→列表→复述" thruline / 复述式结尾（"In summary"…）与追问式收尾 / 完美矩形段（3 句各 15-20 词 SVO 整齐段）/ "No X. No Y. Just Z." 三段式 / tailing clause（句尾现在分词堆意义：「……，从而实现……」）/ 有正解却"两边都对"的假平衡 / 段长整齐无 burstiness（对照 `shared/translationese-patterns.md` 的 AI 腔节，直引 / 学术 / 法律语境豁免）。
 
-## 剪枝（长流程省力）
+## 剪枝 = 上下文工程的 Select / Compress
 
-按当前阶段需要读参考文件，不为"全面"预加载全部规范。继续深入不改变章节计划 / 修复批次 / 学习路径时停止深入——**但停止深入 ≠ 停止读取**：仍需通读确认判断。跳过 / 降级写进 `progress.md` 或报告，不只留在对话里。
+按当前阶段需要读参考文件，不为"全面"预加载全部规范（Select）。继续深入不改变章节计划 / 修复批次 / 学习路径时停止深入——**但停止深入 ≠ 停止读取**：仍需通读确认判断。长程状态压成 `progress.md` / `context-summary.md`（Compress：从全文压缩、保留架构决策与未解问题、可逆），跳过 / 降级写进去，不只留在对话里。
 
-## 校验工具（客观兜底，与是否信任自检无关）
+## 校验工具（客观价值所在，与是否信任自检无关）
 
-- 翻译腔：`shared/translationese-patterns.md`（`validate_code.sh` 动态读取，含硬编码后备）
+下列脚本是这套 skill 真正值钱的客观兜底——确定性、可复跑、不稀释注意力（「对 AI 最好的文档是不需要它的代码」）。纪律 prose 可裁，这些不可裁。
+
+- 翻译腔 + AI 腔：`shared/translationese-patterns.md`（`validate_code.sh` 动态读取，含硬编码后备）
 - 术语一致性：`shared/validate_terms.py`　技术准确性：`shared/validate_tech.py`
 - 代码 / HTML：`review-tech-book/scripts/validate_code.sh`　覆盖度：`generate-book/scripts/check_coverage.sh`
-- MD → HTML 渲染：`generate-book/scripts/build_html.py`（ADR-0001）
+- MD → HTML 渲染：`generate-book/scripts/build_html.py`
 
 ## 路径与运行时
 

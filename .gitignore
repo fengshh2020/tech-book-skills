@@ -1,6 +1,7 @@
 # Runtime state
 .remember/
 .book-doc/
+.playwright-mcp/
 
 # Output
 output/

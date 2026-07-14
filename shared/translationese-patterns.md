@@ -1,12 +1,15 @@
-# 翻译腔高频模式
+# 翻译腔 + AI 腔（slop）高频模式
 
-> 供 generate-book、review-tech-book 及验证脚本共享。定义翻译腔检测模式列表。
+> 供 generate-book、review-tech-book 及验证脚本共享。两类**语音缺陷**的检测模式：
+> - **翻译腔**——逐字直译留下的痕迹（连接词、读者称谓、填充语）。
+> - **AI 腔 / slop**——AI 生成内容回归均值的通用腔：模板化措辞、空洞大词、无具体观点的"安全"句。治法是写人话（具体名词、确切动词、删套话）。定义见 `shared/writing-core.md` 第六类失败模式。
 >
-> 验证脚本从本文件动态读取正则模式。后备硬编码列表也需与此文件保持一致。
+> 验证脚本从本文件动态读取正则模式（表格式不变）。后备硬编码列表也需与此文件保持一致。
+> **密度即信号**：单次命中弱，同类反复出现才判 slop；直引 / 学术 / 法律语境豁免。下列 AI 腔行只收**高精度、无管道、无误报**的固定词（如 `重塑`/`深度融合` 因与 ML 术语 reshape/deep-fusion 撞车故不收）；更全的语族（navigate the complexities / unlock the potential / plays a crucial role / 赋能家族…）由模型自检，不进 blunt 计数器。
 
 ---
 
-## 模式列表
+## 翻译腔模式（直译痕迹）
 
 | 模式 | 正则 | 类型 | 修正 |
 |------|------|------|------|
@@ -26,6 +29,33 @@
 | 事实上 | `事实上` | 直译副词 | 根据语境删除或替换为"实际上"/"确实" |
 | 换句话说 | `换句话说` | 直译过渡语 | 改为"即"/"也就是说"或删除 |
 
+## AI 腔 / slop 模式（通用模板腔）
+
+> 同上表格式（`validate_code.sh` 一并读取并计数）。下列为高精度 lexical 告警——单次出现即值得复查，反复出现基本可判 slop。仅收固定词组（无 `\|` 管道、无 ML 术语撞车，保证 markdown 渲染与脚本解析都不破、无误报）。**不收**易误报的 `landscape` / `journey` / `roadmap` / `symphony`（legit 技术语境常见）与需密度判断的语族（unlock the potential / plays a crucial role / 赋能家族…）——交模型自检。**结构 tell**（完美矩形段 / "No X. No Y. Just Z." / tailing clause）也归模型自检，不进计数器。
+
+| 模式 | 正则 | 类型 | 修正 |
+|------|------|------|------|
+| 综上所述 | `综上所述` | 中文 公文模板（非学术场景几乎只出在 AI 文） | 删，或"因此"/"所以" |
+| 不难发现 | `不难发现` | 中文 套话连接词 | 删，直接给观察 |
+| 由此可见 | `由此可见` | 中文 套话连接词 | 删，或"因此" |
+| 赋能 | `赋能` | 中文 空洞大词 | 写出谁在做什么 |
+| 生态闭环 | `生态闭环` | 中文 商务空话 | 写具体机制 |
+| 大量实践证明 | `大量实践证明` | 中文 伪具体化（无来源） | 给具体研究/数字+链接，或删 |
+| 相关研究表明 | `相关研究表明` | 中文 伪具体化（无来源） | 同上 |
+| delve | `delve` | 英文 AI 标志词 | "explore" / "look at" |
+| tapestry | `tapestry` | 英文 空洞比喻 | "mixture" / "interplay" |
+| seamless | `seamless` | 英文 集成从不是 seamless | 删副词，或"无需额外步骤" |
+| testament | `testament` | 英文 技术写作里过度戏剧化 | "shows" / "proves" |
+| in the realm of | `in the realm of` | 英文 LLM 偏好词 | "in" / "among" |
+| important to note that | `important to note that` | 英文 模板化对冲开场 | 删，或"注：…" |
+| myriad | `myriad` | 英文 虚词族 | "many" |
+| plethora | `plethora` | 英文 虚词族 | "many" / "lots of" |
+| pivotal | `pivotal` | 英文 空洞强调词 | "key" / "central" |
+| underscore | `underscore` | 英文 戏剧化动词 | "show" / "highlight" |
+| foster | `foster` | 英文 空洞动词 | "build" / "support" |
+| intricate | `intricate` | 英文 花哨形容词 | "complex"（或删） |
+| beacon | `beacon` | 英文 花喻 | 删，写具体 |
+
 ## 脚本同步说明
 
-`review-tech-book/scripts/validate_code.sh` 从本文件动态读取正则列（动态读取失败时回落到脚本内的硬编码后备列表）。新增模式只需更新本文件；若希望后备列表同步，也更新 `validate_code.sh` 的硬编码段。
+`review-tech-book/scripts/validate_code.sh` 从本文件动态读取正则列（含翻译腔 + AI 腔两表）。动态读取失败时回落到脚本内的硬编码后备列表——**后备仅保留翻译腔子集**，AI 腔词一律动态读取、不入后备。新增翻译腔模式需同步后备；新增 AI 腔词只更新本文件即可。

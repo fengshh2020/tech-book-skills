@@ -1,6 +1,6 @@
 ---
 name: review-tech-book
-description: "Structured quality review of technical books or docs — works for any tech stack. Default: report only; fix mode only when the user explicitly requests it. Trigger: review book, 审阅这本书, 审阅书籍, quality review, 质量审阅, optimize issues, 修复这些问题, review tech book, 检查这本书, 书籍审阅. Use whenever the user wants to review, audit, or assess the quality of a technical book or learning doc — even without saying 'review'. Do NOT trigger for: generating books (use generate-book), code review, API review."
+description: "Use when reviewing, auditing, or assessing the quality of a technical book or learning doc — any tech stack, even without the word 'review'. Default: report only; fix mode only on explicit request. Triggers: review book, 审阅这本书, 审阅书籍, 书籍审阅, quality review, 质量审阅, 检查这本书, review tech book, optimize issues, 修复这些问题. Do NOT trigger for: generating books (use generate-book), code review, or API review."
 ---
 
 # 审阅技术书籍 / 文档
@@ -19,7 +19,7 @@ description: "Structured quality review of technical books or docs — works for
 P1 扫描 → P2 精读 → P3 打分 → P4 报告 → [修复模式，用户明确请求时]
 ```
 
-每阶段进入前读对应 reference，按其维度执行；阶段结束按 writing-core 失败模式自检（假读 / 伪造校验 / 浅层均匀打分 / 推断当结论）。
+每阶段进入前读对应 reference（按需读 = 上下文工程 Select），按其维度执行；阶段状态写 `findings/phaseN.md`（窗口外结构化记忆）；阶段结束按 writing-core 失败模式自检（假读 / 伪造校验 / 浅层均匀打分 / 推断当结论）。
 
 ### 阶段 1：扫描
 读 `references/spec.md`（评分框架 + 输出模板）。批量扫结构/逻辑/代码密度/术语/翻译痕迹；定义目标读者；绘学习路径图；跑 `scripts/validate_code.sh output/`。输出 `findings/phase1.md`。

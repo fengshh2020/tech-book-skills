@@ -1,6 +1,6 @@
 ---
 name: generate-book
-description: "Generate a technical book or project learning doc from sources or a codebase — works for any tech stack (Python, Rust, Go, embedded C/C++, …). One source: translate. Multiple sources: deep-read + integrate so the reader can't tell them apart. Codebase: discover + analyze + narrate along the execution path. Product shape chosen per run: 'book' = full multi-chapter HTML+MD via the builder; 'doc' = portable in-place MD (e.g. proj/book.md), no builder, trimmed gates. Trigger: generate book, 整合书籍, 生成书籍, merge books, combine sources, translate book, 翻译书籍, 生成项目书籍, codebase walkthrough, 掌握项目, 架构学习指南, codebase book, 代码库书籍, 项目学习文档, 学习指南, 生成 book.md, 项目文档, project guide, learning doc, walkthrough this project, 给这个项目生成文档. For capturing the current session into a note/doc in the Obsidian vault, use take-note instead. Do NOT trigger for: quality review only (use review-tech-book), code review, README, API reference."
+description: "Use when generating a technical book or project learning doc from source books or a codebase — any tech stack (Python / Rust / Go / 嵌入式 C/C++ / shell …). Triggers: generate book, 整合书籍, 生成书籍, 生成项目书籍, merge books, combine sources, translate book, 翻译书籍, codebase walkthrough, codebase book, 代码库书籍, 掌握项目, 架构学习指南, 项目学习文档, 学习指南, 生成 book.md, 项目文档, project guide, learning doc, walkthrough this project, 给这个项目生成文档. Use take-note instead to capture the current session into the Obsidian vault. Do NOT trigger for: quality review only (use review-tech-book), code review, README, or API reference."
 ---
 
 # 生成技术书 / 学习文档
@@ -32,7 +32,7 @@ description: "Generate a technical book or project learning doc from sources or 
 
 ## 流程（共享主干，3 模式只在中段不同）
 
-**读 → 理解 → 写 → 验证 → 报告**。每段结束按 writing-core 失败模式自检（假读 / 缩水 / 伪造校验 / 缝补整合 / 推断当结论）。
+**读 → 理解 → 写 → 验证 → 报告**。每段结束按 writing-core 失败模式自检（假读 / 缩水 / 伪造校验 / 缝补整合 / 推断当结论）。**长程即上下文工程**（writing-core 总律）：`progress.md` = 窗口外结构化记忆、multi-source `context-summary.md` = 压缩（从全文、先 recall 后 precision）、≤3 并行子 Agent = 隔离——任一阶段只加载该阶段高信号 token，不为"全面"预加载。
 
 **① 读**（所有模式）：逐章/逐文件**实读**，记证据（精确段落数、代码块首行、≥3 具体术语、file:line）。不凭标题猜——这是铁律。
 
@@ -45,7 +45,7 @@ description: "Generate a technical book or project learning doc from sources or 
 | 代码库 | 发现执行路径 → 按优先级分析核心模块（每论断 file:line）→ 沿执行路径**叙事**讲解，不罗列函数 | `references/writing-and-content.md` |
 
 **③ 写**：
-- **book 形态**（MD 是信息主源，[ADR-0001](../../docs/adr/0001-markdown-as-source-html-built.md)）：在 `{RUN}/src/` 写 `book.yml`（`title/subtitle/subtitle_cn/author/edition/lang`）+ 编号章节 `NN_*.md`（NN ≥ 02，首行 `# 标题`）。作者约定（callout `> **[标签]**`、` ```mermaid `、代码 `caption=`、图片图注）见 `references/md-authoring.md`。然后：
+- **book 形态**（MD 是信息主源）：在 `{RUN}/src/` 写 `book.yml`（`title/subtitle/subtitle_cn/author/edition/lang`）+ 编号章节 `NN_*.md`（NN ≥ 02，首行 `# 标题`）。作者约定（callout `> **[标签]**`、` ```mermaid `、代码 `caption=`、图片图注）见 `references/md-authoring.md`。然后：
   ```bash
   python scripts/build_html.py {RUN}/src {RUN}/output
   ```
@@ -92,4 +92,4 @@ scripts/check_coverage.sh {RUN}/knowledge_base/ output/ summary   # 仅多源
 | `references/translation.md` | 翻译规则：术语 / 代码块 / 标点 / 红线 + 术语表 | 单源 |
 | `references/multi-source.md` | 多源：知识索引 + 架构设计 + 整合 L1-L4 + Coverage Guardian + 自检 | 多源 |
 | `references/writing-and-content.md` | 代码库写作：叙事驱动 / 认知负荷 / 代码展示 / sidebar | 代码库 |
-| `references/md-authoring.md` | MD 作者约定 + 组件映射（务实子集，ADR-0002） | book 形态 |
+| `references/md-authoring.md` | MD 作者约定 + 组件映射（务实子集） | book 形态 |

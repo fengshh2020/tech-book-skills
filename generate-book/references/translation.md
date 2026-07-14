@@ -1,6 +1,6 @@
 # 翻译规则
 
-单源模式的翻译纪律。MD 是信息主源（[ADR-0001](../../../docs/adr/0001-markdown-as-source-html-built.md)）——agent 只写 MD，HTML 由 builder 渲染，故下文不涉及手写 HTML。读 `shared/writing-core.md`（铁律 / 失败模式）；翻译腔禁用词表见 `shared/translationese-patterns.md`。
+单源模式的翻译纪律。MD 是信息主源——agent 只写 MD，HTML 由 builder 渲染，故下文不涉及手写 HTML。读 `shared/writing-core.md`（铁律 / 失败模式）；翻译腔禁用词表见 `shared/translationese-patterns.md`。
 
 ## 解析源（Phase 0）
 
@@ -50,9 +50,9 @@
 - [ ] 代码块逐字保留（变量/函数/输出/异常英文），**注释已译为中文**
 - [ ] 术语首现带英文括注；同一英文全书同一中文译法；无自造术语
 - [ ] 强调标记（粗体/斜体/行内代码）全部保留
-- [ ] 无翻译腔（对照 `shared/translationese-patterns.md`，目标 0 命中）
+- [ ] 无翻译腔 / AI 腔（对照 `shared/translationese-patterns.md`，目标 0 命中）
 - [ ] 中英文加空格、清单编号连续、交叉引用章号正确
 
 ## 每章自检
 
-段落数匹配 ｜ 术语全书一致 ｜ 翻译腔 0 ｜ 注释已中文化 ｜ 输出 ≥ 源 80%（防缩减）。
+段落数匹配 ｜ 术语全书一致 ｜ 翻译腔/AI 腔 0 ｜ 注释已中文化 ｜ 输出 ≥ 源 80%（防缩减）。

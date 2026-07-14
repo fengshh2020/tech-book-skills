@@ -9,7 +9,7 @@
 - 不重开完整审阅，只实现报告中的修复批次。发现新风险记到 `fix-report.md`，不扩张范围。
 - 翻译/整合/代码库问题按**类别批量处理**，不逐点微修补。
 
-## MD 是源（[ADR-0001](../../../docs/adr/0001-markdown-as-source-html-built.md)）
+## MD 是源
 
 **修复改的是源 MD（`{RUN}/src/*.md`），不是 `output/*.html`**——HTML 由 builder 渲染，手改 HTML 会在下次构建被覆盖。
 
