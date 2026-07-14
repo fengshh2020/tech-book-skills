@@ -28,10 +28,14 @@
 
 **AI 腔 / Slop**：AI 生成内容回归均值的通用腔——模板化措辞、空洞大词、无具体观点的"安全"句（delve / 值得注意的是 / 赋能 / 综上所述…）。本质是回归最可能的下一个 token、不敢给具体立场。第六类失败模式（见 Writing Core）。检测在 `shared/translationese-patterns.md` 的 AI 腔节（脚本 blunt 计数 + 模型自检）；治法是写人话——具体名词、确切动词、删套话、敢给观点。**词汇命中=警告（密度才判），结构命中=直接判**（三联排比 / 万能开头 / 复述式结尾 / 假平衡）。_Avoid_：把单次词汇命中当定罪；用 blunt 计数器做需语境判断的检测。
 
-**Capability Axis（能力轴）**：系统级泛化的两个正交维度——**输入轴**（session / source / codebase）× **形态轴**（note / doc / book）。任一组合成立（session × note = take-note；codebase × doc = 项目学习文档；session × book 长程交付物 = generate-book）。**路由判据 = 长程流水线要不要**（非页数、非目的地）：要流水线 → generate-book；session 即时沉淀 → take-note；目的地正交（产物可经 book-ingest 进库，[ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。三个 skill 合起来覆盖"任意技术 / 笔记文档"的生成。
+**Capability Axis（能力轴）**：系统级泛化的两个正交维度——**输入轴**（session / source / codebase）× **形态轴**（note / doc / book）。任一组合成立（session × note = take-note；codebase × doc = 项目学习文档；session × book 长程交付物 = generate-book）。**路由判据 = 长程流水线要不要**（非页数、非目的地）：要流水线 → generate-book；session 即时沉淀 → take-note；目的地正交（产物可经 book-ingest 进库，[ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。四个 skill 合起来覆盖"任意技术 / 笔记文档"的生成 + 调研。
 
 **上下文工程（Context Engineering）**：这套 skill 的统领范式——策展长程生成时模型该看到什么，总律「最小高信号 token 集」。三战术映射既有机制：Compaction ↔ `context-summary.md`（从全文压缩）、Structured Notes ↔ `progress.md`（窗口外记忆）、Sub-agent Isolation ↔ ≤3 并行子 Agent。见 [ADR-0008](docs/adr/0008-context-engineering-spine-and-landmine-reframe.md)。_Avoid_：把长程生成当"一次性提示"而非分阶段策展上下文。
 
 **Wiki（知识库）**：[KB_ROOT](#kb_root知识库根) 顶层的 `wiki/`——LLM 维护的可复利知识库：`raw/`（不可变源，人策展）→ 编译 concept/entity 页（LLM 写、人读）+ `index.md` + append-only `log.md`，与 `项目-{名}/` · `文档库/` 并行、交叉引用。五操作 INGEST/COMPILE/INDEX/QUERY/LINT，由 take-note 维护。见 [ADR-0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。_Avoid_：手写 wiki 页（那是 LLM 的活）；把 wiki 与项目笔记混为一谈。
 
 **信息增量（AI irreducibility）**：反 slop 的密度框架——密度 = 抵抗被摘要压缩的信息量；治 slop = 写「摘要砍不掉」的内容。是 writing-core 第六类失败模式的治法判据。见 [ADR-0010](docs/adr/0010-anti-slop-precision-info-gain-and-structural-tells.md)。
+
+**Finding Block（发现块）**：research skill 的标准输出——`Answer`（1–3 句直接回答）+ `Evidence`（每条带来源 + V 等级）+ `Gaps`（未解问题）+ `Meta`（来源数 / 置信度 / 是否升级）。既是独立 MD 文件，也可内联嵌入父 skill 上下文。见 `research/references/output-contract.md`。_Avoid_：自由格式散文输出（不可组合）；复用 ulw-research 的 SYNTHESIS.md（过重）。
+
+**Escalation Boundary（升级边界）**：research 迭代耗尽（3 轮）后仍有未解问题时的行为——产出 `escalated: yes` 的发现块，带诚实的 Gaps，而非伪造或扣留。research 自身通过加深迭代处理任何问题（深度由迭代次数控制，非固定 tier）；ulw-research（OhMyOpenCode）是可选的快捷通道，非功能前提。_Avoid_：在 research 内建多级 tier（quick/moderate/deep）；把 ulw-research 当作升级的必需退路。

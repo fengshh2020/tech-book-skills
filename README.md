@@ -1,12 +1,12 @@
 # Tech Book Skills
 
-三个 AI 技能把**任意技术栈**的源材料 / 代码库 / 当前 session 变成结构化文档（note / doc / book），并审阅它。为强模型设计——纪律收敛到一处，不堆防御性脚手架（见 [ADR-0005](docs/adr/0005-trim-scaffolding-for-capable-models.md)、[ADR-0006](docs/adr/0006-generalize-and-consolidate.md)、[ADR-0007](docs/adr/0007-2026-research-driven-description-routing-and-anti-slop.md)）。2026-07 进一步以**上下文工程**为脊柱、演进 take-note 维护可复利 **wiki/**、反 slop 精确化（[ADR-0008](docs/adr/0008-context-engineering-spine-and-landmine-reframe.md) / [0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md) / [0010](docs/adr/0010-anti-slop-precision-info-gain-and-structural-tells.md)）。
+四个 AI 技能把**任意技术栈**的源材料 / 代码库 / 当前 session 变成结构化文档（note / doc / book），并审阅它；**research** 为其他 skill 提供带引用的调研能力。为强模型设计——纪律收敛到一处，不堆防御性脚手架（见 [ADR-0005](docs/adr/0005-trim-scaffolding-for-capable-models.md)、[ADR-0006](docs/adr/0006-generalize-and-consolidate.md)、[ADR-0007](docs/adr/0007-2026-research-driven-description-routing-and-anti-slop.md)）。2026-07 进一步以**上下文工程**为脊柱、演进 take-note 维护可复利 **wiki/**、反 slop 精确化（[ADR-0008](docs/adr/0008-context-engineering-spine-and-landmine-reframe.md) / [0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md) / [0010](docs/adr/0010-anti-slop-precision-info-gain-and-structural-tells.md)）。
 
 **三工具通用**——Claude Code / OpenCode / Codex 均遵循开放 [Agent Skills](https://agentskills.io) 标准（`<name>/SKILL.md` + frontmatter `name`/`description`）；`./install.sh` 一键符号链接安装（见下「安装」）。
 
 ## 能力轴：输入 × 形态（系统级泛化）
 
-三个 skill 合起来覆盖"任意技术 / 笔记文档"的生成——**输入轴**决定读什么（session / 源书 / 代码库），**形态轴**决定产什么（note 原子 / doc 就地 MD / book 全书+builder）。任一组合成立。
+四个 skill 合起来覆盖"任意技术 / 笔记文档"的生成——**输入轴**决定读什么（session / 源书 / 代码库），**形态轴**决定产什么（note 原子 / doc 就地 MD / book 全书+builder）。任一组合成立。**research** 是横向能力，被其他 skill 内联调用。
 
 ```
                  形态 →    note(原子)     doc(就地MD)      book(全书+builder)
@@ -20,7 +20,8 @@ session 内容  ─────────  take-note       take-note     take-
 
 - **take-note**：session → note/doc/短篇书（Obsidian 库适配层）+ 维护顶层 `wiki/` 可复利知识库（ingest/query/lint，[ADR-0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md)）+ 把 generate-book 产物 book-ingest 进 `文档库/`（[ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。
 - **generate-book**：源书 / 代码库 → doc/book。任意技术栈（Python / Rust / Go / 嵌入式 C/C++ / shell …）。
-- 三个 skill 共用 [`shared/writing-core.md`](shared/writing-core.md)（铁律、写作原则、证据 V1-V4、失败模式），各保留自己的目标约定（take-note = Obsidian 库；generate-book = 工作区）。
+- **research**：调研问题 → 带引用的结构化发现块。自适应循环，深度由迭代控制（最多 3 轮）；迭代耗尽仍产出诚实部分答案而非伪造。可被其他 skill 内联调用（指令式，非运行时 API）。
+- 四个 skill 共用 [`shared/writing-core.md`](shared/writing-core.md)（铁律、写作原则、证据 V1-V4、失败模式），各保留自己的目标约定（take-note = Obsidian 库；generate-book = 工作区；research = 发现块）。
 
 ## Skills
 
@@ -29,6 +30,7 @@ session 内容  ─────────  take-note       take-note     take-
 | **generate-book** | 从源书 / 代码库生成技术书或学习文档 | 翻译书、整合多书、代码库走读、项目学习文档 |
 | **review-tech-book** | 结构化质量审阅（默认仅报告） | 审阅已生成的书/文档、质量评估、按报告修复 |
 | **take-note** | 把当前 session 写成 Obsidian 笔记/短文档 | 记笔记、存知识库、记录踩坑/配置/决策 |
+| **research** | 调研问题并返回带引用的结构化发现块 | 查文档、验证技术论断、库行为调研、对比选型 |
 
 ## 结构
 
@@ -55,6 +57,11 @@ tech_book_skills/
 │   ├── references/
 │   │   └── llm-wiki.md               # 可复利 wiki/ 范式：结构 + 五操作 + 交叉引用（按需读）
 │   └── test-prompts.json
+├── research/                         # 调研（带引用的结构化发现块，可被其他 skill 内联调用）
+│   ├── SKILL.md                      # Hub：Plan→Search→Read→Synthesize 循环 + 升级边界
+│   └── references/
+│       ├── search-craft.md           # 查询分解 / 来源质量 / 迭代策略
+│       └── output-contract.md        # 发现块规范 / 置信度校准 / 可组合性协议
 ├── install.sh                    # 三工具（Claude/OpenCode/Codex）用户级符号链接安装
 └── shared/                           # 跨 skill 复用
     ├── writing-core.md               # ★ 唯一纪律源：铁律/原则/V1-V4/失败模式/剪枝/校验工具
@@ -87,6 +94,10 @@ generate-book → review-tech-book → generate-book (按报告修复：改源 M
    │                │
    │                └─ 系统性发现 → flag wiki 候选 → take-note INGEST
    └─ 书 → take-note book-ingest → 文档库/  ；副产物(配置/洞察) → flag → take-note
+
+research ←── generate-book / take-note / review-tech-book (内联调用：验证论断、查文档、对比选型)
+   │
+   └─ 迭代耗尽 → 产出 escalated 发现块（诚实部分答案 + Gaps）
 ```
 
 1. **generate-book** 生成（单源/多源/代码库/session × book/doc）
@@ -125,7 +136,7 @@ generate-book → review-tech-book → generate-book (按报告修复：改源 M
 ./install.sh --uninstall    # 移除链接
 ```
 
-链接 `take-note` / `generate-book` / `review-tech-book` / `shared/` 四项。`shared/` 是三 skill 的兄弟资源（供 `../shared/writing-core.md` 解析；无 `SKILL.md`、不会被当 skill 加载）。
+链接 `take-note` / `generate-book` / `review-tech-book` / `research` / `shared/` 五项。`shared/` 是四 skill 的兄弟资源（供 `../shared/writing-core.md` 解析；无 `SKILL.md`、不会被当 skill 加载）。
 
 > Windows 原生（非 WSL）运行某工具时，路径改 `%USERPROFILE%\.agents\skills` / `%USERPROFILE%\.claude\skills`，符号链接需开发者模式或 `mklink /D`。
 
