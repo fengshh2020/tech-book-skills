@@ -28,3 +28,4 @@ $KB_ROOT/wiki/
 - 交叉引用：项目笔记在 `## 关联笔记` 引相关 wiki concept 页（`[[wiki/topic/concept]]`）；wiki 页引相关项目调试（"实证见 [[项目-X/调试/...]]"）。新 wiki 页也回头更新 `index.md`，让网络闭环。
 - wiki 页 frontmatter：`type: read`、`project: 知识库`，沿用库的 callout / 双链 / 面包屑约定（面包屑写 `📍 知识库入口 [[00_首页]]`）。
 - **多源同源**：`generate-book` 多源的 `knowledge_base/{book}/index.md`（ingest→compile）与 `context-summary.md`（compaction）同源于此范式；区别——书是交付物（不复利），wiki 是活库（复利）。
+- **review 发现作 raw/ 源**：review-tech-book 报告里 flag 的"系统性/可复利候选"（跨书可复用反模式）是 wiki 的 raw/ 来源——INGEST 时**摘那条发现**进 `raw/{topic}/YYYY-MM-DD-slug.md`（不搬整份 report.md，raw/ 是不可变原子源），再 compile 成 concept 页。review 只 flag、不写库（生产者/适配者切分，[ADR-0012](../../docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。

@@ -9,12 +9,14 @@
 ```
                  形态 →    note(原子)     doc(就地MD)      book(全书+builder)
 输入 ↓
-session 内容  ─────────  take-note       take-note        take-note(短篇)
+session 内容  ─────────  take-note       take-note     take-note(短篇)/generate-book(长程)
 源书(1/多)    ─────────      —          generate-book    generate-book
 代码库        ─────────      —          generate-book    generate-book
 ```
 
-- **take-note**：session → note/doc（Obsidian 库适配层），并维护顶层 `wiki/` 可复利知识库（ingest/query/lint，[ADR-0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md)）。
+**路由判据 = 长程流水线要不要**（非页数）：session 短篇书（无流水线）→ take-note；session 长程独立交付物（要分阶段流水线）→ generate-book。目的地正交——产物要进库再经 take-note book-ingest（[ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。
+
+- **take-note**：session → note/doc/短篇书（Obsidian 库适配层）+ 维护顶层 `wiki/` 可复利知识库（ingest/query/lint，[ADR-0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md)）+ 把 generate-book 产物 book-ingest 进 `文档库/`（[ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。
 - **generate-book**：源书 / 代码库 → doc/book。任意技术栈（Python / Rust / Go / 嵌入式 C/C++ / shell …）。
 - 三个 skill 共用 [`shared/writing-core.md`](shared/writing-core.md)（铁律、写作原则、证据 V1-V4、失败模式），各保留自己的目标约定（take-note = Obsidian 库；generate-book = 工作区）。
 
@@ -73,16 +75,21 @@ tech_book_skills/
 - **ADR-0009** LLM-wiki 范式：演进 take-note 维护顶层 `wiki/` 可复利知识库
 - **ADR-0010** 反 slop 精确化：信息增量框架 + 结构 tell 细化
 - **ADR-0011** KB 根解析与 portable：`$KB_ROOT` 动态发现（标记/问/init）+ 实例数据运行时发现，去硬编码
+- **ADR-0012** 生产者/适配者切分：Book Artifact 经 take-note book-ingest 进库（目的地正交；review flag wiki 候选、generate-book flag 沉淀副产物，都不自动写库）
 
 ## 工作流
 
 ```
 generate-book → review-tech-book → generate-book (按报告修复：改源 MD 重建)
+   │                │
+   │                └─ 系统性发现 → flag wiki 候选 → take-note INGEST
+   └─ 书 → take-note book-ingest → 文档库/  ；副产物(配置/洞察) → flag → take-note
 ```
 
-1. **generate-book** 生成（单源/多源/代码库 × book/doc）
+1. **generate-book** 生成（单源/多源/代码库/session × book/doc）
 2. **review-tech-book** 审阅（默认仅报告）
 3. 有问题 → 用户请求 review 修复模式（改 `{RUN}/src/*.md` → 重跑 builder），或把报告喂回 generate-book
+4. **沉淀出口**（端到端）：书进库 → take-note book-ingest（`文档库/`）；review 系统性发现 → take-note INGEST wiki；generate-book 副产物（配置/环境技巧、可迁移洞察）→ take-note。三处都 flag、都由 take-note 写、都不自动写库（生产者/审阅者 portable，库+wiki 唯一主人=take-note）。
 
 ## 设计原则
 

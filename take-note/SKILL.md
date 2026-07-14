@@ -1,6 +1,6 @@
 ---
 name: take-note
-description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", or otherwise explicitly requests writing the current session's content into an Obsidian-style knowledge base (root auto-detected, see 「定位知识库根」) — or ingesting an external source (URL/paper/pasted text) into the compounding wiki/ knowledge base. Also use it proactively when the conversation has distilled reusable long-form content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: writing a full multi-page book or long document from scratch (use generate-book), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
+description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", "把这本书存进知识库/文档库", "ingest book into 文档库", or otherwise explicitly requests writing the current session's content into an Obsidian-style knowledge base (root auto-detected, see 「定位知识库根」) — ingesting an external source (URL/paper/pasted text) into the compounding wiki/ — or adapting a finished generate-book artifact into the vault (`文档库/`) as a Vault Book (book-ingest). Also use it proactively when the conversation has distilled reusable content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: long-form generation needing the phased pipeline (full multi-chapter book / substantial doc from scratch or sources → use generate-book; take-note does write session-formed short books/docs into `文档库/`), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
 allowed-tools: Read, Write
 ---
 
@@ -144,9 +144,17 @@ tags:
 - **只留可复用的**：删探索过程（"我先试…然后猜…"），留命令、根因、配置值、行号引用、决策。短而实胜过灌水长文。
 - **不碰**：`.base`、`.remember/`、`.obsidian/workspace.json`。**只写 `.md`**（不生成 `.html` 兄弟文件，导出插件的事）。**不 commit**（用户用 github-sync 插件 `Ctrl+Shift+S` 自己同步）。
 
-## 写书/文档
+## 写书/文档（`文档库/`）
 
-**从零生成一整本多章技术书 / 给项目或代码库生成学习文档 → 不要用 take-note，用 generate-book**（book 形态 = 全书双格式 builder；doc 形态 = 就地 MD，轻量 gate）。本节仅适用于 **session 里自然成型的短篇**书式文档（几页精读/教程/长方案）：归位 `文档库/{书名}/`，`00_MOC.md`（`type: moc` + `book: "{书名}"`，写"给谁看+目标+阅读路径+目录表+怎么用"）+ `数字_标题.md` 章节（`type: book` + `prev`/`next`）；附录用 `A0_`/`A1_` 前缀，图放书根 `assets/`。**书不套笔记的精简标准**——多页+教学 callout+三级证据都是教学需要，长度不是水分。
+`文档库/{书名}/` 放多页系统学习的书。take-note 三模式：**session-book**（本节，从零写）/ **book-ingest**（本节，适配 generate-book 产物）/ **wiki-ingest**（见下「维护可复利知识库」）。路由判据 = **长程流水线要不要**：要流水线（整本/从源/从代码库）→ generate-book，不归 take-note。
+
+**① session-book**（session 成型短篇书，无流水线）：精读/教程/长方案——不需 generate-book 分阶段流水线时直接写。`00_MOC.md`（`type: moc` + `book: "{书名}"`，写"给谁看+目标+阅读路径+目录表+怎么用"）+ `数字_标题.md` 章节（`type: book` + `prev`/`next`）；附录用 `A0_`/`A1_` 前缀，图放书根 `assets/`。
+
+**② book-ingest**（适配已完成的 generate-book 产物 → Vault Book）：用户要把一本 generate-book 生成的书存进库时——读 `{RUN}/src/*.md`（信息主源，**非 `output-md/`**），每章套库 frontmatter（`type: book` + `book:` + `prev`/`next`）、建 `00_MOC`（`type: moc` + `book:`）、加面包屑、挂链 `00_首页`，落 `文档库/{书名}/`。**Obsidian 原生渲染 callout/mermaid，不走 builder、不可 builder 重建**；HTML Edition 交接时丢弃。见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md)。
+
+**长程/从源/从代码库生成整本 → 不用 take-note，用 generate-book**（book 形态 = 全书双格式 builder；doc 形态 = 就地 MD，轻量 gate）；要进库再走 ② book-ingest。
+
+**书不套笔记的精简标准**——多页+教学 callout+三级证据都是教学需要，长度不是水分。
 
 ## 维护可复利知识库（`wiki/`）
 

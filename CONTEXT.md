@@ -4,7 +4,9 @@
 
 **KB_ROOT（知识库根）**：take-note 写入的知识库根目录——**动态解析、不硬编码**：从 cwd 向上找 `.kb-root` 或 `00_首页.md` 标记；找不到则问用户（指定已有 / 初始化新 / 就地生成）；`KB_ROOT` 环境变量可覆盖。项目名运行时扫 `$KB_ROOT/项目-*` 发现。见 [ADR-0011](docs/adr/0011-kb-root-resolution-and-portability.md)。_Avoid_：把 `/mnt/d/知识库` 这类具体路径写进 skill（那是实例，不是逻辑）。
 
-**Book Artifact（书籍产物）**：生成出来的那本技术书/文档。同一份内容两种渲染。_Avoid_：文档、输出（太泛）。
+**Book Artifact（书籍产物）**：generate-book 产出的独立技术书/文档——HTML Edition + MD Edition 双格式，builder 驱动、portable、不依赖库。**进库由 take-note 的 book-ingest 适配成 Vault Book**（源 MD 消费一次后分叉，见下）。_Avoid_：文档、输出（太泛）；与 Vault Book 混为一谈。
+
+**Vault Book（库内书）**：库内 Obsidian 原生书——`文档库/{书名}/` + `00_MOC`（type: moc）+ 编号章节（type: book + prev/next）+ 面包屑。由 take-note **book-ingest** 模式从一份 Book Artifact 的 `src/*.md` 适配而成（套库 frontmatter、建 MOC、加面包屑、挂链 `00_首页`）；**Obsidian 原生渲染 callout/mermaid，不走 builder、不可 builder 重建**，HTML 版交接时丢弃。与 session 成型短篇书（session-book 模式从零写）同落 `文档库/`、同套约定。见 [ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)。_Avoid_：手改 HTML 进库；把 Book Artifact 与 Vault Book 当同一物的两种渲染。
 
 **HTML Edition（HTML 版）**：书籍产物的交互式渲染，建立在"静奢"设计系统上（`style.css` + `script.js`，**light-only**（ADR-0003）/玻璃拟态/自适应层级/约 30 种组件）。由 [Builder](#) 从 MD 源渲染（ADR-0001）。_Avoid_：网页版、site。
 
@@ -26,7 +28,7 @@
 
 **AI 腔 / Slop**：AI 生成内容回归均值的通用腔——模板化措辞、空洞大词、无具体观点的"安全"句（delve / 值得注意的是 / 赋能 / 综上所述…）。本质是回归最可能的下一个 token、不敢给具体立场。第六类失败模式（见 Writing Core）。检测在 `shared/translationese-patterns.md` 的 AI 腔节（脚本 blunt 计数 + 模型自检）；治法是写人话——具体名词、确切动词、删套话、敢给观点。**词汇命中=警告（密度才判），结构命中=直接判**（三联排比 / 万能开头 / 复述式结尾 / 假平衡）。_Avoid_：把单次词汇命中当定罪；用 blunt 计数器做需语境判断的检测。
 
-**Capability Axis（能力轴）**：系统级泛化的两个正交维度——**输入轴**（session / source / codebase）× **形态轴**（note / doc / book）。任一组合成立（session × note = take-note；codebase × doc = 项目学习文档）。三个 skill 合起来覆盖"任意技术 / 笔记文档"的生成。
+**Capability Axis（能力轴）**：系统级泛化的两个正交维度——**输入轴**（session / source / codebase）× **形态轴**（note / doc / book）。任一组合成立（session × note = take-note；codebase × doc = 项目学习文档；session × book 长程交付物 = generate-book）。**路由判据 = 长程流水线要不要**（非页数、非目的地）：要流水线 → generate-book；session 即时沉淀 → take-note；目的地正交（产物可经 book-ingest 进库，[ADR-0012](docs/adr/0012-book-to-vault-handoff-via-take-note.md)）。三个 skill 合起来覆盖"任意技术 / 笔记文档"的生成。
 
 **上下文工程（Context Engineering）**：这套 skill 的统领范式——策展长程生成时模型该看到什么，总律「最小高信号 token 集」。三战术映射既有机制：Compaction ↔ `context-summary.md`（从全文压缩）、Structured Notes ↔ `progress.md`（窗口外记忆）、Sub-agent Isolation ↔ ≤3 并行子 Agent。见 [ADR-0008](docs/adr/0008-context-engineering-spine-and-landmine-reframe.md)。_Avoid_：把长程生成当"一次性提示"而非分阶段策展上下文。
 

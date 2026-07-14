@@ -51,9 +51,12 @@
 ## 核心发现          [优势 Top3 / 问题 Top3]
 ## 逐章详细审阅       [ChN: 评分 A/B/C/D + 优势 + 问题 + 建议]
 ## 系统性问题        [跨章模式性问题，对照 review-criteria 反模式]
+## 可复利候选（→ wiki） [系统性 + 跨书可复用的反模式/教训，flag 为 wiki 候选——见下「可复利候选」]
 ## 改进建议          [高/中/低优先级]
 ## 修复批次          [P0 技术错误 / P1 结构 / P2 风格翻译 / P3 参考体验]
 ```
+
+**可复利候选（→ wiki）**：系统性问题里**跨书可复用**的反模式/教训（如"Rust async 翻译陷阱""嵌入式 C 代码块密度普遍偏低"）flag 为 wiki 候选——判据：**系统性（非某章专属）+ 跨书可复用（不绑一本书内容）**。review **只 flag、不写库**（生产者/适配者切分）：实际进 wiki 由用户触发 take-note INGEST，**摘那条发现**进 `raw/{topic}/`（不可变原子源，不搬整份报告），再 compile 成 concept 页。run 级修复仍留 `fix-report`。见 [ADR-0012](../../docs/adr/0012-book-to-vault-handoff-via-take-note.md)、[ADR-0009](../../docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。
 
 快速模式：总评 + 关键发现（优势/问题各 3）+ 四层面一句话评分（基础质量/阅读体验/教学设计/读者转化）+ 最优先改进。
 

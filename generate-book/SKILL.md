@@ -1,6 +1,6 @@
 ---
 name: generate-book
-description: "Use when generating a technical book or project learning doc from source books or a codebase — any tech stack (Python / Rust / Go / 嵌入式 C/C++ / shell …). Triggers: generate book, 整合书籍, 生成书籍, 生成项目书籍, merge books, combine sources, translate book, 翻译书籍, codebase walkthrough, codebase book, 代码库书籍, 掌握项目, 架构学习指南, 项目学习文档, 学习指南, 生成 book.md, 项目文档, project guide, learning doc, walkthrough this project, 给这个项目生成文档. Use take-note instead to capture the current session into the Obsidian vault. Do NOT trigger for: quality review only (use review-tech-book), code review, README, or API reference."
+description: "Use when generating a technical book or project learning doc from source books, a codebase, or session content (when a full long-form book or standalone deliverable is wanted — short session distillations stay with take-note) — any tech stack (Python / Rust / Go / 嵌入式 C/C++ / shell …). Triggers: generate book, 整合书籍, 生成书籍, 生成项目书籍, merge books, combine sources, translate book, 翻译书籍, codebase walkthrough, codebase book, 代码库书籍, 掌握项目, 架构学习指南, 项目学习文档, 学习指南, 生成 book.md, 项目文档, project guide, learning doc, walkthrough this project, 给这个项目生成文档. Use take-note instead to capture the current session into the Obsidian vault, or to ingest a finished book artifact into `文档库/` (book-ingest). Do NOT trigger for: quality review only (use review-tech-book), code review, README, or API reference."
 ---
 
 # 生成技术书 / 学习文档
@@ -13,7 +13,7 @@ description: "Use when generating a technical book or project learning doc from 
 
 两个正交维度，启动时一起定。
 
-**输入轴**（读什么）——自动检测：1 个源书 → **单源**（翻译）；2+ 个源书 → **多源**（深度整合）；代码库路径 → **代码库**（发现+分析）。
+**输入轴**（读什么）——自动检测：1 个源书 → **单源**（翻译）；2+ 个源书 → **多源**（深度整合）；代码库路径 → **代码库**（发现+分析）；session 内容要长程独立交付物 → **从零**（session 即源）。短 session 沉淀（note/短doc/短session-book）不走 generate-book、归 take-note——路由判据是**长程流水线要不要**，非页数。
 
 **形态轴**（产什么、走多重的流水线）：
 
@@ -22,7 +22,7 @@ description: "Use when generating a technical book or project learning doc from 
 | **book**（默认） | 正式书 / 多章系统学习 / 要发布 | `{RUN}/src/*.md` + `book.yml` → builder → `output/` HTML + `output-md/` MD |
 | **doc** | 项目学习文档 / 快速上手 / 就地单文件（如 `proj/book.md`） | 就地 MD，**无 builder**，轻量 gate |
 
-任一输入可配任一形态（代码库 × doc = 项目学习文档）。
+任一输入可配任一形态（代码库 × doc = 项目学习文档）。**目的地正交**——产物要进 Obsidian 库时交由 take-note 的 book-ingest 适配成 Vault Book（见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md)），不在此决定。
 
 ## 启动前（生成耗时长，判错 = 整轮返工）
 
@@ -61,7 +61,9 @@ scripts/check_coverage.sh {RUN}/knowledge_base/ output/ summary   # 仅多源
 ```
 任一失败先修后进。模式专属自检：单源 = 段落数 源=目标、翻译腔 0、输出 ≥ 源 80%；多源 = 覆盖率 ≥95%、来源不可辨识；代码库 = 每论断 file:line、核心章 ≥20KB / 概览 ≥10KB / 代码:解释 ≥1:1。
 
-**⑤ 报告**：写 `{RUN}/report.md`（摘要 + 每章评分 + 问题列表 + 覆盖矩阵/设计决策表[代码库] + 校验结果 + 已知限制）。
+**⑤ 报告**：写 `{RUN}/report.md`（摘要 + 每章评分 + 问题列表 + 覆盖矩阵/设计决策表[代码库] + 校验结果 + 已知限制 + **可沉淀副产物**）。
+
+**可沉淀副产物**：flag 生成过程中撞见的、书外仍可复用的洞察——① 配置/环境技巧（如 `PUPPETEER_EXECUTABLE_PATH`、build 依赖、栈特定坑）→ 用户可触发 take-note 进 `系统配置/`；② 可迁移的代码库洞察/通用教训 → 项目笔记或 wiki concept。**只 flag、不自动写**（与 review flag wiki 候选对称；写库仍由 take-note）。章节内容不 flag（已在书里）。
 
 ### doc 形态的轻量 gate
 
