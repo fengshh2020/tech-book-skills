@@ -1,12 +1,12 @@
 ---
 name: take-note
-description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", "把这本书存进知识库/文档库", "ingest book into 文档库", or otherwise explicitly requests writing the current session's content into an Obsidian-style knowledge base (root auto-detected, see 「定位知识库根」) — ingesting an external source (URL/paper/pasted text) into the compounding wiki/ — or adapting a finished generate-book artifact into the vault (`文档库/`) as a Vault Book (book-ingest). Also use it proactively when the conversation has distilled reusable content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: long-form generation needing the phased pipeline (full multi-chapter book / substantial doc from scratch or sources → use generate-book; take-note does write session-formed short books/docs into `文档库/`), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
+description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", "把这本书存进知识库/文档库", "ingest book into 文档库", or otherwise writing the session into an Obsidian-style knowledge base (root auto-detected) — ingesting an external source (URL/paper/pasted text) into the compounding wiki/ — or adapting a finished generate-book artifact into the vault (`文档库/`) as a Vault Book (book-ingest). Also use it proactively when the conversation has distilled reusable content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: long-form generation needing the phased pipeline (full multi-chapter book / substantial doc from scratch or sources → use generate-book; take-note does write session-formed short books/docs into `文档库/`), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
 allowed-tools: Read, Write
 ---
 
 把当前 session 的内容写成一篇符合库约定的结构化笔记，落到正确的位置。库根 `$KB_ROOT` **动态解析**（见下「定位知识库根」），用用户当前语言写（默认中文）。
 
-**写作原则（结论前置 / 原子性 / 标题即论点 / 面向检索 / 上下文自足 / 抽象成原则 / 事实与推断分离）见 `shared/writing-core.md`**——本文件只讲 Obsidian 库特有的：归位、frontmatter、callout 语义、面包屑与双链。库有强归位/命名约定，**下笔前缺信息（哪个项目、文件名、范围、是否拆篇）一律问用户，别默写——猜错会返工**。
+**写作原则（结论前置 / 原子性 / 标题即论点 / 面向检索 / 上下文自足 / 抽象成原则 / 事实与推断分离）见 `../shared/writing-core.md`**——本文件只讲 Obsidian 库特有的：归位、frontmatter、callout 语义、面包屑与双链。库有强归位/命名约定，**下笔前缺信息（哪个项目、文件名、范围、是否拆篇）一律问用户，别默写——猜错会返工**。
 
 ## 定位知识库根（`$KB_ROOT`，portable）
 

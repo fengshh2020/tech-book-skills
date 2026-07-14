@@ -7,7 +7,7 @@ description: "Use when generating a technical book or project learning doc from 
 
 从源书或代码库生成一本技术书或一份项目学习文档——读起来像一本书，不是拼贴画。任意技术栈通用。
 
-**先读 `shared/writing-core.md`**——铁律、写作原则、证据等级 V1-V4、失败模式、剪枝、校验工具都在那，本文件与各 reference 不再重述。任一阶段开始前按需读对应 reference，不顺手全读。
+**先读 `../shared/writing-core.md`**——铁律、写作原则、证据等级 V1-V4、失败模式、剪枝、校验工具都在那，本文件与各 reference 不再重述。任一阶段开始前按需读对应 reference，不顺手全读。
 
 ## 能力轴：输入 × 形态
 
@@ -90,7 +90,7 @@ scripts/check_coverage.sh {RUN}/knowledge_base/ output/ summary   # 仅多源
 
 | 文件 | 内容 | 适用 |
 |---|---|---|
-| `shared/writing-core.md` | 铁律 / 原则 / V1-V4 / 失败模式 / 剪枝 / 校验工具 | 全部 |
+| `../shared/writing-core.md` | 铁律 / 原则 / V1-V4 / 失败模式 / 剪枝 / 校验工具 | 全部 |
 | `references/translation.md` | 翻译规则：术语 / 代码块 / 标点 / 红线 + 术语表 | 单源 |
 | `references/multi-source.md` | 多源：知识索引 + 架构设计 + 整合 L1-L4 + Coverage Guardian + 自检 | 多源 |
 | `references/writing-and-content.md` | 代码库写作：叙事驱动 / 认知负荷 / 代码展示 / sidebar | 代码库 |

@@ -2,6 +2,8 @@
 
 三个 AI 技能把**任意技术栈**的源材料 / 代码库 / 当前 session 变成结构化文档（note / doc / book），并审阅它。为强模型设计——纪律收敛到一处，不堆防御性脚手架（见 [ADR-0005](docs/adr/0005-trim-scaffolding-for-capable-models.md)、[ADR-0006](docs/adr/0006-generalize-and-consolidate.md)、[ADR-0007](docs/adr/0007-2026-research-driven-description-routing-and-anti-slop.md)）。2026-07 进一步以**上下文工程**为脊柱、演进 take-note 维护可复利 **wiki/**、反 slop 精确化（[ADR-0008](docs/adr/0008-context-engineering-spine-and-landmine-reframe.md) / [0009](docs/adr/0009-llm-wiki-paradigm-via-take-note.md) / [0010](docs/adr/0010-anti-slop-precision-info-gain-and-structural-tells.md)）。
 
+**三工具通用**——Claude Code / OpenCode / Codex 均遵循开放 [Agent Skills](https://agentskills.io) 标准（`<name>/SKILL.md` + frontmatter `name`/`description`）；`./install.sh` 一键符号链接安装（见下「安装」）。
+
 ## 能力轴：输入 × 形态（系统级泛化）
 
 三个 skill 合起来覆盖"任意技术 / 笔记文档"的生成——**输入轴**决定读什么（session / 源书 / 代码库），**形态轴**决定产什么（note 原子 / doc 就地 MD / book 全书+builder）。任一组合成立。
@@ -53,6 +55,7 @@ tech_book_skills/
 │   ├── references/
 │   │   └── llm-wiki.md               # 可复利 wiki/ 范式：结构 + 五操作 + 交叉引用（按需读）
 │   └── test-prompts.json
+├── install.sh                    # 三工具（Claude/OpenCode/Codex）用户级符号链接安装
 └── shared/                           # 跨 skill 复用
     ├── writing-core.md               # ★ 唯一纪律源：铁律/原则/V1-V4/失败模式/剪枝/校验工具
     ├── translationese-patterns.md    # 翻译腔模式（validate_code.sh 动态读取）
@@ -105,9 +108,28 @@ generate-book → review-tech-book → generate-book (按报告修复：改源 M
 - **description 即路由规则**：每个 SKILL.md 的 description 是"何时触发"的路由（`Use when…` + 触发短语 + 负路由），不述"做什么"（那是正文）——对齐 2026 Anthropic Agent Skills 规范（ADR-0007）。
 - **反 AI 腔（slop）**：生成内容不得回归通用腔——第六类失败模式 + `translationese-patterns` 的 AI 腔节 + review 反模式三处守住；**密度 = 抵抗被摘要的信息增量**，词汇警告 + 结构 tell 直接判，模型自检为主、脚本计数为辅（ADR-0007）。
 
-## 安装
+## 安装（Claude Code / OpenCode / Codex）
 
-作为 skill pack 放进 agent 的 skills 目录；agent 经 `SKILL.md` frontmatter `description` 发现 skill；每个 skill 渐进披露：SKILL.md（hub）→ reference（按输入/阶段）→ `shared/writing-core.md`（共用纪律）。
+三工具都采用开放 [Agent Skills](https://agentskills.io) 标准（`<name>/SKILL.md` + frontmatter `name`/`description`），本套已合规（目录名 == frontmatter `name`）。差别在扫描路径——**没有单目录被三者全扫**：
+
+- **Codex CLI**：`~/.agents/skills/`（不扫 `.claude/`）
+- **OpenCode**：`~/.agents/skills/`、`~/.opencode/skills/`、`~/.claude/skills/`（全扫）
+- **Claude Code**：`~/.claude/skills/`（不扫 `.agents/`）
+
+故用户级安装需同时链接进 `~/.agents/skills/`（Codex+OpenCode）和 `~/.claude/skills/`（Claude+OpenCode）。仓库根的 `install.sh` 一键做（符号链接，仓库为单一源、可逆）：
+
+```bash
+./install.sh                # 默认：链接进 ~/.agents/skills/ + ~/.claude/skills/
+./install.sh --agents       # 只装 Codex+OpenCode
+./install.sh --claude       # 只装 Claude
+./install.sh --uninstall    # 移除链接
+```
+
+链接 `take-note` / `generate-book` / `review-tech-book` / `shared/` 四项。`shared/` 是三 skill 的兄弟资源（供 `../shared/writing-core.md` 解析；无 `SKILL.md`、不会被当 skill 加载）。
+
+> Windows 原生（非 WSL）运行某工具时，路径改 `%USERPROFILE%\.agents\skills` / `%USERPROFILE%\.claude\skills`，符号链接需开发者模式或 `mklink /D`。
+
+每个 skill 渐进披露：`SKILL.md`（hub）→ reference（按输入/阶段）→ `../shared/writing-core.md`（共用纪律）。
 
 ## License
 

@@ -7,7 +7,7 @@ description: "Use when reviewing, auditing, or assessing the quality of a techni
 
 结构化质量审阅。默认**仅出报告**；修复模式仅在用户明确请求时启用。任意技术栈通用。
 
-**先读 `shared/writing-core.md`**——铁律、证据等级 V1-V4、失败模式、校验工具都在那，本文件与各 reference 不再重述。审阅的铁律就是 writing-core 铁律在审阅侧的体现：**没有原文逐字引用 + 行号就没有发现；🔴/🟠 问题须 ≥V2 证据；不浅层均匀打分**。
+**先读 `../shared/writing-core.md`**——铁律、证据等级 V1-V4、失败模式、校验工具都在那，本文件与各 reference 不再重述。审阅的铁律就是 writing-core 铁律在审阅侧的体现：**没有原文逐字引用 + 行号就没有发现；🔴/🟠 问题须 ≥V2 证据；不浅层均匀打分**。
 
 ## 启动前
 
@@ -43,7 +43,7 @@ P1 扫描 → P2 精读 → P3 打分 → P4 报告 → [修复模式，用户�
 读 `references/review-criteria.md`（五转化维度 + 工程实践标杆）。按 `references/spec.md` 十六维度（仅评有证据的）+ 五转化维度打分；标跨章节反模式。禁均匀打分（全 7/10）、禁无引用评分。输出 `findings/phase3.md`。
 
 ### 阶段 4：报告
-读 `shared/writing-core.md`（报告铁律）+ spec.md 报告模板。写 `report.md`：执行摘要、评分总览、Top3 优势/问题、学习路径+断点、问题分类、系统性问题、**可复利候选（→ wiki）**、修复批次（P0 技术错误 / P1 结构 / P2 风格翻译 / P3 参考体验）。**可复利候选**：系统性 + 跨书可复用的反模式/教训 → flag 为 wiki 候选；review **只 flag、不写库**，由 take-note INGEST（摘条进 `raw/`，非整份报告）。判据 + 模板见 `references/spec.md`，原理见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md) / [ADR-0009](../docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。跑自动校验并附结果：
+读 `../shared/writing-core.md`（报告铁律）+ spec.md 报告模板。写 `report.md`：执行摘要、评分总览、Top3 优势/问题、学习路径+断点、问题分类、系统性问题、**可复利候选（→ wiki）**、修复批次（P0 技术错误 / P1 结构 / P2 风格翻译 / P3 参考体验）。**可复利候选**：系统性 + 跨书可复用的反模式/教训 → flag 为 wiki 候选；review **只 flag、不写库**，由 take-note INGEST（摘条进 `raw/`，非整份报告）。判据 + 模板见 `references/spec.md`，原理见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md) / [ADR-0009](../docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。跑自动校验并附结果：
 ```bash
 scripts/validate_code.sh output/
 python ../shared/validate_tech.py output/
@@ -58,9 +58,9 @@ python ../shared/validate_terms.py output/
 
 | 文件 | 内容 | 阶段 |
 |---|---|---|
-| `shared/writing-core.md` | 铁律 / V1-V4 / 失败模式 / 校验工具 | 全部 |
+| `../shared/writing-core.md` | 铁律 / V1-V4 / 失败模式 / 校验工具 | 全部 |
 | `references/spec.md` | 十六维度 + 五转化整合 + 报告模板 + 校验清单 | P1/P3/P4 |
 | `references/review-criteria.md` | 4 类反模式 + 五转化维度 + 教学理论 + 工程实践标杆 | P2/P3 |
 | `references/apply-fixes.md` | 修复模式：P0-P3 批次 + MD 源重建（非手改 HTML） | 修复 |
-| `shared/translationese-patterns.md` | 翻译腔模式（`validate_code.sh` 读取） | P2 |
-| `shared/validate_tech.py` / `validate_terms.py` | 技术准确性 / 术语一致性校验 | P4 |
+| `../shared/translationese-patterns.md` | 翻译腔模式（`validate_code.sh` 读取） | P2 |
+| `../shared/validate_tech.py` / `../shared/validate_terms.py` | 技术准确性 / 术语一致性校验 | P4 |

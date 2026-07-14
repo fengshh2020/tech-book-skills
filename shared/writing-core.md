@@ -66,6 +66,6 @@
 
 ## 路径与运行时
 
-- skill 内资源相对 `SKILL_DIR`（含本 `SKILL.md` 的目录）；共享资源相对 `SKILL_PACK_DIR/shared/`。
+- skill 内资源相对 `SKILL_DIR`（含本 `SKILL.md` 的目录）；共享资源在 skill 目录的兄弟 **`../shared/`**（即 pack 根的 `shared/`，三工具 portable——见仓库根 `install.sh`）。
 - 命令示例用变量（`"${SKILL_DIR}/scripts/..."`），不硬编码绝对路径，也不假设特定 agent 工具名。
 - 并行子 Agent 是可选优化：仅当 runtime 支持且写入范围不冲突时用，否则串行。
