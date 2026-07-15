@@ -56,11 +56,16 @@
 底线：① 每章某源被映射为主/次 → 该源在该章 ≥3 整合标记；② 每书总标记 ≥（被映射章数 × 0.5）；③ 任一源标记 ≥ 全书总标记 10%；④ 每章 ≥ max(各源同主题章大小) × 0.8。
 **补丁式检测**（任一命中即判补丁式）：标记集中在 ≤2 章 / 标记从不作小节首个标记 / 内容总在主源之后。首次命中 → progress.md 记 WARNING；同源再犯 → 重写受影响章。
 
+**check_coverage.sh 的两个阶段**（消除「≥95% 是否被强制」的歧义）：
+- `summary`（默认，开发期）：报告每源 integrated 标记数、补丁式检测结果、ID 映射覆盖率（若产了 `INDEX/dsp_mapping.md`）。**不强制 exit**——给数字供判断。
+- `stage5`（交付前卡门）：上述任一不过即 `exit 1`，含 ID 映射覆盖率 < 95%。
+- **≥95% 反向覆盖由 Phase 1 反向覆盖矩阵保证**（每源章节都有处置），不靠脚本——脚本只校验已产的标记分布。当前多源工作流以 `<!-- integrated -->` 标记为主；知识点 ID 体系（每文件 frontmatter `id:` + `INDEX/dsp_mapping.md`）为可选增强，未产时 stage5 的 ID 映射检查不生效。
+
 ## 验证与自检
 
 ```bash
-scripts/check_coverage.sh {RUN}/knowledge_base/ output/ summary   # 覆盖率 ≥95%
-python ../shared/validate_tech.py output/; python ../shared/validate_terms.py output/
+scripts/check_coverage.sh {RUN}/knowledge_base/ {RUN}/output/ summary   # summary 报告标记分布（不强制 exit）；见下「两个阶段」
+python ../shared/validate_tech.py {RUN}/output/; python ../shared/validate_terms.py {RUN}/output/
 ```
 
 **每章自检**：非空、含 `<!-- integrated -->` 标记、无 `[待确认]`、大小 ≥ 最大源章 ×0.8、节间有"但是"桥接、随机 3 段无法辨识来源、术语一致、无 AI 腔（多源改写最易回归通用腔——刻意保留具体名词与确切动词）。

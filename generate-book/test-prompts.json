@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "scenario": "多源 × book 形态",
+    "prompt": "把这两本 Rust 入门书整合成一本中文书，输出到 run/rust-book/",
+    "expected": "检测多源 → L3/L4 整合（读者无法辨识来源）+ 反向覆盖；book 形态 → src/*.md + book.yml → builder → output/ HTML + output-md/；🛑 启动前确认；Coverage Guardian。"
+  },
+  {
+    "id": 2,
+    "scenario": "代码库 × doc 形态",
+    "prompt": "给当前这个项目生成一份学习文档，就放在 proj/book.md 一个文件里",
+    "expected": "检测代码库 × doc 形态 → 就地单 MD、无 builder、轻量 gate；按执行路径叙事、每论断 file:line；不走 book 专属重量（20KB 下限 / Coverage Guardian / builder 产物验证）。"
+  }
+]

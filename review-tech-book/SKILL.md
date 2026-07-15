@@ -11,7 +11,7 @@ description: "Use when reviewing, auditing, or assessing the quality of a techni
 
 ## 启动前
 
-向用户确认审阅对象（哪本书 / `output/` 目录路径）与范围（深度/标准/快速模式）——审阅耗时，对象搞错 = 白跑。模式无须问：默认仅报告；修复须用户显式开启且已有完整 `report.md`。确认 OK 再进入阶段 1。
+🛑 **向用户确认再开跑**——审阅对象（哪本书 / `output/` 目录路径）与范围（深度/标准/快速模式）：审阅耗时，对象搞错 = 白跑。模式无须问：默认仅报告；修复须用户显式开启且已有完整 `report.md`。**确认 OK 再进入阶段 1**。
 
 ## 工作流
 
@@ -40,10 +40,10 @@ P1 扫描 → P2 精读 → P3 打分 → P4 报告 → [修复模式，用户�
 没有直接引用 = 无效发现，不写。每 5 章批量检查（跨章术语一致、严重度/证据分布合理、去重）。输出 `findings/phase2.md`。
 
 ### 阶段 3：打分
-读 `references/review-criteria.md`（五转化维度 + 工程实践标杆）。按 `references/spec.md` 十六维度（仅评有证据的）+ 五转化维度打分；标跨章节反模式。禁均匀打分（全 7/10）、禁无引用评分。输出 `findings/phase3.md`。
+读 `references/review-criteria.md`（五转化维度 + 工程实践标杆）。按 `references/spec.md` 十六维度（仅评有证据的）+ 五转化维度打分；标跨章节反模式。**禁均匀打分**（全打 3 或分数挤在中间档；spec.md 为 1-5 尺度）、禁无引用评分。输出 `findings/phase3.md`。
 
 ### 阶段 4：报告
-读 `../shared/writing-core.md`（报告铁律）+ spec.md 报告模板。写 `report.md`：执行摘要、评分总览、Top3 优势/问题、学习路径+断点、问题分类、系统性问题、**可复利候选（→ wiki）**、修复批次（P0 技术错误 / P1 结构 / P2 风格翻译 / P3 参考体验）。**可复利候选**：系统性 + 跨书可复用的反模式/教训 → flag 为 wiki 候选；review **只 flag、不写库**，由 take-note INGEST（摘条进 `raw/`，非整份报告）。判据 + 模板见 `references/spec.md`，原理见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md) / [ADR-0009](../docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。跑自动校验并附结果：
+读 `../shared/writing-core.md`（报告铁律）+ spec.md 报告模板。写 `report.md`：执行摘要、评分总览、Top3 优势/问题、学习路径+断点、问题分类、系统性问题、**可复利候选（→ wiki）**、修复批次（P0 技术错误 / P1 结构 / P2 风格翻译 / P3 参考体验）。**可复利候选**：系统性 + 跨书可复用的反模式/教训 → flag 为 wiki 候选；review **只 flag、不写库**，由 take-note INGEST（摘条进 `raw/`，非整份报告）。判据 + 模板见 `references/spec.md`，原理见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md) / [ADR-0009](../docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。跑自动校验并附结果（**book 形态**；**doc 形态无 HTML → 跳过 `validate_code.sh`**——它要求 HTML、doc 形态会 exit 1——仅跑 `validate_tech`/`validate_terms` + P1-P3 人工维度）：
 ```bash
 scripts/validate_code.sh output/
 python ../shared/validate_tech.py output/
@@ -52,7 +52,7 @@ python ../shared/validate_terms.py output/
 
 ## 修复模式（仅用户明确请求）
 
-读 `references/apply-fixes.md`。加载最新 `report.md` → 提取 P0→P3 → 逐批执行。**MD 是源**：改 `{RUN}/src/*.md`（非手改 HTML）→ 重新跑 `generate-book/scripts/build_html.py` → 跑校验。翻译/整合/代码库问题按类别批量处理；发现新风险记 `fix-report.md`，不扩张范围。输出 `fix-report.md`。
+🛑 **进入修复前再确认**——修复改源 MD（`{RUN}/src/*.md`）并重建 HTML，是破坏性操作。读 `references/apply-fixes.md`。加载最新 `report.md` → 提取 P0→P3 → 逐批执行。**MD 是源**：改 `{RUN}/src/*.md`（非手改 HTML）→ 重新跑 `../generate-book/scripts/build_html.py` → 跑校验。翻译/整合/代码库问题按类别批量处理；发现新风险记 `fix-report.md`，不扩张范围。输出 `fix-report.md`。
 
 ## 参考文件
 

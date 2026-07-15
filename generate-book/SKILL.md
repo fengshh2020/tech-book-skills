@@ -54,10 +54,10 @@ description: "Use when generating a technical book or project learning doc from 
 
 **④ 验证**：
 ```bash
-scripts/validate_output.sh output/                       # book 形态
-python ../shared/validate_tech.py output/                 # 技术准确性
-python ../shared/validate_terms.py output/                # 术语一致
-scripts/check_coverage.sh {RUN}/knowledge_base/ output/ summary   # 仅多源
+scripts/validate_output.sh {RUN}/output/                       # book 形态
+python ../shared/validate_tech.py {RUN}/output/                 # 技术准确性
+python ../shared/validate_terms.py {RUN}/output/                # 术语一致
+scripts/check_coverage.sh {RUN}/knowledge_base/ {RUN}/output/ summary   # 仅多源（summary 报告 integrated 标记分布；≥95% 反向覆盖由 Phase 1 反向覆盖矩阵保证，见 multi-source.md）
 ```
 任一失败先修后进。模式专属自检：单源 = 段落数 源=目标、翻译腔 0、输出 ≥ 源 80%；多源 = 覆盖率 ≥95%、来源不可辨识；代码库 = 每论断 file:line、核心章 ≥20KB / 概览 ≥10KB / 代码:解释 ≥1:1。
 

@@ -1,7 +1,7 @@
 ---
 name: take-note
 description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", "把这本书存进知识库/文档库", "ingest book into 文档库", or otherwise writing the session into an Obsidian-style knowledge base (root auto-detected) — ingesting an external source (URL/paper/pasted text) into the compounding wiki/ — or adapting a finished generate-book artifact into the vault (`文档库/`) as a Vault Book (book-ingest). Also use it proactively when the conversation has distilled reusable content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: long-form generation needing the phased pipeline (full multi-chapter book / substantial doc from scratch or sources → use generate-book; take-note does write session-formed short books/docs into `文档库/`), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
-allowed-tools: Read, Write
+allowed-tools: Read Write Glob
 ---
 
 把当前 session 的内容写成一篇符合库约定的结构化笔记，落到正确的位置。库根 `$KB_ROOT` **动态解析**（见下「定位知识库根」），用用户当前语言写（默认中文）。
@@ -16,7 +16,7 @@ allowed-tools: Read, Write
 2. **找不到 → 问用户**（三选一，别猜）：① 指定一个已有 KB 的绝对路径；② 在 cwd **初始化新 KB**（建 `00_首页.md` + `文档库/` + `系统配置/` + `wiki/` 骨架）；③ 就地生成单篇（不建 KB，写到 cwd）。
 3. **覆盖**：环境变量 `KB_ROOT` 设了即用（CI / 固定库场景）。
 
-定下 `$KB_ROOT` 后所有结构在它之下生成。**项目与 MOC 运行时发现**——扫 `$KB_ROOT/项目-*/` 列出现有项目（不硬编码项目名）；每个项目夹的 `{项目名}.md` 或 `00_MOC.md` 是其 MOC。
+定下 `$KB_ROOT` 后所有结构在它之下生成。**项目与 MOC 运行时发现**——用 Glob 列出 `$KB_ROOT/项目-*/` 现有项目（不硬编码项目名，Glob 能列目录、Read 不能）；每个项目夹的 `{项目名}.md` 或 `00_MOC.md` 是其 MOC。
 
 ## 库结构（在 `$KB_ROOT` 下，按项目组织）
 
@@ -36,13 +36,13 @@ $KB_ROOT/
 
 | | 笔记（note） | 书籍/文档（book） |
 |---|---|---|
-| 形态 | 原子、单点结论（一个坑/一条配置/一个结论） | 多页、系统讲清一个主题 |
-| 归位 | `项目-{名}/{调试|方案|设计}/` 或 `系统配置/` | `文档库/{书名}/` |
-| type | `debug`/`plan`/`config`/`read`/`design` | `moc`（书总目录）+ `book`（章节） |
-| 规则 | writing-core 六原则（结论前置/原子/去水分） | **不套笔记的"精简"标准**——书就该厚，多页+MOC+教学 callout+三级证据 |
-| 导航 | 面包屑链回项目 MOC | `prev`/`next` 串章 + 面包屑链回书 MOC |
+| 形态 | 原子、单点结论（一个坑/一条配置/一个结论） | 多页、系统讲清一个主题 | 技术方案文档（问题→约束→架构→权衡→骨架） |
+| 归位 | `项目-{名}/{调试|方案|设计}/` 或 `系统配置/` | `文档库/{书名}/` | `项目-{名}/方案/` |
+| type | `debug`/`plan`/`config`/`read`/`design` | `moc`（书总目录）+ `book`（章节） | `proposal` |
+| 规则 | writing-core 六原则（结论前置/原子/去水分） | **不套笔记的精简标准**——书就该厚，多页+MOC+教学 callout+三级证据 | **保留方案体完整结构**——不套笔记精简标准；Goals/Non-Goals/架构图/权衡/代码骨架不可删 |
+| 导航 | 面包屑链回项目 MOC | `prev`/`next` 串章 + 面包屑链回书 MOC | 面包屑链回项目 MOC |
 
-一个可复用独立结论 → 笔记；要系统讲清、需多页展开 → 书/文档（且从零生成时用 generate-book）；跨项目/跨书的可迁移 concept/entity → `wiki/` 编译页（见下「维护可复利知识库」）。拿不准问用户。下文默认讲**笔记**写法。
+一个可复用独立结论 → 笔记；要系统讲清、需多页展开 → 书/文档（且从零生成时用 generate-book）；从技术目标推演的方案文档 → `type: proposal`（保留完整方案体结构，不套笔记精简标准）；跨项目/跨书的可迁移 concept/entity → `wiki/` 编译页（见下「维护可复利知识库」）。拿不准问用户。下文默认讲**笔记**写法。
 
 ## 🔴 下笔前停下问用户（会造成返工的自主决策点）
 
@@ -51,7 +51,7 @@ $KB_ROOT/
 3. **文件名拿不准** → 给 2-3 个带论点的候选让用户选。
 4. **写书/长文档** → 动笔前敲定书名、目录、目标读者（大工程）。
 
-边角情况（文件已存在/项目无夹/MOC 不存在）一律「先试合理默认 → 失败就问用户」，绝不静默猜或静默覆盖。**Read-before-Write**：目标文件已存在时先 Read ≥1 行，同主题→追加章节并链回，撞名→问用户「覆盖/追加/改名」。
+边角情况（文件已存在 / MOC 不存在）一律「先试合理默认 → 失败就问用户」；**项目无夹是结构决策，不走默认——按 Step 1 第 3 问问用户（新建 or 归现有）**。绝不静默猜或静默覆盖。**Read-before-Write**：目标文件已存在时先 Read ≥1 行，同主题→追加章节并链回，撞名→问用户「覆盖/追加/改名」。
 
 ## Step 1 — 归位（先项目，再子目录）
 
@@ -75,7 +75,7 @@ $KB_ROOT/
 ```yaml
 ---
 title: "{标题，与文件名、H1 一致}"
-type: {moc | design | debug | plan | config | read}
+type: {moc | design | debug | plan | config | read | proposal}
 project: {扫 $KB_ROOT/项目-* 得的现有项目名 | 系统配置 | 知识库 | {新项目名}}
 date: YYYY-MM-DD
 status: {active | draft | archived}
@@ -87,7 +87,7 @@ tags:
 ---
 ```
 
-`type` 决定角色，通常对应子目录（`moc`=项目总览，`read`=不属具体项目的通用学习）。`project` 填项目名（不含"项目-"前缀）；跨项目配置填 `系统配置`。`status`：`active`(默认)/`draft`/`archived`（方案类也可 `implemented`/`approved`/`rejected`）。`tags` 3-8 个，扁平、不要 `topic/subtag` 层级。可选：`platform`、`source`、`prev`/`next`/`book`（仅多页系列/书式笔记）。
+`type` 决定角色，通常对应子目录（`moc`=项目总览，`read`=不属具体项目的通用学习，`proposal`=tech-proposal 产出的方案文档）。`project` 填项目名（不含"项目-"前缀）；跨项目配置填 `系统配置`。`status`：`active`(默认)/`draft`/`archived`（方案类也可 `implemented`/`approved`/`rejected`）。`tags` 3-8 个，扁平、不要 `topic/subtag` 层级。可选：`platform`、`source`、`prev`/`next`/`book`（仅多页系列/书式笔记）。
 
 ## Step 4 — 正文骨架
 
@@ -105,9 +105,9 @@ tags:
 {环境基线用表格（设备/版本/配置）。}
 
 ## {主体章节}            ## 坑 N：{坑标题}（仅踩坑/调试类）
-{## 分章。}              **现象**：{报错原样引用}
-                         **根因**：{为什么；复杂根因用 5-Why 链}
-                         **解决**：`{命令}` → `# 预期输出: {...}`
+{## 分章。}              > [!warning] 现象：{报错原样引用}
+                         > **根因**：{为什么；复杂根因用 5-Why 链}
+                         > **解决**：`{命令}` → `# 预期输出: {...}`
 
 ## 方法论沉淀            ← 调试/配置类结尾
 > [!abstract] 红线一：{一句话原则}

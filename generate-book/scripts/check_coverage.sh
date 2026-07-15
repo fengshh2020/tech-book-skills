@@ -50,8 +50,12 @@ else
 fi
 echo "  总计: $TOTAL 个知识点"
 if [ "$SOURCE_DIRS" -eq 0 ] || [ "$TOTAL" -eq 0 ]; then
-  echo "❌ 未找到源书知识点"
-  ERRORS=$((ERRORS + 1))
+  if [ "$STAGE" = "stage5" ]; then
+    echo "❌ 未找到源书知识点"
+    ERRORS=$((ERRORS + 1))
+  else
+    echo "⚠ 未找到源书知识点（summary 仅报告；KB 应为 {book}/*.md 子目录结构）"
+  fi
 fi
 
 ID_REPORT=$(python3 - "$KB" "${KB}INDEX/dsp_mapping.md" <<'PY'
@@ -117,9 +121,13 @@ done <<< "$ID_REPORT"
 
 echo "  有 ID 的知识点: $IDS_TOTAL"
 if [ "$IDS_MISSING" -gt 0 ]; then
-  echo "❌ $IDS_MISSING 个知识点文件缺少 frontmatter id"
-  echo "  示例: $IDS_MISSING_LIST"
-  ERRORS=$((ERRORS + 1))
+  if [ "$STAGE" = "stage5" ]; then
+    echo "❌ $IDS_MISSING 个知识点文件缺少 frontmatter id"
+    echo "  示例: $IDS_MISSING_LIST"
+    ERRORS=$((ERRORS + 1))
+  else
+    echo "⚠ $IDS_MISSING 个知识点文件缺少 frontmatter id（summary 仅报告；stage5 才强制）"
+  fi
 fi
 
 # 2. 检查映射文件
@@ -209,8 +217,12 @@ fi
 echo ""
 echo "=== 校验完成 ==="
 if [ "$ERRORS" -gt 0 ]; then
-  echo "❌ $ERRORS 项硬性检查未通过"
-  exit 1
+  if [ "$STAGE" = "stage5" ]; then
+    echo "❌ $ERRORS 项硬性检查未通过（stage5 强制 exit）"
+    exit 1
+  else
+    echo "⚠ $ERRORS 项硬性检查未通过（summary 仅报告不 exit；交付前用 stage5 卡门）"
+  fi
 fi
 
 echo "✅ 硬性检查通过"

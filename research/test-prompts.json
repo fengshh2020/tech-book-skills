@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "scenario": "happy-path 文档调研",
+    "prompt": "查一下 Python 3.12 的 type 语句（PEP 695）和 typing.TypeAlias 有什么区别，什么时候该用哪个？",
+    "expected": "一个 Finding Block：Answer 1-3 句直接回答；Evidence 每条带 PEP/文档来源 + V 等级（多为 V3 文档）；Gaps；Meta（sources-checked/confidence/escalated）。cite every claim。"
+  },
+  {
+    "id": 2,
+    "scenario": "对比/可能 escalated",
+    "prompt": "对比 ONNX Runtime 和 TensorRT 在 Jetson Orin 上跑 ResNet-50 的推理延迟和精度差异",
+    "expected": "多源调研；边缘设备 benchmark 数据可能不全公开 → 若 3 轮后有未解轴，产 escalated: yes + 诚实 Gaps，而非伪造数字；confidence 据实标 low/medium。"
+  }
+]

@@ -36,6 +36,10 @@
 
 **信息增量（AI irreducibility）**：反 slop 的密度框架——密度 = 抵抗被摘要压缩的信息量；治 slop = 写「摘要砍不掉」的内容。是 writing-core 第六类失败模式的治法判据。见 [ADR-0010](docs/adr/0010-anti-slop-precision-info-gain-and-structural-tells.md)。
 
-**Finding Block（发现块）**：research skill 的标准输出——`Answer`（1–3 句直接回答）+ `Evidence`（每条带来源 + V 等级）+ `Gaps`（未解问题）+ `Meta`（来源数 / 置信度 / 是否升级）。既是独立 MD 文件，也可内联嵌入父 skill 上下文。见 `research/references/output-contract.md`。_Avoid_：自由格式散文输出（不可组合）；复用 ulw-research 的 SYNTHESIS.md（过重）。
+**Finding Block（发现块）**：research skill 的标准输出——`Answer`（1–3 句直接回答）+ `Evidence`（每条带来源 + V 等级）+ `Gaps`（未解问题）+ `Meta`（来源数 / 置信度 / 是否升级）。既是独立 MD 文件，也可内联嵌入父 skill 上下文。见 `research/references/output-contract.md`。_Avoid_：自由格式散文输出（不可组合）；照搬外部调研 skill 的过重 SYNTHESIS 模板。
 
-**Escalation Boundary（升级边界）**：research 迭代耗尽（3 轮）后仍有未解问题时的行为——产出 `escalated: yes` 的发现块，带诚实的 Gaps，而非伪造或扣留。research 自身通过加深迭代处理任何问题（深度由迭代次数控制，非固定 tier）；ulw-research（OhMyOpenCode）是可选的快捷通道，非功能前提。_Avoid_：在 research 内建多级 tier（quick/moderate/deep）；把 ulw-research 当作升级的必需退路。
+**Escalation Boundary（升级边界）**：research 迭代耗尽（3 轮）后仍有未解问题时的行为——产出 `升级: yes` 的发现块，带诚实的 Gaps，而非伪造或扣留。research 自身通过加深迭代处理任何问题（深度由迭代次数控制，非固定 tier）；runtime 若提供更重的调研 skill 是可选快捷通道，非功能前提。_Avoid_：在 research 内建多级 tier（quick/moderate/deep）；把任何外部调研 skill 当作升级的必需退路。
+
+**Tech Proposal（技术方案推演）**：从技术目标推演到结构化方案文档 + 内嵌代码骨架的 skill。覆盖三种场景：从零设计新系统、已有系统新需求（增量设计）、需求变更。产出方案文档（问题定义→约束→Goals/Non-Goals→调研摘要→C4 架构图→Drawbacks-first 权衡→接口定义+伪代码→迁移路径→风险→Change Log）+ 内嵌代码块（不独立成文件）。默认落项目目录，用户说"存库"时交 take-note `type: proposal`。调 research 做定向调研，消费 Finding Block。_Avoid_：把 tech-proposal 当 generate-book 的子集（它推演方案，不写叙事书）；把方案文档当笔记（方案体保留完整结构，不套精简标准）；依赖非本套 skill 的外部 skill。
+
+**Proposal Document（方案文档）**：tech-proposal 的核心产出——结构化技术方案，包含问题定义、约束、Goals/Non-Goals、调研摘要、C4 架构图、技术选型与权衡（Drawbacks-first）、代码骨架（接口定义+伪代码+TODO(#N)）、迁移/实施路径、风险与待定、Change Log。Living Proposal 生命周期：Draft → Implementing → Done → Superseded。进库时 take-note 用 `type: proposal`，归位 `项目-{名}/方案/`。_Avoid_：把方案文档当笔记（结构不同、纪律不同）；把方案文档当书（方案是推演工具，书是叙事工具）。

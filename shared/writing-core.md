@@ -68,4 +68,5 @@
 
 - skill 内资源相对 `SKILL_DIR`（含本 `SKILL.md` 的目录）；共享资源在 skill 目录的兄弟 **`../shared/`**（即 pack 根的 `shared/`，三工具 portable——见仓库根 `install.sh`）。
 - 命令示例用变量（`"${SKILL_DIR}/scripts/..."`），不硬编码绝对路径，也不假设特定 agent 工具名。
+- **命令 CWD = `SKILL_DIR`**（含 `SKILL.md` 的目录）：`scripts/` 指本 skill 脚本、`../shared/` 指共享资源、跨 skill 调用写 `../{sister-skill}/scripts/`。各命令块遵循此约定；若换 CWD，相对路径要相应调整。
 - 并行子 Agent 是可选优化：仅当 runtime 支持且写入范围不冲突时用，否则串行。

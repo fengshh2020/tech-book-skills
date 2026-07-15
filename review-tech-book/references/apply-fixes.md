@@ -29,8 +29,9 @@ doc 形态产物（就地 MD，无 builder）：直接改那份 MD，无需重�
 4. **P3 参考体验**：练习、自测、速查表、索引、实践项目。
 
 ```bash
-generate-book/scripts/validate_output.sh output/
-review-tech-book/scripts/validate_code.sh output/
+# CWD = review-tech-book/（与 SKILL.md P4 一致；跨 skill 用 ../sister-skill/）
+../generate-book/scripts/validate_output.sh output/
+scripts/validate_code.sh output/
 python ../shared/validate_tech.py output/; python ../shared/validate_terms.py output/
 ```
 

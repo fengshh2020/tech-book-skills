@@ -1,104 +1,98 @@
 ---
 name: research
-description: "Investigate a question against high-trust sources and return a structured finding block with cited evidence. Use when any skill or conversation needs verified facts, API details, library behavior, comparative data, or external context — triggers: research, look up, find out, investigate, verify, check docs, what does X do, how does X work, 调研, 查一下, 查文档, 验证. Do NOT trigger for: code review, book generation, or questions answerable from files already in context."
+description: "Investigate a question against high-trust primary sources and capture the findings as a structured Finding Block. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent. Also used by other skills (tech-proposal, generate-book, review-tech-book) via inline invocation for directed research requests. Triggers: 调研, 查文档, 验证论断, research, investigate, look up docs, find out. Do NOT trigger for: designing solutions (use tech-proposal), generating content (use generate-book), recording notes (use take-note)."
+allowed-tools: Read Glob Grep
 ---
 
-# Research — Cited Finding Block
+# 调研
 
-Investigate a question, return a **single structured finding block** with cited evidence. One adaptive loop; depth scales with budget, not with explicit tiers.
+调研问题并返回带引用的结构化发现块。可被用户直接触发，也可被其他 skill 内联调用（指令式，非运行时 API）。
 
-**Evidence levels (V1–V4) and writing discipline** — see `../shared/writing-core.md`. This skill does not redefine them.
+**先读 `../shared/writing-core.md`**——铁律、证据等级 V1-V4、失败模式都在那，本文件不再重述。
 
-## Depth control
+## 流程
 
-This skill uses one adaptive loop — **Plan → Search → Read → Synthesize** — that deepens naturally with the question. There are no fixed tiers; depth scales by iterating the loop.
+**Plan → Search → Read → Synthesize**，自适应循环，最多 3 轮。每轮加深而非拓宽。
 
-**When to deepen** (run another iteration):
-- First pass returned 0 relevant results → reformulate query
-- Sources contradict each other → find a tiebreaker source
-- Answer is partial → narrow the gap with a targeted query
-- Only Tier 3 sources found → try to reach Tier 1–2
-- User explicitly asks for more thorough investigation
+### ① Plan（查询分解）
 
-**When to stop**:
-- 2+ independent Tier 1–2 sources agree, no contradiction
-- Budget met (planned number of sources checked)
-- Further searching is unlikely to change the conclusion
-- The gap is structural (the information simply doesn't exist publicly) — flag it and stop
+读 `references/search-craft.md`（查询分解 / 来源质量 / 迭代策略）。
 
-**Hard limit**: 3 iterations. After 3 passes with unresolved axes, produce the finding block with `escalated: yes` and honest Gaps — a partial answer with cited evidence is more useful than no answer or a fabricated one.
+将问题拆为可独立回答的子查询。每个子查询指定：
+- 要回答什么
+- 优先查什么源（官方文档 > 源码 > 一方 API > 社区文章）
+- 证据等级要求
 
-**Optional shortcut**: if `ulw-research` is available (OhMyOpenCode runtime) and the question has 3+ orthogonal axes, you may delegate to it for saturation coverage. This is a convenience, not a requirement — research handles any question independently.
+**定向调研请求**（被其他 skill 调用时）：调用方提供结构化请求——目标、需确认领域、证据等级要求、产出格式。直接用，不重新分解。
 
-## Flow
+### ② Search
 
-**Plan → Search → Read → Synthesize**. Iterate when the first pass is insufficient (see Depth control above).
+按子查询优先级搜索。来源优先级：
 
-**① Plan** — Decompose the question into 1–3 concrete search queries. Identify the best source territory (official docs / source code / web / academic). Set a budget: how many sources justify stopping? Write the plan as a one-line note to yourself.
+| 优先级 | 来源 | 信任度 |
+|--------|------|--------|
+| 1 | 官方文档 / spec / PEP / RFC | 最高 |
+| 2 | 源码（GitHub / 本地） | 高 |
+| 3 | 一方 API 文档 | 高 |
+| 4 | 权威博客 / 技术委员会文章 | 中 |
+| 5 | Stack Overflow / 社区回答 | 低（需交叉验证） |
 
-**② Search** — Execute the planned queries. Use the right tool per territory:
-- Official docs → Context7 or direct fetch
-- Source code → codegraph / grep / LSP
-- Web → websearch / webfetch
-- Library examples → librarian agent (background) or grep.app
-Search craft details → `references/search-craft.md`.
+**不接受的来源**：AI 生成的博客 / 未署名的转载 / 无原始引用的二手总结。
 
-**③ Read** — Actually read the top results; snippets lie. For each relevant source, capture: exact claim, source URL/path, evidence level (V1–V4). If two sources contradict, note both and flag the conflict.
+### ③ Read
 
-**④ Synthesize** — Write the **finding block**. If the first pass left critical gaps, iterate: reformulate queries, try a different source territory, or narrow scope. Apply the depth control rules above.
+实读找到的源，记录：
+- 具体段落 / 代码行 / API 签名
+- 证据等级（V1-V4）
+- 与问题的关联
 
-**⑤ Deliver** — Produce the finding block. If critical gaps remain after exhausting iterations, deliver it with `escalated: yes` and honest Gaps rather than fabricating or withholding.
+**不凭标题猜**——这是铁律。打开文件/页面完整读，记录段落数/代码块首行/术语位置。
 
-## Finding Block (output contract)
+### ④ Synthesize
 
-Every research call produces exactly this block — as a file for standalone use, or inline for skill-to-skill calls.
+读 `references/output-contract.md`（Finding Block 规范 / 置信度校准 / 可组合性协议）。
 
-```markdown
-## Findings: {question}
+产出 Finding Block：
 
-### Answer
-{1–3 sentence direct answer. If no definitive answer, say so.}
+```
+## Answer
+{1-3 句直接回答}
 
-### Evidence
-- {claim}: {source URL or file:line} [V{1–4}]
-- {claim}: {source} [V{level}]
+## Evidence
+- {论断} — [V{1-4} {类型}] — {来源：URL/文件:行号}
+- {论断} — [V{1-4} {类型}] — {来源}
 
-### Gaps
-- {what could not be answered, and why}
+## Gaps
+- {未解问题} — {为什么没找到答案}
+- {未解问题} — {需要什么额外信息}
 
-### Meta
-- sources-checked: {N}
-- confidence: {high | medium | low}
-- escalated: {no | yes — reason}
+## Meta
+- 来源数：{N}
+- 置信度：{high/medium/low}
+- 升级：{no/yes} — {理由}
 ```
 
-**Confidence heuristic**: `high` = 2+ independent sources agree, no contradiction · `medium` = 1 strong source or sources partially agree · `low` = only indirect evidence, unresolved contradictions, or V4-heavy.
+### 迭代与升级边界
 
-Full output contract and composability protocol → `references/output-contract.md`.
+**迭代条件**：Gaps 非空且有可能通过追加搜索填补 → 进入下一轮（重新 Plan→Search→Read→Synthesize）。
 
-## Composability: calling research from another skill
+🔴 **升级边界**（3 轮耗尽后仍有 Gaps——关键决策点：到此停下交付，不再硬凑轮次）：
+- 产出 `升级: yes` 的 Finding Block
+- Gaps 诚实列出，不伪造也不扣留
+- 已找到的部分答案正常产出
+- 调用方可选择：接受部分答案 / 标为待定 / 换用 runtime 提供的更重调研能力（若有——非功能前提，research 自身能处理任何问题）
 
-When a parent skill needs research mid-flow, the agent:
+**不建多级 tier**（quick/moderate/deep）——深度由迭代次数控制，非固定分类。
 
-1. Reads this SKILL.md (or the parent skill's `references/research.md` pointer).
-2. Follows the flow above using its available tools.
-3. Produces the finding block **inline** — the block becomes part of the parent skill's working context.
-4. Continues the parent skill's flow with the findings integrated.
+## 产出落点
 
-No separate skill invocation is needed. The research protocol is instructions, not a runtime call.
+- **被其他 skill 内联调用**：Finding Block 直接返回给调用方，不写文件
+- **用户直接触发**：写成单篇 MD 文件，落项目目录或知识库（按 take-note 约定）
 
-## Rules
+## 参考文件（按需读，不全读）
 
-- **Cite every claim.** No claim without a source or a V-level tag.
-- **Don't fabricate.** If a source doesn't say what you need, flag it as a gap.
-- **Don't over-research.** Stop when the answer is clear. More sources ≠ better if they repeat the same claim.
-- **Don't under-research.** A single secondary blog post is not sufficient for a `high` confidence answer.
-- **Flag V4.** Inferred claims are `[V4 推断]` — never present them as confirmed findings.
-
-## Reference files (load on demand)
-
-| File | When to read |
-|---|---|
-| `references/search-craft.md` | Need query decomposition, source quality heuristics, or iteration strategy |
-| `references/output-contract.md` | Need composability protocol, confidence calibration, or embedding rules |
-| `../shared/writing-core.md` | Need evidence level definitions, iron law, or failure modes |
+| 文件 | 内容 | 适用 |
+|------|------|------|
+| `../shared/writing-core.md` | 铁律 / V1-V4 / 失败模式 | 全部 |
+| `references/search-craft.md` | 查询分解 / 来源质量 / 迭代策略 | ①② |
+| `references/output-contract.md` | Finding Block 规范 / 置信度校准 / 可组合性 | ④ |

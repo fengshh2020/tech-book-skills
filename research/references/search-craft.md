@@ -1,99 +1,100 @@
-# Search Craft
+# 查询分解与迭代策略
 
-Query decomposition, source quality heuristics, and iteration strategy for the research skill.
+research 阶段①②的深度参考。按需读，不常驻。
 
-## Query Decomposition
+## 查询分解
 
-Break the question into 1–3 concrete search queries before executing any. Each query should target a different source territory or angle.
+将复杂问题拆为可独立回答的子查询。
 
-**Decomposition patterns:**
+### 分解原则
 
-| Question shape | Decompose into |
-|---|---|
-| "Does X support Y?" | ① official docs for X's Y feature · ② real-world examples of X+Y · ③ known limitations of X+Y |
-| "What's the difference between X and Y?" | ① X official docs on the relevant dimension · ② Y official docs on the same · ③ comparison articles or migration guides |
-| "How does X work internally?" | ① X source code (codegraph/grep) · ② X architecture docs · ③ X author's talks/blog posts |
-| "Is X available in version V?" | ① X changelog/release notes for V · ② X API docs pinned to V · ③ GitHub issues/commits around V |
-| "What's the best practice for X?" | ① official X docs/guides · ② high-signal community sources (StackOverflow top answer, core contributor blog) · ③ counter-examples (what NOT to do) |
+1. **一个子查询回答一个维度**——"GO2 SDK 支持哪些运动模式"和"GO2 SDK 的通信协议是什么"是两个子查询
+2. **子查询可独立验证**——每个子查询的答案可独立确认对错
+3. **子查询间有依赖时标注**——"B 的答案依赖 A 的结论"
 
-**Rule**: Never run the same query twice. If the first query returns nothing, reformulate — change keywords, add operators, or switch source territory.
+### 分解模板
 
-## Source Quality Heuristics
+```
+原问题：{用户问题}
 
-Not all sources are equal. Apply authority-aware ranking:
+子查询 1：{要回答什么}
+  优先源：{官方文档 / SDK 源码 / …}
+  证据要求：≥V{2/3}
 
-**Tier 1 — Primary sources** (always prefer):
-- Official documentation (docs.python.org, docs.rs, kubernetes.io/docs)
-- Source code (file:line references)
-- Specification / RFC / PEP / W3C standard
-- First-party changelog / release notes
-- Vendor knowledge base (AWS docs, Azure docs)
+子查询 2：{要回答什么}
+  优先源：{…}
+  依赖：子查询 1（如果 1 的答案是 X，则查…）
 
-**Tier 2 — High-signal secondary** (useful, verify against Tier 1):
-- Core contributor blog posts / talks
-- StackOverflow answers with 50+ upvotes
-- GitHub issues/PRs with maintainer response
-- Academic papers (arXiv, peer-reviewed)
-- Established tech publications (InfoQ, The New Stack)
+子查询 3：{…}
+```
 
-**Tier 3 — Low-signal secondary** (use only when Tier 1–2 absent):
-- Random blog posts / tutorials
-- Reddit/HN comments (may contain expert insight, but unvetted)
-- AI-generated content (treat as V4 — unverified inference)
+### 定向调研请求（被 tech-proposal 等调用时）
 
-**Rule**: A `high` confidence answer requires at least one Tier 1 source. A `medium` answer with only Tier 2–3 sources should flag this in Gaps.
+调用方提供结构化请求，直接用，不重新分解：
 
-## Search Tool Selection
+```
+调研请求：
+- 目标：{一句话}
+- 需确认领域：[{…}, {…}]
+- 证据等级要求：≥V2
+- 产出格式：Finding Block
+```
 
-| Source territory | Primary tool | Fallback |
-|---|---|---|
-| Official docs | Context7 (`context7_resolve-library-id` → `context7_query-docs`) | Direct fetch of docs site |
-| Source code (local) | codegraph_explore / codegraph_node | grep / LSP |
-| Source code (remote) | librarian agent (background) | grep.app / `gh search code` |
-| Web (general) | websearch | webfetch on top result |
-| Web (specific page) | webfetch | librarian agent |
-| Library examples | grep.app (search code patterns) | librarian agent |
-| Academic | websearch with `site:arxiv.org` or `filetype:pdf` | — |
+## 来源质量判断
 
-**Parallelism**: When 2+ queries target different territories, fire them in parallel. When they target the same territory, run sequentially (results from query 1 may refine query 2).
+### 优先级
 
-## Iteration Strategy
+| 优先级 | 来源类型 | 信任度 | 何时用 |
+|--------|----------|--------|--------|
+| 1 | 官方文档 / spec / PEP / RFC | 最高 | API 行为、语言特性、协议细节 |
+| 2 | 源码（GitHub / 本地） | 高 | 实际行为、边界条件、实现细节 |
+| 3 | 一方 API 文档 | 高 | SDK 接口、配置选项 |
+| 4 | 权威博客 / 技术委员会 | 中 | 最佳实践、迁移指南 |
+| 5 | Stack Overflow / 社区 | 低 | 需交叉验证；仅作线索不作为证据 |
 
-The research loop is **Plan → Search → Read → Synthesize**, with iteration when the first pass is insufficient.
+### 不接受的来源
 
-**When to iterate** (one more pass):
-- First pass returned 0 relevant results → reformulate query
-- Sources contradict each other → find a tiebreaker source
-- Answer is partial → narrow the gap with a targeted query
-- Only Tier 3 sources found → try to reach Tier 1–2
+- AI 生成的博客（无人类审核痕迹）
+- 未署名的转载（无原始出处）
+- 无原始引用的二手总结
+- 过时文档（未标注适用版本）
 
-**When to stop** (do not iterate further):
-- Budget met (planned number of sources checked)
-- 2+ independent Tier 1–2 sources agree
-- Further searching is unlikely to change the conclusion
-- The gap is structural (the information simply doesn't exist publicly) — flag it and stop
+### 交叉验证规则
 
-**Hard limit**: 3 iterations. After 3 passes with unresolved gaps, produce the finding block with `escalated: yes` and honest Gaps. A partial answer with cited evidence beats no answer or a fabricated one.
+- 🔴 严重论断：≥2 个独立来源确认
+- 🟠 重要论断：≥1 个高信任来源
+- 🟡 一般论断：单源可接受，标注来源
+- V4 推断：必须标注，降一级严重度
 
-**Deepening tactics** (when a second or third pass is needed):
-- **Switch source territory**: if web search was unproductive, try source code or official docs (or vice versa)
-- **Reformulate with operators**: add `site:`, `filetype:`, `"exact"`, or `after:` to narrow
-- **Chase references**: if a source cites another source, follow that citation
-- **Decompose the gap**: if "does X support Y?" is unresolved, try "X Y integration" and "X Y limitation" as separate queries
-- **Seek contradiction**: if all sources agree but confidence is still low, actively search for counter-evidence (`X problem OR issue OR limitation`)
+## 迭代策略
 
-## Search Operators (web)
+### 何时迭代
 
-Vary operators on every query — same query twice wastes a pass:
+Gaps 非空 **且** 以下任一成立：
+- 有明确的追加搜索方向（知道该查什么但还没查）
+- 已有来源暗示另一个来源存在（"详见 RFC-XXXX"）
+- 子查询间依赖解锁了新搜索路径
 
-| Operator | Example | Use |
-|---|---|---|
-| `site:` | `site:docs.python.org asyncio` | Restrict to a domain |
-| `filetype:` | `filetype:pdf kubernetes scheduling` | Papers, specs |
-| `intitle:` | `intitle:benchmark LLM inference` | Targeted pages |
-| `"exact"` | `"context window" management` | Precision match |
-| `-term` | `python asyncio -tutorial` | Exclude noise |
-| `OR` | `fastapi OR starlette middleware` | Coverage |
-| `after:` | `rust async after:2025-01-01` | Recency control |
+### 何时停止
 
-**High-yield combos**: official docs (`site:<docs-domain>`), GitHub (`site:github.com`), recent discussion (`site:reddit.com OR site:news.ycombinator.com after:<date>`), changelog hunting (`changelog OR "release notes" <version>`).
+- 3 轮耗尽 → 产出 escalated Finding Block
+- Gaps 无法通过搜索填补（需实机验证 / 需人类决策 / 源不存在）→ 诚实记录
+- 已有答案足够完整（覆盖所有子查询）→ 正常结束
+
+### 每轮加深而非拓宽
+
+- 第 1 轮：广度优先，覆盖所有子查询
+- 第 2 轮：深度优先，针对 Gaps 追踪线索
+- 第 3 轮：最后尝试，换角度/换关键词/换源类型
+
+**不重复搜索同一源**——如果第 1 轮查了官方文档没找到，第 2 轮查源码而不是再查官方文档。
+
+## 工具与源不可达兜底（runtime-neutral）
+
+不同 runtime 可用工具不同（有的有 WebSearch/Context7/codegraph/librarian，有的只有 curl/grep）；列出工具缺位或搜索连续返空时的兜底：
+
+- **已知权威 URL 直取**（首选）：从 changelog/索引页定位具体页 URL，用 runtime 任意 fetch（`curl`/`WebFetch`/`WebReader`）直拉（如 `https://peps.python.org/pep-0695/`、`https://docs.python.org/3/library/...`）——比通用搜索更准、更稳。
+- **源码**：`gh search code` / `grep.app` / clone 后 `grep -rn`；本地用 Glob/Grep。
+- **搜索连续返空**：换关键词 / 加 `site:` / 换源类型（文档 ↔ 源码 ↔ 社区）/ 直取已知权威 URL，而非反复跑同一查询。
+- **runtime 无任何 fetch 工具**：诚实标 Gaps（"无法在线验证"）、降 confidence，**绝不靠猜填答案**。
+- **优先级**：已知权威 URL 直取 > 搜索发现 > 标 Gaps。工具表是"有则用"，不是"必须"。
