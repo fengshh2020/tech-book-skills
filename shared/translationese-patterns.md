@@ -1,11 +1,8 @@
 # 翻译腔 + AI 腔（slop）高频模式
 
-> 供 generate-book、review-tech-book 及验证脚本共享。两类**语音缺陷**的检测模式：
-> - **翻译腔**——逐字直译留下的痕迹（连接词、读者称谓、填充语）。
-> - **AI 腔 / slop**——AI 生成内容回归均值的通用腔：模板化措辞、空洞大词、无具体观点的"安全"句。治法是写人话（具体名词、确切动词、删套话）。定义见 `shared/writing-core.md` 第六类失败模式。
+> 供 generate-book、review-tech-book 及验证脚本共享。**翻译腔** = 逐字直译痕迹；**AI 腔 / slop** = 回归均值的通用腔（定义 / 治法见 `shared/writing-core.md` 反 AI 腔节）。
 >
-> 验证脚本从本文件动态读取正则模式（表格式不变）。后备硬编码列表也需与此文件保持一致。
-> **密度即信号**：单次命中弱，同类反复出现才判 slop；直引 / 学术 / 法律语境豁免。下列 AI 腔行只收**高精度、无管道、无误报**的固定词（如 `重塑`/`深度融合` 因与 ML 术语 reshape/deep-fusion 撞车故不收）；更全的语族（navigate the complexities / unlock the potential / plays a crucial role / 赋能家族…）由模型自检，不进 blunt 计数器。
+> 验证脚本从本文件动态读取正则模式（表格式不变）；后备硬编码列表需与此文件保持一致。**密度即信号**：单次命中弱，同类反复出现才判 slop；直引 / 学术 / 法律语境豁免。词表只收高精度、无管道、无误报的固定词（`重塑`/`深度融合` 等与 ML 术语撞车的不收）；更全语族（navigate the complexities / unlock the potential / plays a crucial role…）由模型自检，不进计数器。
 
 ---
 
@@ -31,7 +28,7 @@
 
 ## AI 腔 / slop 模式（通用模板腔）
 
-> 同上表格式（`validate_code.sh` 一并读取并计数）。下列为高精度 lexical 告警——单次出现即值得复查，反复出现基本可判 slop。仅收固定词组（无 `\|` 管道、无 ML 术语撞车，保证 markdown 渲染与脚本解析都不破、无误报）。**不收**易误报的 `landscape` / `journey` / `roadmap` / `symphony`（legit 技术语境常见）与需密度判断的语族（unlock the potential / plays a crucial role / 赋能家族…）——交模型自检。**结构 tell**（完美矩形段 / "No X. No Y. Just Z." / tailing clause）也归模型自检，不进计数器。
+> 同上表格式（`validate_code.sh` 一并读取并计数）。单次出现即值得复查，反复出现基本可判 slop。**不收**易误报的 `landscape` / `journey` / `roadmap` / `symphony`（legit 技术语境常见）——交模型自检；**结构 tell**（完美矩形段 / "No X. No Y. Just Z." / tailing clause）同样归模型自检，不进计数器。
 
 | 模式 | 正则 | 类型 | 修正 |
 |------|------|------|------|
@@ -58,4 +55,4 @@
 
 ## 脚本同步说明
 
-`review-tech-book/scripts/validate_code.sh` 从本文件动态读取正则列（含翻译腔 + AI 腔两表）。动态读取失败时回落到脚本内的硬编码后备列表——**后备仅保留翻译腔子集**，AI 腔词一律动态读取、不入后备。新增翻译腔模式需同步后备；新增 AI 腔词只更新本文件即可。
+`validate_code.sh` 动态读取两表的正则列；失败时回落脚本内硬编码后备（仅翻译腔子集）。新增翻译腔模式需同步后备；新增 AI 腔词只更新本文件。

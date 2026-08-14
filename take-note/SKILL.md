@@ -1,171 +1,63 @@
 ---
 name: take-note
-description: Use when the user asks to "记笔记", "记录一下", "存到知识库", "把这个记下来", "记一笔", "写进笔记", "整理知识库", "维护 wiki", "ingest 这个源/链接/论文", "把这本书存进知识库/文档库", "ingest book into 文档库", or otherwise writing the session into an Obsidian-style knowledge base (root auto-detected) — ingesting an external source (URL/paper/pasted text) into the compounding wiki/ — or adapting a finished generate-book artifact into the vault (`文档库/`) as a Vault Book (book-ingest). Also use it proactively when the conversation has distilled reusable content worth saving (a debug finding, a config trick, a design decision, a code walkthrough) even without an explicit trigger phrase. Do NOT trigger for: long-form generation needing the phased pipeline (full multi-chapter book / substantial doc from scratch or sources → use generate-book; take-note does write session-formed short books/docs into `文档库/`), code/API review (use review-tech-book), or authoring original long-form content not derived from this session or an ingested source.
+description: "Use when the user asks to 记笔记 / 记录一下 / 存到知识库 / 把这个记下来 / 写进笔记 / 整理知识库 / 维护 wiki, when ingesting an external source (URL / paper / pasted text / book) into the Obsidian-style knowledge base (root auto-detected), when adapting a finished generate-book/translate-book artifact into the vault (book-ingest), or proactively when the session distilled reusable content (debug finding, config trick, design decision) worth saving — even without an explicit trigger phrase. Do NOT trigger for: full multi-chapter books generated from sources/codebase (use generate-book / translate-book), quality review (use review-tech-book), or original long-form content not derived from this session."
 allowed-tools: Read Write Glob
 ---
 
-把当前 session 的内容写成一篇符合库约定的结构化笔记，落到正确的位置。库根 `$KB_ROOT` **动态解析**（见下「定位知识库根」），用用户当前语言写（默认中文）。
+把当前 session 的内容写成一篇符合库约定的结构化笔记，落到正确的位置。库根 `$KB_ROOT` **动态解析**（见下），用用户当前语言写（默认中文）。铁律与反 AI 腔见 `../shared/writing-core.md`；**归位 / frontmatter / 正文骨架 / callout / 双链约定在 `references/vault-conventions.md`——下笔前读一次**。
 
-**写作原则（结论前置 / 原子性 / 标题即论点 / 面向检索 / 上下文自足 / 抽象成原则 / 事实与推断分离）见 `../shared/writing-core.md`**——本文件只讲 Obsidian 库特有的：归位、frontmatter、callout 语义、面包屑与双链。库有强归位/命名约定，**下笔前缺信息（哪个项目、文件名、范围、是否拆篇）一律问用户，别默写——猜错会返工**。
+## 核心回路
+
+**判落点（项目 / 系统配置 / 文档库 · 笔记 vs 书）→ 写原子笔记（结论前置 + 环境基线 + 证据）→ 挂双链与面包屑**
+
+## 笔记质量（非协商）
+
+1. **结论前置**——首屏给最重要的答案 / 命令 / 论断，不读全文也能拿走。
+2. **原子自足**——一篇只答一个问题 / 记一个坑；脱离产生它的对话也能读懂（写全环境基线、复现步骤、关键变量值）。
+3. **标题即论点**——带核心结论或关键变量，不是话题标签；含"半年后你会用什么词搜"的关键词（技术名 / 报错关键字 / 设备型号）。
+4. **事实与推断分离**——推断 / 未实测一律 `[!caution]` 标「推断 / 待验证」，不当结论写。
+5. **只留可复用的**——删探索过程（"我先试…然后猜…"），留命令、根因、配置值、行号引用、决策。短而实胜过灌水长文。
 
 ## 定位知识库根（`$KB_ROOT`，portable）
 
-本 skill 不假设库在哪——**从 cwd 向上发现根**，在任何地方都能用：
+从 cwd 向上找 KB 标记——`.kb-root` 文件（显式）**或** `00_首页.md`（约定）；命中 → 该目录即 `$KB_ROOT`；**找不到 → 问用户**：① 指定已有 KB 路径；② 在 cwd 初始化新 KB（建 `00_首页.md` + `文档库/` + `系统配置/` + `wiki/`）；③ 就地单篇。环境变量 `KB_ROOT` 设了即用。项目运行时发现——Glob 列 `$KB_ROOT/项目-*/` 现有项目（不硬编码）；每个项目夹的 `{项目名}.md` 或 `00_MOC.md` 是其 MOC。
 
-1. **标记发现**：从当前目录向上逐级找 KB 标记——`.kb-root` 文件（显式）**或** `00_首页.md`（约定，零配置覆盖现有 Obsidian 库）。命中任一 → 该目录即 `$KB_ROOT`。
-2. **找不到 → 问用户**（三选一，别猜）：① 指定一个已有 KB 的绝对路径；② 在 cwd **初始化新 KB**（建 `00_首页.md` + `文档库/` + `系统配置/` + `wiki/` 骨架）；③ 就地生成单篇（不建 KB，写到 cwd）。
-3. **覆盖**：环境变量 `KB_ROOT` 设了即用（CI / 固定库场景）。
+## 归位速判（归位表与三问见 references/vault-conventions.md）
 
-定下 `$KB_ROOT` 后所有结构在它之下生成。**项目与 MOC 运行时发现**——用 Glob 列出 `$KB_ROOT/项目-*/` 现有项目（不硬编码项目名，Glob 能列目录、Read 不能）；每个项目夹的 `{项目名}.md` 或 `00_MOC.md` 是其 MOC。
+一个可复用独立结论 → 笔记；要系统讲清、多页展开 → 书/文档（长程从源/代码库生成用 generate-book / translate-book）；技术方案 → `type: proposal`（保留完整方案体，不套精简标准）；跨项目可迁移概念 → `wiki/`（opt-in）。
 
-## 库结构（在 `$KB_ROOT` 下，按项目组织）
+## 🔴 下笔前问用户（会造成返工的自主决策点；问法走 `../shared/kickoff.md`）
 
-```
-$KB_ROOT/
-├── 00_首页.md                 ← 全库入口/仪表盘
-├── 文档库/                    ← 书籍/长文档（多页系统学习，每本一文件夹 + 00_MOC）
-├── 项目-{名}/                 ← 每项目自包含：{项目名}.md 作 MOC + 调试/方案/设计 子目录
-│   （每项目自包含；现有项目运行时扫 `$KB_ROOT/项目-*` 得，别硬编码）
-├── 系统配置/                  ← 跨项目复用的工具链/环境配置（扁平，type: config）
-└── wiki/                      ← 可复利知识库（LLM 维护：raw/ 不可变源 → 编译 concept/entity 页 + index + log，见 `references/llm-wiki.md`）
-```
+1. **一个 session 有 ≥2 个独立主题** → 各拟标题+归属，等确认拆分，别堆一篇。
+2. **项目归属不清/跨项目** → 列候选问归哪个或是否新建 `项目-{名}/`。**特例**：既是项目 debug 故事又是可复用 config → 以项目 debug 笔记为主，在 `系统配置/` 那篇加一行链回。
+3. **写书/长文档** → 动笔前敲定书名、目录、目标读者。
 
-每个项目夹有一篇 MOC（`{项目名}.md` 或 `00_MOC.md`）串联其下笔记；`文档库/` 每本书有自己的 `00_MOC`。任何笔记都链回所属 MOC + `00_首页`，不孤立。
+**Read-before-Write**：目标文件已存在时先 Read，同主题→追加并链回，撞名→问「覆盖/追加/改名」。
 
-## 先判类型：笔记 vs 书
+## 写书/文档（`文档库/`，opt-in）
 
-| | 笔记（note） | 书籍/文档（book） |
-|---|---|---|
-| 形态 | 原子、单点结论（一个坑/一条配置/一个结论） | 多页、系统讲清一个主题 | 技术方案文档（问题→约束→架构→权衡→骨架） |
-| 归位 | `项目-{名}/{调试|方案|设计}/` 或 `系统配置/` | `文档库/{书名}/` | `项目-{名}/方案/` |
-| type | `debug`/`plan`/`config`/`read`/`design` | `moc`（书总目录）+ `book`（章节） | `proposal` |
-| 规则 | writing-core 六原则（结论前置/原子/去水分） | **不套笔记的精简标准**——书就该厚，多页+MOC+教学 callout+三级证据 | **保留方案体完整结构**——不套笔记精简标准；Goals/Non-Goals/架构图/权衡/代码骨架不可删 |
-| 导航 | 面包屑链回项目 MOC | `prev`/`next` 串章 + 面包屑链回书 MOC | 面包屑链回项目 MOC |
+- **session-book**（session 成型短篇书，无流水线）：直接写。`00_MOC.md`（`type: moc` + `book: "{书名}"`）+ `数字_标题.md` 章节（`type: book` + `prev`/`next`）；附录用 `A0_`/`A1_` 前缀，图放书根 `assets/`。
+- **book-ingest**（适配已完成的 generate-book / translate-book 产物 → Vault Book）：读 `{RUN}/src/*.md`（**非 `output-md/`**；工作区布局见 `../shared/book-project.md`），每章套库 frontmatter（`type: book` + `book:` + `prev`/`next`）、建 `00_MOC`、加面包屑、挂链 `00_首页`。Obsidian 原生渲染 callout/mermaid，不走 builder、HTML 版交接时丢弃。
 
-一个可复用独立结论 → 笔记；要系统讲清、需多页展开 → 书/文档（且从零生成时用 generate-book）；从技术目标推演的方案文档 → `type: proposal`（保留完整方案体结构，不套笔记精简标准）；跨项目/跨书的可迁移 concept/entity → `wiki/` 编译页（见下「维护可复利知识库」）。拿不准问用户。下文默认讲**笔记**写法。
+书不套笔记的精简标准——多页 + 教学 callout 是教学需要，长度不是水分。
 
-## 🔴 下笔前停下问用户（会造成返工的自主决策点）
+## 维护可复利知识库（`wiki/`，opt-in）
 
-1. **一个 session 有 ≥2 个独立主题** → 别堆一篇，各拟标题+归属，等确认拆分。
-2. **项目归属不清/跨项目** → 别猜目录，列候选问归哪个或是否新建 `项目-{名}/`。**特例**：既是项目 debug 故事又是可复用 config（如 Jetson 跑 DDPM 撞见 `LD_LIBRARY_PATH`）→ 以**项目 debug 笔记**为主，在 `系统配置/` 那篇加一行链回，别把 debug 故事挪进 `系统配置/`。
-3. **文件名拿不准** → 给 2-3 个带论点的候选让用户选。
-4. **写书/长文档** → 动笔前敲定书名、目录、目标读者（大工程）。
-
-边角情况（文件已存在 / MOC 不存在）一律「先试合理默认 → 失败就问用户」；**项目无夹是结构决策，不走默认——按 Step 1 第 3 问问用户（新建 or 归现有）**。绝不静默猜或静默覆盖。**Read-before-Write**：目标文件已存在时先 Read ≥1 行，同主题→追加章节并链回，撞名→问用户「覆盖/追加/改名」。
-
-## Step 1 — 归位（先项目，再子目录）
-
-**第 1 问：跨项目复用的工具链/环境配置？**（换项目也用得上的 Claude Code/shell 技巧/uv/功率模式/LD_LIBRARY_PATH 等）→ `系统配置/`（`type: config`）。
-**第 2 问：哪个项目？** → `项目-{名}/{子目录}/`，子目录对齐该项目已有目录（打开该项目夹看一眼）：
-
-| 笔记性质 | 子目录 | type |
-|---|---|---|
-| 设计/架构/读代码精读/学习总结/教学 | `设计/` | `design` |
-| 踩坑/调试/部署问题/bug 排查 | `调试/` | `debug` |
-| 方案/选型/架构规划 | `方案/` | `plan` |
-
-**第 3 问：项目还没有文件夹？** → 问用户：新建 `项目-{名}/`（并建 `{项目名}.md` 作 MOC）还是归现有项目。
-
-## Step 2 — 文件名
-
-中文主题词 + 必要英文术语，空格分隔（`LD_LIBRARY_PATH 与 bash 参数展开语法`）。**无日期前缀**（日期在 frontmatter）。标题带论点（原则 3）、含可搜索关键词（原则 4）。多页连续主题用 `数字_标题.md` + `prev`/`next` 串起来。
-
-## Step 3 — frontmatter（六字段必填）
-
-```yaml
----
-title: "{标题，与文件名、H1 一致}"
-type: {moc | design | debug | plan | config | read | proposal}
-project: {扫 $KB_ROOT/项目-* 得的现有项目名 | 系统配置 | 知识库 | {新项目名}}
-date: YYYY-MM-DD
-status: {active | draft | archived}
-tags:
-  - {platform}     # thor, jetson-agx-orin, jetpack-7（硬件相关时）
-  - {tech}         # tensorrt, pytorch, docker, onnx（核心技术）
-  - {tech-2}       # 再补 1-2 个相关技术
-  - {topic}        # deployment, conversion, precision（主题）
----
-```
-
-`type` 决定角色，通常对应子目录（`moc`=项目总览，`read`=不属具体项目的通用学习，`proposal`=tech-proposal 产出的方案文档）。`project` 填项目名（不含"项目-"前缀）；跨项目配置填 `系统配置`。`status`：`active`(默认)/`draft`/`archived`（方案类也可 `implemented`/`approved`/`rejected`）。`tags` 3-8 个，扁平、不要 `topic/subtag` 层级。可选：`platform`、`source`、`prev`/`next`/`book`（仅多页系列/书式笔记）。
-
-## Step 4 — 正文骨架
-
-单个 `# H1`（同文件名）。按 type 裁剪章节，不是每节都用：
-
-```markdown
-# {标题}
-
-> {YYYY-MM-DD} · {项目或场景} · {一句话：记什么、为什么记}
-
-> [!important] 结论 / TL;DR
-> {最重要的答案/命令/论点，1-3 句。不读全文也能拿走。}
-
-## 背景 / 环境基线 / 问题描述
-{环境基线用表格（设备/版本/配置）。}
-
-## {主体章节}            ## 坑 N：{坑标题}（仅踩坑/调试类）
-{## 分章。}              > [!warning] 现象：{报错原样引用}
-                         > **根因**：{为什么；复杂根因用 5-Why 链}
-                         > **解决**：`{命令}` → `# 预期输出: {...}`
-
-## 方法论沉淀            ← 调试/配置类结尾
-> [!abstract] 红线一：{一句话原则}
-> {把单次经验抽象成可迁移红线。}
-
-## 关联笔记
-- [[{相关笔记}]] — {一句话关系}
-- [[{待创建}]]（待创建）
-
----
-📍 所属项目：[[{项目MOC 或 00_首页}]] · 知识库入口 [[00_首页]]
-```
-
-**面包屑页脚（必加，硬约定）**：末尾 `📍 所属项目：[[{项目 MOC}]] · 知识库入口 [[00_首页]]`。`系统配置/` 无项目 MOC，写 `📍 知识库入口 [[00_首页]]`。**Commands carry expected output**（shell/dockerfile/python 块下加 `# 预期输出: ...`）。**Cite code with `file:line`**。单 H1、不跳级。
-
-## Step 5 — Callout 语义（库固定）
-
-| 用途 | Callout |
-|---|---|
-| 陷阱/坑/反例 | `> [!warning]` |
-| 补充说明 | `> [!info]` / `> [!tip]` |
-| 最重要结论/唯一要点 | `> [!important]` |
-| 方法论红线（方法论沉淀节） | `> [!abstract] 红线N：{title}` |
-| 推断/未实测/待验证 | `> [!caution]`（标"推断/待验证"——**最重要的一条**，别把假设写成结论） |
-| 已验证/确认可用 | `> [!success]` |
-
-## Step 6 — 双链（笔记是网络节点）
-
-1. **结构回链**：面包屑页脚指向项目 MOC + `00_首页`。
-2. **主题互链**：`## 关联笔记` 区用 `- [[note]] — {关系}` 链 1-2 条相关笔记并注明关系（因果/对比/前置/同主题）；`[[待创建]]（待创建）` 留给应存在但还没的笔记。**项目 hub 运行时发现**：扫 `$KB_ROOT/项目-*/` 得现有项目名作 hub（别硬编码——换库即失效）；`文档库/` 下每本书的 `00_MOC` 是书总目录、与项目 MOC 不同（别链错）。新笔记也要回头更新它引用到的项目 MOC（笔记地图加一行），让双链闭环。
+跨项目/跨书、值得反复回查的可迁移 concept/entity → `$KB_ROOT/wiki/`。**你不手写 wiki，LLM 写——你只策展源、问好问题**；单 session 的项目结论仍走笔记，不进 wiki。结构 + 五操作（INGEST/COMPILE/INDEX/QUERY/LINT）见 `references/llm-wiki.md`（按需读）。
 
 ## 规则
 
-- **只留可复用的**：删探索过程（"我先试…然后猜…"），留命令、根因、配置值、行号引用、决策。短而实胜过灌水长文。
-- **不碰**：`.base`、`.remember/`、`.obsidian/workspace.json`。**只写 `.md`**（不生成 `.html` 兄弟文件，导出插件的事）。**不 commit**（用户用 github-sync 插件 `Ctrl+Shift+S` 自己同步）。
-
-## 写书/文档（`文档库/`）
-
-`文档库/{书名}/` 放多页系统学习的书。take-note 三模式：**session-book**（本节，从零写）/ **book-ingest**（本节，适配 generate-book 产物）/ **wiki-ingest**（见下「维护可复利知识库」）。路由判据 = **长程流水线要不要**：要流水线（整本/从源/从代码库）→ generate-book，不归 take-note。
-
-**① session-book**（session 成型短篇书，无流水线）：精读/教程/长方案——不需 generate-book 分阶段流水线时直接写。`00_MOC.md`（`type: moc` + `book: "{书名}"`，写"给谁看+目标+阅读路径+目录表+怎么用"）+ `数字_标题.md` 章节（`type: book` + `prev`/`next`）；附录用 `A0_`/`A1_` 前缀，图放书根 `assets/`。
-
-**② book-ingest**（适配已完成的 generate-book 产物 → Vault Book）：用户要把一本 generate-book 生成的书存进库时——读 `{RUN}/src/*.md`（信息主源，**非 `output-md/`**），每章套库 frontmatter（`type: book` + `book:` + `prev`/`next`）、建 `00_MOC`（`type: moc` + `book:`）、加面包屑、挂链 `00_首页`，落 `文档库/{书名}/`。**Obsidian 原生渲染 callout/mermaid，不走 builder、不可 builder 重建**；HTML Edition 交接时丢弃。见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md)。
-
-**长程/从源/从代码库生成整本 → 不用 take-note，用 generate-book**（book 形态 = 全书双格式 builder；doc 形态 = 就地 MD，轻量 gate）；要进库再走 ② book-ingest。
-
-**书不套笔记的精简标准**——多页+教学 callout+三级证据都是教学需要，长度不是水分。
-
-## 维护可复利知识库（`wiki/`）
-
-跨项目/跨书、值得反复回查的可迁移 concept/entity → `$KB_ROOT/wiki/`（与 `项目-{名}/` · `文档库/` 并列）。**你不手写 wiki，LLM 写——你只策展源、问好问题**；单 session 的项目结论仍走笔记，不进 wiki。触发：ingest 外部源（URL / 论文 / 粘贴文本）或"维护知识库 / ingest"。
-
-ingest → compile → 维护 index → 答查询并回写（复利）→ 定期 lint（Read 驱动自检，take-note 无 Bash）。**完整 `wiki/` 结构、五操作细节、与项目结构的交叉引用约定**见 **`references/llm-wiki.md`**（按需读，不常驻）。
+**不碰**：`.base`、`.remember/`、`.obsidian/workspace.json`。**只写 `.md`**（不生成 `.html` 兄弟文件）。**不 commit**（用户自己同步）。
 
 ## 完成时
 
-只打印一行：写入文件的绝对路径 + 一句话内容摘要。
+只打印一行：`$KB_ROOT/项目-{项目名}/{子目录}/{filename}.md — {一句话内容摘要}`
 
-```
-$KB_ROOT/项目-{项目名}/{子目录}/{filename}.md — {一句话内容摘要}
-```
+## 参考文件（按需读，不全读）
+
+| 文件 | 适用 |
+|---|---|
+| `references/vault-conventions.md` | 每次下笔前（归位表 / frontmatter / 骨架 / callout / 双链） |
+| `references/llm-wiki.md` | 维护 wiki |
+| `../shared/writing-core.md` | 铁律 / 反 AI 腔 |
+| `../shared/kickoff.md` | 下笔前问用户时 |

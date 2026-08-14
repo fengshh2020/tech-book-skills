@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "scenario": "从零设计新系统 happy-path",
+    "prompt": "我要给 Unitree GO2 机器狗加一套语音控制系统，跑在 Jetson Orin 上，帮我做个技术方案。",
+    "expected": "判场景=从零设计 → 目标澄清（硬件/平台/Non-Goals 模糊时追问）→ 调 research 发定向调研请求消费 Finding Block → 约束提炼（硬/软/已有架构）→ C4 架构图(Context/Container/Component) + 数据流 sequence + Drawbacks-first 选型 → 接口定义(完整类型、无 any) + 关键路径伪代码 TODO(#N) → 自检（模块名/接口名/调用关系与图一致）。默认落项目目录 PROPOSAL.md，说「存库」才交 take-note type:proposal。"
+  },
+  {
+    "id": 2,
+    "scenario": "增量需求（在已有架构找接入点）",
+    "prompt": "在我们现有的 ROS 2 运动控制 node 上加一个低功耗休眠模式，做个方案。",
+    "expected": "判场景=增量 → 读现有代码找 seam、记 file:line、评估影响范围 → 保留已有架构约束（如运动控制走 ROS 2 node 不可改）→ 方案文档标注已有/新增接口 → 自检 Goals 都有覆盖、Non-Goals 没被悄悄纳入。"
+  },
+  {
+    "id": 3,
+    "scenario": "歧义/负路由（应不触发）",
+    "prompt": "帮我生成一本讲嵌入式 RTOS 的书 / 调研一下 FreeRTOS 的任务调度原理",
+    "expected": "负路由命中：生成书 → generate-book；纯调研（无方案设计）→ research；tech-proposal 不触发——它推演方案文档+代码骨架，既不写叙事书也不做无设计的纯调研。"
+  }
+]

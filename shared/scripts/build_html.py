@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""build_html.py — MD 源 → HTML 书籍渲染器（ADR-0001 / 0002 / 0004）。
+"""build_html.py — MD 源 → HTML 书籍渲染器。
 
 把通用/GitHub 方言的 MD 章节渲染成"静奢"HTML 设计系统。MD 是信息主源，
-HTML 是渲染目标（见 docs/adr/0001）。务实子集组件映射见 ADR-0002。
+HTML 是渲染目标。组件映射为"务实子集"（约定见 shared/md-authoring.md）。
 
 用法:
     python scripts/build_html.py <md_dir> <out_dir>
@@ -11,18 +11,19 @@ HTML 是渲染目标（见 docs/adr/0001）。务实子集组件映射见 ADR-00
     book.yml        元数据: title / subtitle / subtitle_cn / author / edition / lang
     README.md       (可选) MD 版目录; 缺失则从章节自动生成
     NN_*.md         章节, NN >= 02 (00/01 留给封面/目录)
-    ```mermaid 块   构建期渲染为 diagrams/*.png (需 npx mmdc; 缺失则降级为运行时渲染)
+    ```mermaid 块   构建期渲染为 diagrams/*.svg (需 npx mmdc; 缺失则降级为运行时渲染)
+    src/diagrams/*.svg  手写 SVG 图表原样复制进两版产物 (可视化优先)
 
 <out_dir>/          HTML 版
-    00_cover.html 01_toc.html NN_*.html  style.css script.js  diagrams/*.png
-<out_dir>-md/       可移植 MD 版 (mermaid → png 嵌入) + diagrams/*.png
+    00_cover.html 01_toc.html NN_*.html  style.css script.js  diagrams/*.{svg,png}
+<out_dir>-md/       可移植 MD 版 (mermaid → svg 嵌入) + diagrams/*.{svg,png}
 
-作者约定 (务实子集, ADR-0002):
+作者约定 (务实子集, 见 shared/md-authoring.md):
     > **[性能提示]** …            → <div class="sidebar performance-tip">…
     ```python caption="L7-1"      → <pre data-lang="Python">… + .CodeListingCaption
     ![alt](p "图：标题")          → .svg-diagram + .fig-caption[data-num]
     ![alt](p)                     → 普通 <img>
-    ```mermaid …                  → diagrams/*.png (或运行时 <pre class="mermaid">)
+    ```mermaid …                  → diagrams/*.svg (或运行时 <pre class="mermaid">)
     <table>                       → .table-wrapper 包裹
 """
 from __future__ import annotations
@@ -126,17 +127,17 @@ def _render_mermaid(code: str, caption: str, env: dict) -> str:
     if diag_dir is None:
         return runtime
     digest = hashlib.md5(code.encode("utf-8")).hexdigest()[:10]
-    png = diag_dir / f"mmd-{digest}.png"
-    rendered = png.exists()
+    svg = diag_dir / f"mmd-{digest}.svg"
+    rendered = svg.exists()
     if not rendered and not env.get("_mmdc_dead"):
-        rendered = _try_mmdc(code, png)
+        rendered = _try_mmdc(code, svg)
         if not rendered:
             env["_mmdc_dead"] = True  # 渲染器不可用：后续图直接降级，不重复试
     if not rendered:
         env["_mmdc_failed_count"] = env.get("_mmdc_failed_count", 0) + 1
         return runtime  # 运行时降级: script.js 渲染
     cap = f'\n<p class="fig-caption" data-num>{e(caption)}</p>' if caption else ""
-    return f'<div class="svg-diagram"><img src="{rel}/{png.name}" alt="{e(caption or "diagram")}"></div>{cap}'
+    return f'<div class="svg-diagram"><img src="{rel}/{svg.name}" alt="{e(caption or "diagram")}"></div>{cap}'
 
 
 def _find_browser() -> str | None:
@@ -179,14 +180,14 @@ def _find_browser() -> str | None:
     return None
 
 
-def _try_mmdc(code: str, png: Path) -> bool:
-    """渲染一张 mermaid 为 PNG。跨平台探测浏览器 + --no-sandbox（WSL/容器/CI 必需）。"""
+def _try_mmdc(code: str, svg: Path) -> bool:
+    """渲染一张 mermaid 为 SVG（按输出扩展名定格式）。跨平台探测浏览器 + --no-sandbox（WSL/容器/CI 必需）。"""
     has_mmdc = shutil.which("mmdc") is not None
     has_npx = shutil.which("npx") is not None
     if not has_mmdc and not has_npx:
         return False
-    mmd = png.with_suffix(".mmd")
-    cfg = png.with_suffix(".puppeteer.json")
+    mmd = svg.with_suffix(".mmd")
+    cfg = svg.with_suffix(".puppeteer.json")
     mmd.write_text(code, encoding="utf-8")
     chrome = _find_browser()
     puppeteer = {"args": ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"]}
@@ -194,7 +195,7 @@ def _try_mmdc(code: str, png: Path) -> bool:
         puppeteer["executablePath"] = chrome
     cfg.write_text(json.dumps(puppeteer), encoding="utf-8")
     cmd = ["mmdc"] if has_mmdc else ["npx", "-y", "@mermaid-js/mermaid-cli"]
-    cmd += ["-i", str(mmd), "-o", str(png), "-b", "transparent", "--scale", "2",
+    cmd += ["-i", str(mmd), "-o", str(svg), "-b", "transparent",
             "--puppeteerConfigFile", str(cfg)]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=360)
@@ -204,7 +205,7 @@ def _try_mmdc(code: str, png: Path) -> bool:
         for tmp in (mmd, cfg):
             if tmp.exists():
                 tmp.unlink()
-    return result.returncode == 0 and png.exists()
+    return result.returncode == 0 and svg.exists()
 
 
 # ---------------------------------------------------------------- transforms
@@ -375,6 +376,9 @@ def build(md_dir: Path, out_dir: Path) -> dict:
         fail(f"在 {md_dir} 未找到 NN_*.md 章节（00/01 留给封面/目录）")
 
     diag_dir = out_dir / "diagrams"
+    # 手写 SVG 图表（可视化优先）：src/diagrams/*.svg 原样进入两版产物
+    for svg in sorted((md_dir / "diagrams").glob("*.svg")):
+        shutil.copy2(svg, diag_dir / svg.name)
     env = {"_diag_dir": diag_dir, "_diag_rel": "diagrams"}
     md = make_md()
 
@@ -421,22 +425,23 @@ def build(md_dir: Path, out_dir: Path) -> dict:
 
 def build_md_edition(md_dir: Path, out_dir: Path, chapters: list[Path],
                      diag_dir: Path, rendered: list[tuple[str, str]], book: str) -> None:
-    """可移植 MD 版：mermaid 块替换为 PNG 嵌入 + 复制 diagrams。"""
+    """可移植 MD 版：mermaid 块替换为 SVG 嵌入（旧 PNG 回退）+ 复制 diagrams。"""
     md_out = Path(str(out_dir) + "-md")
     md_out.mkdir(parents=True, exist_ok=True)
     (md_out / "diagrams").mkdir(exist_ok=True)
-    for png in diag_dir.glob("*.png"):
-        shutil.copy2(png, md_out / "diagrams")
+    for pattern in ("*.svg", "*.png"):
+        for f in diag_dir.glob(pattern):
+            shutil.copy2(f, md_out / "diagrams")
 
     for path in chapters:
         text = path.read_text(encoding="utf-8")
 
         def repl(match: re.Match) -> str:
             digest = hashlib.md5(match.group(1).encode("utf-8")).hexdigest()[:10]
-            png_name = f"mmd-{digest}.png"
-            if (diag_dir / png_name).exists():
-                return f"![diagram](diagrams/{png_name})"
-            return match.group(0)  # PNG 未生成 → 保留 ```mermaid（GitHub 原生渲染）
+            for name in (f"mmd-{digest}.svg", f"mmd-{digest}.png"):  # svg 优先，旧 png 回退
+                if (diag_dir / name).exists():
+                    return f"![diagram](diagrams/{name})"
+            return match.group(0)  # 未生成 → 保留 ```mermaid（GitHub 原生渲染）
 
         text = re.sub(r"```mermaid\n(.*?)```", repl, text, flags=re.DOTALL)
         (md_out / path.name).write_text(text, encoding="utf-8")

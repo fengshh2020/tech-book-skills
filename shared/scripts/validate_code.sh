@@ -268,12 +268,12 @@ check_html_structure
 echo ""
 echo "--- 翻译质量扫描 ---"
 
-# 翻译腔高频模式（从 shared/translationese-patterns.md 读取，与 translate-book/validate_format.sh 同源）
+# 翻译腔高频模式（从 shared/translationese-patterns.md 读取，三书共用本脚本）
 TRANSLATIONESE=$(python3 -c "
 import re, glob, os
 count = 0
 # 从共享文件读取模式；若文件不存在则使用硬编码后备列表
-shared_path = os.path.join('${SCRIPT_DIR}', '..', '..', 'shared', 'translationese-patterns.md')
+shared_path = os.path.join('${SCRIPT_DIR}', '..', 'translationese-patterns.md')
 patterns = []
 if os.path.exists(shared_path):
     for line in open(shared_path):

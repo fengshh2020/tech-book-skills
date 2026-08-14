@@ -1,13 +1,13 @@
 # 翻译规则
 
-单源模式的翻译纪律。MD 是信息主源——agent 只写 MD，HTML 由 builder 渲染，故下文不涉及手写 HTML。读 `shared/writing-core.md`（铁律 / 失败模式）；翻译腔禁用词表见 `shared/translationese-patterns.md`。
+translate-book 的翻译纪律。agent 只写 MD（不手写 HTML）。读 `../../shared/writing-core.md`（铁律 / 反 AI 腔）；翻译腔禁用词表见 `../../shared/translationese-patterns.md`；book 形态的 MD 作者约定（caption / 图注 / 组件）见 `../../shared/md-authoring.md`。
 
-## 解析源（Phase 0）
+## 解析源
 
 逐章实读前先把源结构解析清楚，不凭目录猜：
 - **EPUB**：解压 → `META-INF/container.xml` 找 OPF 路径 → `content.opf` 的 `spine` 定阅读顺序 → `toc.ncx`/`nav` 取目录 → 逐章实读。
 - **HTML**：解析结构与标题导航定章节边界。
-- **PDF（有文本层）**：`pdftotext`/`pymupdf` 提文本 + 页码 → 按 TOB/TOC 切章，页码留作引用。
+- **PDF（有文本层）**：`pdftotext`/`pymupdf` 提文本 + 页码 → 按 TOC 切章，页码留作引用。
 - 🛑 **扫描件 / 纯图片 PDF（无文本层）**：停下问用户——逐章实读做不到。两选：① 用户提供文本版（epub/html/md）；② 接受 OCR（代码/术语易错，须逐章人工校对，标 `[!caution] OCR]`）。不静默降级。
 - 🛑 **DRM 加密 / 无法解析**：停下告知用户，**不绕过 DRM**；建议提供无保护版本。
 - 记录书名、章节数、源路径、源指纹。不跳章。每章记阅读证据（精确段落数、代码块数、≥3 具体术语）。
@@ -21,16 +21,9 @@
 
 ## 术语
 
-**保留英文**：`class`/`def`/`return`/`True`/`None`/`import`/`self` 等关键字与内置名；`os`/`sys`/`asyncio` 等标准库模块；`HTTP`/`TCP`/`WebSocket` 协议名；`str`/`list[str]`/`Optional[int]` 类型注解；`python -m`/`pip install` 命令；`PATH`/`stdin`/`stdout` 系统概念。
+**保留英文**：`class`/`def`/`return`/`True`/`None` 等关键字与内置名；`os`/`sys`/`asyncio` 等标准库模块；`HTTP`/`TCP`/`WebSocket` 协议名；`str`/`list[str]`/`Optional[int]` 类型注解；`python -m`/`pip install` 命令；`PATH`/`stdin`/`stdout` 系统概念。
 
-**首现加注**：技术术语首次出现用通用中文译法 + 括号英文，其后统一中文。下表以 Python 为例（其它语言同理：保留语言关键字/标准库/协议名英文，首现加注通用中文译法）：
-
-| English | 中文 | English | 中文 |
-|---|---|---|---|
-| decorator 装饰器 | generator 生成器 | iterator 迭代器 | comprehension 推导式 |
-| context manager 上下文管理器 | metaclass 元类 | descriptor 描述符 | coroutine 协程 |
-| event loop 事件循环 | type hint 类型提示 | closure 闭包 | scope 作用域 |
-| namespace 命名空间 | dataclass 数据类 | duck typing 鸭子类型 | monkey patching 猴子补丁 |
+**首现加注**：技术术语首次出现用通用中文译法 + 括号英文（如 decorator 装饰器、generator 生成器、closure 闭包、event loop 事件循环），其后全书统一中文，不自造译名。其它语言同理：保留该语言的关键字 / 标准库 / 协议名英文。
 
 **永不翻译**：代码块内的变量名/函数名/输出串/异常文本（注释除外）、行内代码 `` `word` ``、文件名与路径、命令、人名/公司名/产品名、URL、书名（首现加注中文译法）。
 
@@ -38,8 +31,7 @@
 
 1. 逐字复制源码；`# 注释` 译为中文，输出与异常文本英文。
 2. 用 ` ```lang ` 围栏标注语言；围栏内是字面文本，不放内联标记（`**` 等会被原样显示）。
-3. 清单标题写在围栏信息串 `caption="Listing N: …"`（builder 渲染为 `.CodeListingCaption`），**不手写 HTML**。
-4. 代码清单编号**全书连续**——原书跳号或插入时重新连续编号。缩进 4 空格。
+3. 清单标题写在围栏信息串 `caption="Listing N: …"`，**不手写 HTML**。代码清单编号**全书连续**——原书跳号或插入时重新连续编号。缩进 4 空格。
 
 ## 格式红线
 
@@ -47,15 +39,11 @@
 - 中英文之间加空格（`Python 是`）；数字与中文之间加空格（`3 个`）；`第 N 章` 加空格。
 - 破折号用 `——`。强调（粗体/斜体/行内代码）与源对应，不丢失。
 
-## 红线清单（违反即翻译失败）
+## 红线清单（终检对照；每章自查同一组）
 
-- [ ] 每段都已翻译，无遗漏；段落数 源 = 目标，无合并/拆分
+- [ ] 每段都已翻译；段落数 源 = 目标，无合并/拆分
 - [ ] 代码块逐字保留（变量/函数/输出/异常英文），**注释已译为中文**
 - [ ] 术语首现带英文括注；同一英文全书同一中文译法；无自造术语
-- [ ] 强调标记（粗体/斜体/行内代码）全部保留
-- [ ] 无翻译腔 / AI 腔（对照 `shared/translationese-patterns.md`，目标 0 命中）
-- [ ] 中英文加空格、清单编号连续、交叉引用章号正确
-
-## 每章自检
-
-段落数匹配 ｜ 术语全书一致 ｜ 翻译腔/AI 腔 0 ｜ 注释已中文化 ｜ 输出 ≥ 源 80%（防缩减）。
+- [ ] 强调标记（粗体/斜体/行内代码）全部保留；清单编号连续、交叉引用章号正确
+- [ ] 无翻译腔 / AI 腔（对照 `../../shared/translationese-patterns.md`，目标 0 命中）
+- [ ] 输出 ≥ 源 80%（防缩减）

@@ -1,66 +1,77 @@
 ---
 name: review-tech-book
-description: "Use when reviewing, auditing, or assessing the quality of a technical book or learning doc (book/doc 形态) — any tech stack, even without the word 'review'. Default: report only; fix mode only on explicit request. Triggers: review book, 审阅这本书, 审阅书籍, 书籍审阅, quality review, 质量审阅, 检查这本书, review tech book, optimize issues, 修复这些问题. Do NOT trigger for: generating books (use generate-book), code review, API review, or **atomic notes**（原子笔记过轻——note 质量由 take-note 写作时按 writing-core 自检兜住，不走 16 维审阅）."
+description: "Use when reviewing, auditing, or assessing the quality of a technical book or learning doc (original or translated, book/doc 形态) — any tech stack, even without the word 'review'. Default: report only; fix mode only on explicit request. Triggers: review book, 审阅这本书, 审阅书籍, 书籍审阅, quality review, 质量审阅, 检查这本书, review tech book, optimize issues, 修复这些问题. Do NOT trigger for: generating books (use generate-book), translating (use translate-book), code review, API review, or atomic notes（原子笔记过轻——note 质量由 take-note 写作时自检兜住，不走多维审阅）."
 ---
 
 # 审阅技术书籍 / 文档
 
-结构化质量审阅。默认**仅出报告**；修复模式仅在用户明确请求时启用。任意技术栈通用。
+结构化质量审阅。默认**仅出报告**；修复模式仅在用户明确请求时启用。任意技术栈、原创或译作通用。
 
-**先读 `../shared/writing-core.md`**——铁律、证据等级 V1-V4、失败模式、校验工具都在那，本文件与各 reference 不再重述。审阅的铁律就是 writing-core 铁律在审阅侧的体现：**没有原文逐字引用 + 行号就没有发现；🔴/🟠 问题须 ≥V2 证据；不浅层均匀打分**。
+**先读 `../shared/writing-core.md`**——讲解质量三标准与反冗余红线就是审阅的尺子。审阅铁律：**没有原文逐字引用 + 行号就没有发现；技术错误级指控必须自己复核**（跑代码 / 查源码 / 查官方文档），复核不了的标「疑似」，不写死。
 
-## 启动前
+## 核心回路
 
-🛑 **向用户确认再开跑**——审阅对象（哪本书 / `output/` 目录路径）与范围（深度/标准/快速模式）：审阅耗时，对象搞错 = 白跑。模式无须问：默认仅报告；修复须用户显式开启且已有完整 `report.md`。**确认 OK 再进入阶段 1**。
+**通读全书（不跳章）→ 找真问题（原文 + 行号 + 类别 + 严重度）→ 出报告**
 
-## 工作流
+🛑 **开跑对齐走 `../shared/kickoff.md`**，决策：审阅对象、范围（深度 / 标准 / 快速）——对象搞错 = 白跑。模式无须问：默认仅报告；修复须用户显式开启且已有完整 `report.md`。发现统一记进**一个** `findings.md`（窗口外 scratchpad）。
+
+### 通读
+
+起步先读 `{RUN}/progress.md` 的结构决策与生产者自检记录（book-project 状态契约）——生产者标注过的薄弱点是先验地图，但不替代审阅者自己的通读与判断。第一轮略读**所有**章节（不跳过）标 🔴（需深读）；第二轮深读 🔴 章 + 首末章 + 代码密集章 + 核心概念章。跑校验（book 形态，要求 HTML；doc 形态跳过、模型自检）：
+
+```bash
+../shared/scripts/validate_code.sh output/    # 代码格式与编号 / 术语 / 断链 / 翻译腔AI腔；套件全表见 writing-core
+```
+
+**两种镜头分开跑，防互相遮蔽**：质量通读（讲解 / 冗余 / 叙事 / 腔调——文学式细读）与技术复核（P0——对抗式验证）是两种姿态，沉浸在文笔里会漏技术错误，专注复核 API 会漏叙事断裂。长书可按章分片并行审——子任务无共享上下文，每片喂全六类信号清单 + 发现格式；回传后合并去重再出报告。
+
+### 找真问题（六类；每类识别信号与正反例见 references/review-criteria.md）
+
+| 类别 | 严重度 |
+|---|---|
+| 技术错误（过时 API、不可运行代码、错误论断——须复核实锤） | P0 |
+| 讲解不足（跳步、定义先行无动机、代码贴了不讲、边界缺失） | P1 |
+| 冗余与装饰结构（同一知识点 / 代码多处讲；章前目标 / 章末小结 / 练习题） | P1 |
+| 叙事断裂（节间无衔接、知识点堆叠、列表替代讲解） | P2 |
+| 一致性（术语多译名、风格 / 深度 / 编号跳变、交叉引用断） | P2 |
+| 翻译腔 / AI 腔（对照词表；结构 tell 直接判） | P2 |
+
+**发现格式**（没有原文逐字引用 = 无效发现，不写）：
 
 ```
-P1 扫描 → P2 精读 → P3 打分 → P4 报告 → [修复模式，用户明确请求时]
-```
-
-每阶段进入前读对应 reference（按需读 = 上下文工程 Select），按其维度执行；阶段状态写 `findings/phaseN.md`（窗口外结构化记忆）；阶段结束按 writing-core 失败模式自检（假读 / 伪造校验 / 浅层均匀打分 / 推断当结论）。
-
-### 阶段 1：扫描
-读 `references/spec.md`（评分框架 + 输出模板）。批量扫结构/逻辑/代码密度/术语/翻译痕迹；定义目标读者；绘学习路径图；跑 `scripts/validate_code.sh output/`。输出 `findings/phase1.md`。
-
-### 阶段 2：精读
-读 `references/review-criteria.md`（反模式清单，对照识别问题）。**第一轮略读所有章节（不跳过）**，标 🔴（需深读）/轻微；每章证据：段落数+核心内容+≥3 术语。**第二轮深读**首轮 🔴 + 首章/末章/代码密集章/核心概念章。发现格式：
-
-```
-### [N]. [章节] [标题] [🔴/🟠/🟡]
+### [N]. [章节] [标题] [P0/P1/P2]
 - 位置：`ChX line NNN-NNN`
 - 原文：[逐字引用，不可改写]
 - 问题：[具体分析，非泛泛]
-- 证据：[V1/V2/V3/V4 + 验证方法]   ← 🔴/🟠 须 ≥V2
-- 影响：[对读者的具体影响]
+- 证据：[怎么复核的：跑了什么 / 查了什么；查不了标「疑似」]
 - 修复：[可操作步骤，非"改进一下"]
 ```
 
-没有直接引用 = 无效发现，不写。每 5 章批量检查（跨章术语一致、严重度/证据分布合理、去重）。输出 `findings/phase2.md`。
+### 抽查讲透度（审阅最重要的一步）
 
-### 阶段 3：打分
-读 `references/review-criteria.md`（五转化维度 + 工程实践标杆）。按 `references/spec.md` 十六维度（仅评有证据的）+ 五转化维度打分；标跨章节反模式。**禁均匀打分**（全打 3 或分数挤在中间档；spec.md 为 1-5 尺度）、禁无引用评分。输出 `findings/phase3.md`。
+每章抽 1-2 个核心知识点，按 writing-core 检验法判：读者读完能复述"是什么、为什么、什么时候用"吗？代码能说清每一段在干嘛吗？答不上 = P1，写明缺了链条的哪一环（动机 / 机制 / 示例 / 边界 / 走读）。
 
-### 阶段 4：报告
-读 `../shared/writing-core.md`（报告铁律）+ spec.md 报告模板。写 `report.md`：执行摘要、评分总览、Top3 优势/问题、学习路径+断点、问题分类、系统性问题、**可复利候选（→ wiki）**、修复批次（P0 技术错误 / P1 结构 / P2 风格翻译 / P3 参考体验）。**可复利候选**：系统性 + 跨书可复用的反模式/教训 → flag 为 wiki 候选；review **只 flag、不写库**，由 take-note INGEST（摘条进 `raw/`，非整份报告）。判据 + 模板见 `references/spec.md`，原理见 [ADR-0012](../docs/adr/0012-book-to-vault-handoff-via-take-note.md) / [ADR-0009](../docs/adr/0009-llm-wiki-paradigm-via-take-note.md)。跑自动校验并附结果（**book 形态**；**doc 形态无 HTML → 跳过 `validate_code.sh`**——它要求 HTML、doc 形态会 exit 1——仅跑 `validate_tech`/`validate_terms` + P1-P3 人工维度）：
-```bash
-scripts/validate_code.sh output/
-python ../shared/validate_tech.py output/
-python ../shared/validate_terms.py output/
-```
+### 出报告
 
-## 修复模式（仅用户明确请求）
+写 `report.md`：
 
-🛑 **进入修复前再确认**——修复改源 MD（`{RUN}/src/*.md`）并重建 HTML，是破坏性操作。读 `references/apply-fixes.md`。加载最新 `report.md` → 提取 P0→P3 → 逐批执行。**MD 是源**：改 `{RUN}/src/*.md`（非手改 HTML）→ 重新跑 `../generate-book/scripts/build_html.py` → 跑校验。翻译/整合/代码库问题按类别批量处理；发现新风险记 `fix-report.md`，不扩张范围。输出 `fix-report.md`。
+1. **总评**：一段话——适合谁、最大优势、最大问题、可用性结论（可用 / 修复后可用 / 需重写）。
+2. **系统性问题**：跨章模式（如"全书代码普遍无走读""每章末尾都有小结复述"）。
+3. **问题列表**：按 P0 → P1 → P2 排序，用上述发现格式。
+4. **修复批次建议**：P0 技术错误 / P1 讲解与结构 / P2 风格一致性。
 
-## 参考文件
+系统性、跨书可复用的教训 flag 给用户（可经 take-note 进 wiki）——review **只 flag、不写库**。
 
-| 文件 | 内容 | 阶段 |
-|---|---|---|
-| `../shared/writing-core.md` | 铁律 / V1-V4 / 失败模式 / 校验工具 | 全部 |
-| `references/spec.md` | 十六维度 + 五转化整合 + 报告模板 + 校验清单 | P1/P3/P4 |
-| `references/review-criteria.md` | 4 类反模式 + 五转化维度 + 教学理论 + 工程实践标杆 | P2/P3 |
-| `references/apply-fixes.md` | 修复模式：P0-P3 批次 + MD 源重建（非手改 HTML） | 修复 |
-| `../shared/translationese-patterns.md` | 翻译腔模式（`validate_code.sh` 读取） | P2 |
-| `../shared/validate_tech.py` / `../shared/validate_terms.py` | 技术准确性 / 术语一致性校验 | P4 |
+## 修复（用户明确请求时）
+
+🛑 **进入修复前再确认**——改源 MD 并重建是破坏性操作。修复是**工作区操作而非审阅者的模式**：分批顺序（P0→P1→P2）、MD 源纪律（改 `src/*.md` 不手改 HTML）、重建重校——全在 `../shared/book-project.md`「修复操作」节。
+
+## 参考文件（按需读，不全读）
+
+| 文件 | 适用 |
+|---|---|
+| `../shared/writing-core.md` | 全部（先读） |
+| `references/review-criteria.md` | 找问题：六类信号 + 正反例（分片子任务必喂） |
+| `../shared/translationese-patterns.md` | 腔调类 |
+| `../shared/book-project.md` | 通读起步 · 修复 |
+| `../shared/kickoff.md` | 开跑前 |

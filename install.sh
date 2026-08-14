@@ -5,7 +5,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS=(take-note generate-book review-tech-book research tech-proposal shared)   # shared/ 是 skill 的兄弟资源（无 SKILL.md，不被当 skill 加载）
+SKILLS=(take-note generate-book translate-book review-tech-book research tech-proposal shared)   # shared/ 是 skill 的兄弟资源（无 SKILL.md，不被当 skill 加载）
 
 AGENTS_DIR="${HOME}/.agents/skills"   # Codex CLI + OpenCode
 CLAUDE_DIR="${HOME}/.claude/skills"   # Claude Code（OpenCode 也扫这里）

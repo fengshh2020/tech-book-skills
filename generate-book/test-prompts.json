@@ -3,12 +3,24 @@
     "id": 1,
     "scenario": "多源 × book 形态",
     "prompt": "把这两本 Rust 入门书整合成一本中文书，输出到 run/rust-book/",
-    "expected": "检测多源 → L3/L4 整合（读者无法辨识来源）+ 反向覆盖；book 形态 → src/*.md + book.yml → builder → output/ HTML + output-md/；🛑 启动前确认；Coverage Guardian。"
+    "expected": "读透每源（能答方法论差异）→ 认知递进统一结构 → 融合到无法辨识来源（同一主题只主讲一次）→ book 形态走 ../shared/scripts/build_html.py；讲解质量三标准 + 反冗余红线全程生效；check_coverage 报告标记分布；🛑 启动前确认。"
   },
   {
     "id": 2,
     "scenario": "代码库 × doc 形态",
     "prompt": "给当前这个项目生成一份学习文档，就放在 proj/book.md 一个文件里",
-    "expected": "检测代码库 × doc 形态 → 就地单 MD、无 builder、轻量 gate；按执行路径叙事、每论断 file:line；不走 book 专属重量（20KB 下限 / Coverage Guardian / builder 产物验证）。"
+    "expected": "发现执行路径 → 沿路径叙事讲透（每论断 file:line、贴出的代码都走读）→ 就地单 MD、无 builder；不写章前目标/章末小结/练习题；结构够用就好，不搞过度目录设计。"
+  },
+  {
+    "id": 3,
+    "scenario": "讲解质量核心检验",
+    "prompt": "把这三本 Python 并发书整合成一本教程",
+    "expected": "抽节自检：读者合上书能复述知识点'是什么/为什么/什么时候用'、代码能说清每行在干嘛；同一知识点（如 GIL）只在最合适的位置讲透一次，其余处引用；不出现换角度复述。"
+  },
+  {
+    "id": 4,
+    "scenario": "路由负例：单本翻译",
+    "prompt": "把这本英文书翻译成中文",
+    "expected": "不触发 generate-book → 引导 translate-book（结构 1:1、不重新设计）。"
   }
 ]
